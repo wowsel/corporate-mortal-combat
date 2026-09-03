@@ -33,7 +33,7 @@ export function createAudio(assets: AssetStore): Audio {
         master.connect(ctx.destination);
       } catch { return null; }
     }
-    if (ctx.state === 'suspended') void ctx.resume();
+    if (ctx.state === 'suspended') void ctx.resume().catch(() => {});
     return ctx;
   }
 
@@ -85,6 +85,7 @@ export function createAudio(assets: AssetStore): Audio {
       const g1 = env(ac, o, 0.7 * g, 0.01, 1.6); env(ac, o2, 0.3 * g, 0.01, 1.2);
       g1.connect(delay); delay.connect(lp); lp.connect(fb); fb.connect(delay); lp.connect(master!);
       o.start(); o2.start(); o.stop(ac.currentTime + 2); o2.stop(ac.currentTime + 2);
+      setTimeout(() => { lp.disconnect(); fb.disconnect(); delay.disconnect(); }, 2500);
     },
     type: (ac, g) => { tone(ac, 'square', 2200, 2000, 0.015, 0.05 * g); },
     win: (ac, g) => {
@@ -101,6 +102,11 @@ export function createAudio(assets: AssetStore): Audio {
     lose: (ac, g) => { tone(ac, 'sawtooth', 220, 60, 1.2, 0.4 * g); },
   };
 
+  function playSfx(name: SoundName, gain: number) {
+    const ac = ensure(); if (!ac || !master || ac.state !== 'running') return;
+    try { sfx[name](ac, gain); } catch (e) { console.warn('sfx failed', name, e); }
+  }
+
   function playBuffer(buf: AudioBuffer, gainValue: number): { src: AudioBufferSourceNode; gain: GainNode } | null {
     const ac = ensure(); if (!ac || !master) return null;
     const src = ac.createBufferSource(); src.buffer = buf;
@@ -116,14 +122,11 @@ export function createAudio(assets: AssetStore): Audio {
       if (master && ctx) master.gain.setTargetAtTime(m ? 0 : 1, ctx.currentTime, 0.02);
     },
     unlock() { ensure(); },
-    play(name, gain = 1) {
-      const ac = ensure(); if (!ac || !master) return;
-      try { sfx[name](ac, gain); } catch (e) { console.warn('sfx failed', name, e); }
-    },
+    play(name, gain = 1) { playSfx(name, gain); },
     typeTick() {
       const now = performance.now();
       if (now - lastType < 35) return;
-      lastType = now; this.play('type');
+      lastType = now; playSfx('type', 1);
     },
     playVoice(id) {
       const buf = assets.getAudioBuffer(id);
@@ -132,10 +135,10 @@ export function createAudio(assets: AssetStore): Audio {
     playMusic(id) {
       if (music?.id === id) return;
       const buf = assets.getAudioBuffer(id);
+      if (!buf) return;
       const ac = ensure(); if (!ac) return;
       const old = music; music = null;
       if (old) { old.gain.gain.setTargetAtTime(0, ac.currentTime, 0.4); old.src.stop(ac.currentTime + 1.2); }
-      if (!buf) return;
       const started = playBuffer(buf, 0); if (!started) return;
       started.src.loop = true;
       started.gain.gain.setTargetAtTime(0.5, ac.currentTime, 0.4);
