@@ -101,7 +101,7 @@ git add -A && git commit -m "chore: tsx, env loader, public/assets layout"
 **Interfaces:**
 - Produces: `readManifest(path?): Manifest`, `writeManifest(m, path?): void`, `topoSort(entries): AssetEntry[]` (бросает при цикле или неизвестном id), `publicPath(entry): string` (= `public/assets/<file>`), `KIND_BUDGET_KB: Record<AssetKind, number>`.
 
-- [ ] **Step 1: Тест `test/manifest.test.ts`**
+- [ ] **Step 1: Тест `test/manifest.test.ts`** (заменяет минимальный тест этапа 1 целиком)
 
 ```ts
 import { existsSync, statSync } from 'node:fs';
@@ -715,10 +715,11 @@ async function main() {
   const touchedCharacters = new Set<string>();
 
   for (const e of todo) {
+    if (!e.prompt) { console.log(`skip ${e.id} (no prompt)`); continue; }
     console.log(`→ ${e.id}`);
     try {
       if (e.kind === 'music' || e.kind === 'voice') {
-        const r = await withRetry(() => generateAudio({ model: e.model, prompt: `${manifest.stylePrefix && e.kind === 'voice' ? '' : ''}${e.prompt}`, voice: e.voice, format: 'mp3' }, key));
+        const r = await withRetry(() => generateAudio({ model: e.model, prompt: e.prompt, voice: e.voice, format: 'mp3' }, key));
         toMp3IfNeeded(r.audio, r.format, publicPath(e));
         spent += r.cost ?? estimate(e);
         e.generated = true;
@@ -746,7 +747,7 @@ async function main() {
 main().catch(e => { console.error(e); process.exit(1); });
 ```
 
-Исправить строку с `prompt` для аудио: убрать бессмысленный тернарник, оставить `prompt: e.prompt`.
+Также: записи с пустым `prompt` пропускать с сообщением `skip (no prompt)` — это dev-заглушки, которые заполняются на следующих этапах.
 
 - [ ] **Step 2: `tools/check-assets.ts`**
 
