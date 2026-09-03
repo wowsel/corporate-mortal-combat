@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- `npm install --ignore-scripts`. Единственная новая dev-зависимость: `tsx`.
+- `npm install --ignore-scripts`. Новые dev-зависимости: `tsx`, `@types/node`.
 - Ключ только из `.env` в корне: `OPENROUTER_API_KEY=...`. Никогда не логировать ключ, не коммитить `.env`.
 - Сгенерированные файлы лежат в `public/assets/img/**` и `public/assets/audio/**`, в манифесте поле `file` — путь относительно `public/assets/`. Сырые PNG в `assets/raw/` (в `.gitignore`).
 - Хромакей спрайтов `#FF00FF`. Спрайты одного персонажа обрабатываются вместе: общий bbox, один холст 700×900, один якорь.
@@ -34,7 +34,9 @@
 
 - [ ] **Step 1: Зависимость и скрипты**
 
-Run: `npm install --ignore-scripts --save-dev tsx@^4`
+Run: `npm install --ignore-scripts --save-dev tsx@^4 @types/node@^24`
+
+В `tsconfig.json`: `"types": ["vite/client", "node"]`, `"lib": ["ES2023", "DOM", "DOM.Iterable"]` — иначе `process`, `Buffer` в `tools/*.ts` не типизированы и `npm run typecheck` падает (tools входят в `include`). При конфликте DOM/Node типов `fetch` полагаться на `skipLibCheck: true`.
 
 В `package.json` добавить в `scripts`:
 
@@ -79,7 +81,9 @@ export function requireKey(): string {
 }
 ```
 
-- [ ] **Step 4: `vite.config.ts` — `publicDir` по умолчанию `public`, ничего менять не надо; проверить, что `base: './'` остаётся.**
+- [ ] **Step 4: `vite.config.ts`**
+
+`publicDir` по умолчанию `public`, `base: './'` остаётся. Добавить `build: { target: 'es2022', outDir: 'dist', assetsDir: 'bundle' }`: иначе бандлы Vite (`index-<hash>.js`) окажутся в `dist/assets/` рядом с игровыми `public/assets/**`. Решение по логотипу: «CORPORATE MORTAL KOMBAT» остаётся HTML-заголовком из этапа 1, отдельной картинки нет; промпт `il_title` резервирует под него верхнюю треть.
 
 - [ ] **Step 5: Проверка и коммит**
 
@@ -96,7 +100,7 @@ git add -A && git commit -m "chore: tsx, env loader, public/assets layout"
 
 **Files:**
 - Create: `tools/manifest.ts`, `test/manifest.test.ts`
-- Modify: `src/types.ts` (поле `file` теперь относительно `public/assets/`; добавить `voice?: string`, `format?: string` для аудио — комментарии)
+- Modify: `src/types.ts` (поле `file` теперь относительно `public/assets/`; добавить `voice?: string`, `resolution?: '1K' | '2K'`)
 
 **Interfaces:**
 - Produces: `readManifest(path?): Manifest`, `writeManifest(m, path?): void`, `topoSort(entries): AssetEntry[]` (бросает при цикле или неизвестном id), `publicPath(entry): string` (= `public/assets/<file>`), `KIND_BUDGET_KB: Record<AssetKind, number>`.
@@ -134,7 +138,10 @@ describe('manifest', () => {
     expect(() => topoSort(manifest.entries)).not.toThrow();
     const ids = new Set(manifest.entries.map(e => e.id));
     for (const e of manifest.entries) {
-      for (const r of e.references ?? []) if (!r.includes('/')) expect(ids.has(r), `${e.id} → ${r}`).toBe(true);
+      for (const r of e.references ?? []) if (!r.includes('/')) {
+        expect(ids.has(r), `${e.id} → ${r}`).toBe(true);
+        expect(e.dependsOn ?? [], `${e.id}: reference ${r} must also be in dependsOn`).toContain(r);
+      }
     }
   });
   it('каждый id из контента есть в манифесте', () => {
@@ -283,13 +290,17 @@ const HEADERS = (key: string) => ({
   'X-Title': 'Corporate Mortal Kombat asset pipeline',
 });
 
+export class ApiError extends Error {
+  constructor(message: string, public readonly status: number) { super(message); }
+}
+
 export async function withRetry<T>(fn: () => Promise<T>, tries = 3): Promise<T> {
   let last: unknown;
   for (let i = 0; i < tries; i++) {
     try { return await fn(); } catch (e) {
       last = e;
-      const msg = String(e);
-      if (/40[013]/.test(msg)) break; // ключ/запрос неверны — не повторяем
+      // 400/401/402/403 — неверный запрос, ключ или нет средств: повтор бессмыслен
+      if (e instanceof ApiError && e.status >= 400 && e.status < 404) break;
       await new Promise(r => setTimeout(r, 2000 * (i + 1)));
     }
   }
@@ -313,23 +324,29 @@ export async function generateImage(req: ImageRequest, key: string): Promise<{ p
   if (req.seed !== undefined) body['seed'] = req.seed;
   if (req.references.length) body['input_references'] = req.references.map(url => ({ type: 'image_url', image_url: { url } }));
   const res = await fetch(`${BASE}/images`, { method: 'POST', headers: HEADERS(key), body: JSON.stringify(body) });
-  if (!res.ok) throw new Error(`images ${res.status}: ${(await res.text()).slice(0, 500)}`);
+  if (!res.ok) throw new ApiError(`images ${res.status}: ${(await res.text()).slice(0, 500)}`, res.status);
   const json = await res.json() as { data?: { b64_json?: string; media_type?: string }[]; usage?: { cost?: number } };
   const b64 = json.data?.[0]?.b64_json;
   if (!b64) throw new Error(`images: no b64_json in response: ${JSON.stringify(json).slice(0, 300)}`);
   return { png: Buffer.from(b64, 'base64'), cost: json.usage?.cost ?? null };
 }
 
-export interface AudioRequest { model: string; prompt: string; voice?: string; format: 'mp3' | 'wav' }
+export interface AudioRequest {
+  model: string; prompt: string;
+  voice?: string;            // голоса chat-completions-аудио OpenAI: alloy, ash, ballad, coral, echo, sage, shimmer, verse
+  format: 'mp3' | 'wav';
+  audioParams?: boolean;     // false — не посылать поле `audio` вовсе (для моделей, которые его отвергают)
+}
 
 export async function generateAudio(req: AudioRequest, key: string): Promise<{ audio: Buffer; format: string; cost: number | null }> {
-  const body = {
+  const body: Record<string, unknown> = {
     model: req.model, stream: true, modalities: ['text', 'audio'],
-    audio: { voice: req.voice ?? 'onyx', format: req.format },
     messages: [{ role: 'user', content: req.prompt }],
+    stream_options: { include_usage: true }, // без этого usage.cost в стриме не приходит
   };
+  if (req.audioParams !== false) body['audio'] = req.voice ? { voice: req.voice, format: req.format } : { format: req.format };
   const res = await fetch(`${BASE}/chat/completions`, { method: 'POST', headers: HEADERS(key), body: JSON.stringify(body) });
-  if (!res.ok || !res.body) throw new Error(`audio ${res.status}: ${(await res.text()).slice(0, 500)}`);
+  if (!res.ok || !res.body) throw new ApiError(`audio ${res.status}: ${(await res.text()).slice(0, 500)}`, res.status);
   const reader = res.body.getReader();
   const dec = new TextDecoder();
   let buf = '';
@@ -375,16 +392,17 @@ if (what === 'image') {
   const r = await generateImage({ model: 'bytedance-seed/seedream-5-0-pro', prompt: 'a red office stapler on a wooden desk, photorealistic, soft window light', aspectRatio: '1:1', resolution: '1K', references: [] }, key);
   writeFileSync('assets/raw/_smoke.png', r.png); console.log('image ok', r.png.length, 'bytes, cost', r.cost);
 } else if (what === 'voice') {
-  const r = await generateAudio({ model: 'openai/gpt-audio-mini', prompt: 'Say exactly, in a deep dramatic fighting-game announcer voice, nothing else: "FIGHT!"', voice: 'onyx', format: 'mp3' }, key);
+  const r = await generateAudio({ model: 'openai/gpt-audio-mini', prompt: 'Say exactly, in a deep dramatic fighting-game announcer voice, nothing else: "FIGHT!"', voice: 'ash', format: 'mp3' }, key);
   writeFileSync(`assets/raw/_smoke_voice.${r.format}`, r.audio); console.log('voice ok', r.audio.length, r.format, 'cost', r.cost);
 } else {
-  const r = await generateAudio({ model: 'google/lyria-3-clip-preview', prompt: 'Instrumental. Dark orchestral fighting-game theme with taiko drums and a ringing office telephone in the rhythm, 30 seconds, loopable.', format: 'mp3' }, key);
+  const withAudio = process.argv[3] !== 'noaudio';
+  const r = await generateAudio({ model: 'google/lyria-3-clip-preview', prompt: 'Instrumental. Dark orchestral fighting-game theme with taiko drums and a ringing office telephone in the rhythm, 30 seconds, loopable.', format: 'mp3', audioParams: withAudio }, key);
   writeFileSync(`assets/raw/_smoke_music.${r.format}`, r.audio); console.log('music ok', r.audio.length, r.format, 'cost', r.cost);
 }
 ```
 
 Run по очереди: `npx tsx tools/smoke.ts image`, `npx tsx tools/smoke.ts voice`, `npx tsx tools/smoke.ts music`.
-Expected: три файла в `assets/raw/`, открываются. Записать в README фактический формат аудио, который вернули gpt-audio-mini и Lyria (mp3 или wav), и стоимость. Если Lyria игнорирует `audio.format` и отдаёт wav — оставить как есть, конвертация в Task 5. Если Lyria отвергает поле `audio` (400) — убрать поле `audio` для моделей с `music` и повторить.
+Expected: три файла в `assets/raw/`, открываются. Записать в README фактический формат аудио, который вернули gpt-audio-mini и Lyria (mp3 или wav), и стоимость. Если Lyria игнорирует `audio.format` и отдаёт wav — нормально, конвертация в Task 5. Если Lyria отвергает поле `audio` (400) — повторить `npx tsx tools/smoke.ts music noaudio`; если так работает, в Task 5 для `kind: music` передавать `audioParams: false`. Голос диктора: `ash` (самый низкий из голосов chat-completions; `onyx` — голос другого, TTS-эндпоинта, и здесь даст 400). Модель диктора — `gpt-audio-mini` вместо `gpt-audio` из спеки: дешевле, качества для восьми слов хватает; это осознанное отклонение.
 
 - [ ] **Step 3: Коммит**
 
@@ -420,7 +438,7 @@ def make_sprite(path, box, color):
 def main():
     with tempfile.TemporaryDirectory() as d:
         a = os.path.join(d, 'a.png'); b = os.path.join(d, 'b.png')
-        make_sprite(a, (150, 200, 250, 560), (40, 60, 200))   # фигура пониже
+        make_sprite(a, (150, 200, 250, 560), (200, 40, 40))   # фигура пониже, «красный галстук»
         make_sprite(b, (120, 100, 280, 560), (40, 60, 200))   # фигура шире и выше
         out = os.path.join(d, 'out')
         res = subprocess.run([sys.executable, 'tools/postprocess.py', 'character', '--out-dir', out, '--size', '700x900',
@@ -438,9 +456,22 @@ def main():
             alpha = img.split()[3]
             bbox = alpha.getbbox(); return bbox[3]
         assert abs(bottom(ia) - bottom(ib)) <= 2, (bottom(ia), bottom(ib))
-        # despill: в фигуре нет розового
+        # despill не должен гасить красный: галстук остаётся красным
         r, g, bch, _ = ia.getpixel((350, 850))
-        assert not (r > 150 and bch > 150 and g < 100)
+        assert r > 170 and g < 90 and bch < 90, (r, g, bch)
+        # а настоящий маджентовый налёт — гасит
+        c = os.path.join(d, 'c.png'); make_sprite(c, (150, 200, 250, 560), (220, 40, 220))
+        outc = os.path.join(d, 'outc')
+        subprocess.run([sys.executable, 'tools/postprocess.py', 'character', '--out-dir', outc, '--size', '700x900',
+                        '--chroma', 'FF00FF', f'y_idle={c}'], capture_output=True, text=True, check=True)
+        ic = Image.open(os.path.join(outc, 'y_idle.webp')).convert('RGBA')
+        px = ic.getpixel((350, 850))
+        assert px[3] > 200, px                          # фигура не вырезана (расстояние до ключа велико по Y? нет — по CbCr она близка, см. ниже)
+        assert not (px[0] > 150 and px[2] > 150 and px[1] < 100), px  # но розовость подавлена
+        # ВНИМАНИЕ: фигура (220,40,220) по CbCr близка к ключу (dist ≈ 20 < near) и будет вырезана целиком —
+        # это корректное поведение хромакея, поэтому ассерт alpha > 200 выше НЕВЕРЕН. Заменить блок «маджентовый налёт»
+        # на фигуру (180,90,170) (dist ≈ 60 → alpha ≈ 0.2, частично прозрачна) и проверять только подавление розовости
+        # у пикселей с alpha > 0. Исполнитель: реализовать именно этот вариант, а не тот, что выше.
         # plain
         big = os.path.join(d, 'bg.png'); Image.new('RGB', (2048, 1536), (10, 20, 30)).save(big)
         outbg = os.path.join(d, 'bg.webp')
@@ -483,22 +514,32 @@ def rgb_to_ycbcr(arr):
     return y, cb, cr
 
 
-def chroma_key(img, key_rgb, near=28.0, far=70.0):
-    """Возвращает RGBA: маска по расстоянию в CbCr до ключа, мягкая кромка, despill."""
+def chroma_key(img, key_rgb, near=45.0, far=115.0):
+    """Возвращает RGBA: маска по расстоянию в CbCr до ключа, мягкая кромка, despill.
+
+    Расстояние в CbCr от чистой мадженты до нейтрального серого ≈ 136; near/far ≈ 1/3 и 5/6
+    от него, чтобы сглаженная кромка «50% фон + 50% субъект» (≈68) получила alpha ≈ 0.3, а не 0.95.
+    """
     arr = np.asarray(img.convert('RGB')).astype(np.float32)
     _, cb, cr = rgb_to_ycbcr(arr)
     kcb, kcr = rgb_to_ycbcr(np.array(key_rgb, dtype=np.float32).reshape(1, 1, 3))[1:]
     dist = np.sqrt((cb - kcb) ** 2 + (cr - kcr) ** 2)
     alpha = np.clip((dist - near) / (far - near), 0.0, 1.0)
-    # despill: канал ключа сжимаем к среднему двух других там, где он доминирует
     r, g, b = arr[..., 0], arr[..., 1], arr[..., 2]
     kr, kg, kb = key_rgb
-    if kr > 128 and kb > 128 and kg < 128:  # маджента: подавляем r и b относительно g
+    # despill только там, где цвет действительно «маджентовый» (оба канала ключа выше третьего);
+    # красный галстук (200,40,40) или твид (150,110,80) не трогаем: у них min(r,b) <= g → spill = 0
+    if kr > 128 and kb > 128 and kg < 128:
+        spill = np.clip((np.minimum(r, b) - g) / 60.0, 0.0, 1.0)
         lim = g + (np.maximum(r, b) - g) * 0.35
-        r = np.minimum(r, lim); b = np.minimum(b, lim)
-    elif kg > 128 and kr < 128:  # зелёный
+        r = r * (1 - spill) + np.minimum(r, lim) * spill
+        b = b * (1 - spill) + np.minimum(b, lim) * spill
+    elif kg > 128 and kr < 128:  # зелёный ключ
+        spill = np.clip((g - np.maximum(r, b)) / 60.0, 0.0, 1.0)
         lim = (r + b) / 2 + (g - (r + b) / 2) * 0.35
-        g = np.minimum(g, lim)
+        g = g * (1 - spill) + np.minimum(g, lim) * spill
+    # лёгкая эрозия + размытие альфы: убирает однопиксельную грязную кромку
+    alpha = np.clip((alpha - 0.06) / 0.94, 0.0, 1.0)
     out = np.stack([r, g, b, alpha * 255], axis=-1)
     rgba = Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), 'RGBA')
     a = rgba.split()[3].filter(ImageFilter.GaussianBlur(0.8))
@@ -529,7 +570,7 @@ def do_character(args):
     norm = []
     for aid, rgba, bbox in items:
         if rgba.size != base_size:
-            rgba = rgba.resize(base_size, Image.LANCZOS); bbox = alpha_bbox(rgba)
+            rgba = rgba.convert('RGBa').resize(base_size, Image.LANCZOS).convert('RGBA'); bbox = alpha_bbox(rgba)
         norm.append((aid, rgba, bbox))
     x0 = min(b[0] for _, _, b in norm); y0 = min(b[1] for _, _, b in norm)
     x1 = max(b[2] for _, _, b in norm); y1 = max(b[3] for _, _, b in norm)
@@ -543,9 +584,12 @@ def do_character(args):
     os.makedirs(args.out_dir, exist_ok=True)
     files = {}
     for aid, rgba, _ in norm:
-        crop = rgba.crop((x0, y0, x1, y1)).resize((nw, nh), Image.LANCZOS)
+        # ресайз в премультиплицированном режиме (RGBa): иначе LANCZOS подмешает в кромку
+        # тёмно-фиолетовый RGB прозрачных пикселей фона
+        crop = rgba.crop((x0, y0, x1, y1)).convert('RGBa').resize((nw, nh), Image.LANCZOS).convert('RGBA')
         canvas = Image.new('RGBA', (w, h), (0, 0, 0, 0))
-        canvas.paste(crop, (ox, oy), crop)
+        # alpha_composite, а не paste с маской: paste умножает RGB на альфу и даёт чёрный ореол
+        canvas.alpha_composite(crop, (ox, oy))
         out = os.path.join(args.out_dir, f'{aid}.webp')
         canvas.save(out, 'WEBP', quality=args.quality, method=6)
         files[aid] = out
@@ -614,8 +658,8 @@ git add tools/postprocess.py tools/postprocess_test.py && git commit -m "feat: c
 
 ```ts
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, writeFileSync, renameSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { existsSync, mkdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { basename, dirname, resolve } from 'node:path';
 import type { AssetEntry, Manifest } from '../src/types';
 import { requireKey } from './env';
 import { PUBLIC_ASSETS, RAW_DIR, publicPath, rawPath, readManifest, topoSort, writeManifest } from './manifest';
@@ -630,6 +674,8 @@ const force = flag('--force');
 const dryRun = flag('--dry-run');
 
 const PRICE = { img1k: 0.045, img2k: 0.09, ref: 0.003, music: 0.04, voice: 0.02 };
+// Выставить по результату smoke-теста Task 3: false, если Lyria отвергает поле `audio`
+const MUSIC_AUDIO_PARAMS = true;
 
 function aspectOf(size: [number, number] | undefined): string {
   if (!size) return '1:1';
@@ -687,13 +733,16 @@ function postprocessCharacter(character: string, manifest: Manifest): void {
   }
 }
 
-function toMp3IfNeeded(buf: Buffer, format: string, target: string): void {
+function toMp3(buf: Buffer, format: string, target: string, kind: 'music' | 'voice'): void {
+  // всегда через ffmpeg: нормализуем битрейт под бюджет (музыка 96k стерео, голос 64k моно)
   mkdirSync(dirname(target), { recursive: true });
-  if (format === 'mp3') { writeFileSync(target, buf); return; }
-  const tmp = `${target}.${format}.tmp`;
+  const tmp = resolve(RAW_DIR, `${basename(target)}.${format}.tmp`);
   writeFileSync(tmp, buf);
-  const r = spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', tmp, '-codec:a', 'libmp3lame', '-b:a', '96k', target]);
-  if (r.status !== 0) throw new Error(`ffmpeg failed: ${r.stderr?.toString()}`);
+  try {
+    const extra = kind === 'voice' ? ['-ac', '1', '-b:a', '64k'] : ['-b:a', '96k'];
+    const r = spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', tmp, '-codec:a', 'libmp3lame', ...extra, target]);
+    if (r.status !== 0) throw new Error(`ffmpeg failed: ${r.stderr?.toString()}`);
+  } finally { rmSync(tmp, { force: true }); }
 }
 
 async function main() {
@@ -702,6 +751,9 @@ async function main() {
   let todo = topoSort(manifest.entries).filter(e => (force || !e.generated));
   if (only) todo = todo.filter(e => only.includes(e.id));
   if (group) todo = todo.filter(e => e.group === group);
+  const noPrompt = todo.filter(e => !e.prompt.trim());
+  todo = todo.filter(e => e.prompt.trim().length > 0);
+  if (noPrompt.length) console.log(`skipped ${noPrompt.length} entries without prompt: ${noPrompt.map(e => e.id).join(', ')}`);
   if (!todo.length) { console.log('nothing to generate'); return; }
 
   const est = todo.reduce((s, e) => s + estimate(e), 0);
@@ -715,12 +767,19 @@ async function main() {
   const touchedCharacters = new Set<string>();
 
   for (const e of todo) {
-    if (!e.prompt) { console.log(`skip ${e.id} (no prompt)`); continue; }
+    // утверждённый raw не пересъёмываем без --force: иначе --group core снимет idle заново,
+    // и остальные позы получат другой референс, чем тот, что смотрели глазами
+    if (!force && existsSync(rawPath(e))) {
+      console.log(`  ${e.id}: raw exists, skip generation (use --force to redo)`);
+      if (e.kind === 'sprite' && e.character) touchedCharacters.add(e.character);
+      else if (e.kind !== 'music' && e.kind !== 'voice' && !e.generated) { postprocessPlain(e); e.generated = true; }
+      continue;
+    }
     console.log(`→ ${e.id}`);
     try {
       if (e.kind === 'music' || e.kind === 'voice') {
-        const r = await withRetry(() => generateAudio({ model: e.model, prompt: e.prompt, voice: e.voice, format: 'mp3' }, key));
-        toMp3IfNeeded(r.audio, r.format, publicPath(e));
+        const r = await withRetry(() => generateAudio({ model: e.model, prompt: e.prompt, voice: e.voice, format: 'mp3', audioParams: e.kind === 'music' ? MUSIC_AUDIO_PARAMS : true }, key));
+        toMp3(r.audio, r.format, publicPath(e), e.kind);
         spent += r.cost ?? estimate(e);
         e.generated = true;
       } else {
@@ -795,7 +854,7 @@ git add tools/gen-assets.ts tools/check-assets.ts && git commit -m "feat: asset 
 Photorealistic cinematic still, 35mm lens, shallow depth of field. Setting: a mundane modern corporate office of "Outworld Corp" that is decorated with skulls, dark iron trophies and bone ornaments as if they were normal office decor. Soft warm office lighting mixed with cold fluorescent panels, muted warm color grade, fine skin and fabric detail. Match the style, lighting and color grading of the reference image exactly. No text, no captions, no watermarks.
 ```
 
-- [ ] **Step 2: Описание героя (вставляется в каждый его промпт)**
+- [ ] **Step 2: Описание героя (вставляется целиком в каждый промпт, где он упомянут: портреты, спрайты, иллюстрации)**
 
 ```
 HERO: a slim man in his early 40s, curly dark brown hair, round wire-rim glasses, thin goatee, tired polite face; brown tweed three-piece suit with waistcoat, beige shirt, dark red striped tie, small "Employee of the Month" badge on the lapel. Same face and outfit as the man in the reference image.
@@ -814,7 +873,7 @@ HERO: a slim man in his early 40s, curly dark brown hair, round wire-rim glasses
 
 `chroma: "#FF00FF"`, `flip: false`. Если сгенерированный герой смотрит влево — поставить `flip: true` и пересобрать кроп без перегенерации.
 
-- [ ] **Step 4: Титул и концовки** (`kind: illustration`, 1600×900, `resolution: 2K`, references: постер из поста)
+- [ ] **Step 4: Титул и концовки** (`kind: illustration`, 1600×900, `resolution: 2K`, `references: ["assets/reference/post-hero-and-shao-kahn.png", "pt_hero_neutral"]`, `dependsOn: ["pt_hero_neutral"]` — иначе лицо героя на иллюстрациях не совпадёт со спрайтами). Блок HERO из Step 2 вставляется целиком и в промпты иллюстраций. В `manifest.json` не должно остаться плейсхолдеров вида `HERO:` без развёрнутого описания: генератор ничего не подставляет.
 
 | id | group | file | prompt |
 |----|-------|------|--------|
@@ -834,7 +893,7 @@ HERO: a slim man in his early 40s, curly dark brown hair, round wire-rim glasses
 | `mu_final` | rank5 | «Instrumental, loopable 30s. Final boss theme: heavy war drums, male choir chanting, dissonant brass, 120 BPM, relentless. No vocals with words.» |
 | `mu_ending` | endings | «Instrumental 30s. Triumphant yet slightly ironic orchestral fanfare resolving into a calm corporate-lounge piano outro. No vocals.» |
 
-- [ ] **Step 6: Диктор** (`kind: voice`, `model: openai/gpt-audio-mini`, `voice: onyx`, `duration: 2`, group `core`, `file: audio/<id>.mp3`)
+- [ ] **Step 6: Диктор** (`kind: voice`, `model: openai/gpt-audio-mini`, `voice: ash`, `duration: 2`, group `core`, `file: audio/<id>.mp3`)
 
 Промпт для каждого: `Say exactly the following phrase and nothing else, in the deep, slow, dramatic, slightly distorted voice of a 1990s arcade fighting-game announcer: "<PHRASE>"`.
 
@@ -856,7 +915,7 @@ HERO: a slim man in his early 40s, curly dark brown hair, round wire-rim glasses
 - [ ] **Step 8: Тесты и коммит**
 
 Run: `npm test -- manifest` (снять `it.todo`, если ставили в Task 2) и `npm run gen -- --dry-run`.
-Expected: тесты PASS; dry-run показывает ~21 запись к генерации и оценку около 1.6 $.
+Expected: тесты PASS; dry-run показывает 24 записи к генерации (6 картинок героя, 4 иллюстрации, 6 музыки, 8 реплик), dev-записи без промпта перечислены отдельной строкой `skipped`, оценка около 1.1 $.
 
 ```bash
 git add assets/manifest.json test/manifest.test.ts && git commit -m "feat: manifest with hero, title, endings, music and announcer prompts"
@@ -882,12 +941,12 @@ Run: `npm run gen -- --only sp_hero_idle`
 - [ ] **Step 3: Остальные позы и портрет worried**
 
 Run: `npm run gen -- --group core` (сгенерирует `pt_hero_worried`, `sp_hero_attack`, `sp_hero_hurt`, `sp_hero_win`, `il_title`, `mu_title`, `vo_*`; dev-записи без промптов пропускаются — добавить в `gen-assets.ts` пропуск записей с пустым `prompt` с сообщением `skip (no prompt)`).
-Затем `npm run assets:check`. Открыть четыре `hero_*.webp`: кромка без розовой каймы, все четыре стоят на одной линии, размер 700×900, `anchor` записан в манифест. Если у одной позы фигура обрезана по краю — перегенерировать эту позу `--only sp_hero_hurt --force`, кроп пересчитается автоматически (в `gen-assets.ts` кроп персонажа запускается, если тронута хоть одна поза).
+Утверждённые в Step 1–2 raw не пересъёмываются (генератор пропускает существующие raw без `--force`), кроп персонажа запускается, когда появились все четыре raw. Затем `npm run assets:check`. Открыть четыре `hero_*.webp`: кромка без розовой и без тёмной каймы, все четыре стоят на одной линии, размер 700×900, `anchor` записан в манифест. Если у одной позы фигура обрезана по краю — перегенерировать эту позу `--only sp_hero_hurt --force`, кроп пересчитается автоматически (в `gen-assets.ts` кроп персонажа запускается, если тронута хоть одна поза).
 
 - [ ] **Step 4: Концовки и остальная музыка**
 
 Run: `npm run gen -- --group endings` и `npm run gen -- --only mu_office,mu_battle,mu_council,mu_final`.
-Проверить, что все mp3 играют (`ffprobe public/assets/audio/mu_title.mp3`), длительность около 30 с, размер ≤ 400 КБ. Если больше — перекодировать: `ffmpeg -y -i in.mp3 -b:a 80k out.mp3`.
+Проверить, что все mp3 играют (`ffprobe public/assets/audio/mu_title.mp3`), длительность около 30 с, размер ≤ 400 КБ (96 кбит/с × 30 с ≈ 360 КБ). Если Lyria вернула клип длиннее 30 с и файл больше — обрезать: `ffmpeg -y -i in.mp3 -t 30 -b:a 96k out.mp3`.
 
 - [ ] **Step 5: Бюджет и тесты**
 
@@ -1021,11 +1080,11 @@ async function bufferFor(id: string): Promise<AudioBuffer | null> {
 ```
 
 `playVoice(id)`: `void bufferFor(id).then(b => { if (b) playBuffer(b, 0.9); })`.
-`playMusic(id)`: запоминает `wantedMusic = id`; после `await bufferFor(id)` проверяет, что `wantedMusic === id` (пользователь мог уйти на другой экран), затем делает fade-out старого и fade-in нового как раньше.
+`playMusic(id)`: в начале `if (wantedMusic === id) return; wantedMusic = id;` (ранний выход по желаемому треку, а не по `music?.id`, который до конца декода ещё не установлен — иначе два монтирования экрана запустят два источника); после `await bufferFor(id)` проверяет, что `wantedMusic === id` (пользователь мог уйти на другой экран), затем fade-out старого и fade-in нового. `stopMusic()` сбрасывает `wantedMusic = null`, чтобы повисший декод не включил музыку после ухода с экрана.
 
 - [ ] **Step 3: `src/screens/start.ts`**
 
-После загрузки групп: показать `il_title` фоном (уже есть), запустить `ctx.audio.playMusic('mu_title')` **после** клика (автоплей до жеста запрещён): кнопка «Начать карьеру» вызывает `unlock()`, затем `playVoice('vo_title')`, ждёт 1200 мс (`gsap.delayedCall` или `setTimeout`) и переходит в `event`. Музыка `mu_office` включится на экране события.
+После загрузки групп: показать `il_title` фоном (уже есть). Автоплей до жеста запрещён, поэтому первый `pointerdown` где угодно на титуле вызывает `unlock()` и `playMusic('mu_title')` (обработчик `{ once: true }`) — пользователь слышит тему, пока читает. Кнопка «Начать карьеру»: `playVoice('vo_title')`, пауза 1200 мс (`setTimeout`), затем `go('event')`, где включится `mu_office`. Убрать из кнопки вызов `playMusic('mu_title')`, добавленный на этапе 1.
 
 - [ ] **Step 4: Проверка**
 
@@ -1049,7 +1108,7 @@ git add -A && git commit -m "feat: real asset loader with groups, audio decoding
 
 - [ ] **Step 1: `scene.ts`**
 
-В `Fighter.setTextures(t, anchor)`:
+Расширить сигнатуру в трёх местах: `interface Scene.setFighter(who, textures, name, title, portrait, anchor?: [number, number] | null)`, реализация `setFighter` в `getScene()` передаёт `anchor` дальше: `(f as Fighter).setTextures(textures, anchor ?? null)`, и сам `Fighter.setTextures(t, anchor)`:
 
 ```ts
 const tex = t['idle'] ?? Texture.EMPTY;
@@ -1061,17 +1120,11 @@ else this.sprite.anchor.set(0.5, 1);
 
 - [ ] **Step 2: `battle.ts`**
 
-Передавать `ctx.assets.getAnchor('sp_hero_idle')` и `ctx.assets.getAnchor(boss.sprites.idle)` в `setFighter`. Использовать `pt_hero_neutral` для портрета героя в HUD (уже так).
+Перед `setBackground`/`setFighter` дождаться группы текущей ступени: `await ctx.assets.loadGroup(\`rank${state.rank}\` as AssetGroup); if (!alive) return;` — `getTexture` синхронный, и если префетч не успел, персонаж останется заглушкой на весь бой; `loadGroup` дедуплицирует промисы, так что после префетча это бесплатно. Передавать `ctx.assets.getAnchor('sp_hero_idle')` и `ctx.assets.getAnchor(boss.sprites.idle)` в `setFighter`. Использовать `pt_hero_neutral` для портрета героя в HUD (уже так).
 
 - [ ] **Step 3: `event.ts` — префетч**
 
-```ts
-const nextGroup = `rank${state.rank + 1}` as AssetGroup;
-if (state.rank + 1 < ctx.content.ranks.length) ctx.assets.prefetchGroup(nextGroup);
-if (state.rank >= 4) ctx.assets.prefetchGroup('endings');
-```
-
-Также портрет героя `pt_hero_worried` показывать в диалоге, когда `reaction` есть и стресс после выбора ≥ 60 — нет, это усложнение; **не делать**. Ограничиться префетчем.
+Убедиться, что префетч следующей ступени и `endings` уже стоит в `event.mount` (добавлен на этапе 1). Ничего не менять. Также добавить в `event.mount` перед рендером `await ctx.assets.loadGroup(\`rank${state.rank}\` as AssetGroup)` — иначе при переходе на новую ступень фон и портрет первого события могут отрисоваться заглушками, если префетч не успел.
 
 - [ ] **Step 4: Проверка в браузере**
 
