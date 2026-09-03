@@ -106,6 +106,7 @@ export function getScene(): Scene {
   const banners = new Container();
   const overlay = new Container();
   const vignette = new Graphics();
+  const frameMask = new Graphics();
   const hero = new Fighter(HERO_X, false);
   const boss = new Fighter(BOSS_X, true);
   const heroBar = new Bar(40, 500, false);
@@ -119,7 +120,6 @@ export function getScene(): Scene {
 
   shadows.ellipse(HERO_X, GROUND_Y + 6, 120, 18).fill({ color: 0x000000, alpha: 0.45 });
   shadows.ellipse(BOSS_X, GROUND_Y + 6, 150, 20).fill({ color: 0x000000, alpha: 0.45 });
-  vignette.rect(0, 0, W, H).fill({ color: 0x000000, alpha: 0 });
   vignette.rect(0, 0, W, 80).fill({ color: 0x000000, alpha: 0.35 });
   vignette.rect(0, H - 100, W, 100).fill({ color: 0x000000, alpha: 0.5 });
 
@@ -132,7 +132,11 @@ export function getScene(): Scene {
   heroPortrait.position.set(40 + 500 + 10, 24);
   bossPortrait.anchor.set(1, 0); bossPortrait.position.set(W - 40 - 500 - 10, 24);
   hud.addChild(heroBar.container, bossBar.container, heroPortrait, bossPortrait, timerText);
-  rootC.addChild(world, hud, banners, vignette, overlay);
+  frameMask.rect(0, 0, W, H).fill({ color: 0xffffff });
+  // виньетка под HUD, иначе она затемняет полоски, имена и таймер
+  rootC.addChild(world, vignette, hud, banners, overlay, frameMask);
+  // маска-ребёнок: следует за scale/position rootC и обрезает фон (×1.06) и камеру по «письму»
+  rootC.mask = frameMask;
 
   const fit = (container: HTMLElement) => {
     const w = container.clientWidth, h = container.clientHeight;
@@ -172,7 +176,7 @@ export function getScene(): Scene {
       for (const layer of [fx, banners, overlay]) {
         gsap.killTweensOf(layer.children);
         for (const c of layer.children) gsap.killTweensOf(c.scale);
-        layer.removeChildren().forEach(c => c.destroy());
+        layer.removeChildren().forEach(c => c.destroy({ children: true }));
       }
       if (resizeHandler) app.renderer.off('resize', resizeHandler);
       resizeHandler = null;
@@ -194,7 +198,7 @@ export function getScene(): Scene {
       const p = who === 'hero' ? heroPortrait : bossPortrait;
       p.texture = portrait; p.width = 56; p.height = 56;
     },
-    setBar(who, value, max, ms) { return (who === 'hero' ? heroBar : bossBar).set(value / max, ms); },
+    setBar(who, value, max, ms) { return (who === 'hero' ? heroBar : bossBar).set(value / (max || 1), ms); },
     camera: cameraTween,
     setTimeScale(v) { gsap.globalTimeline.timeScale(v); },
     fighterPoint(who) {

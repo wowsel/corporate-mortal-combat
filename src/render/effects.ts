@@ -94,7 +94,7 @@ export function speechLine(scene: Scene, text: string, style: 'bubble' | 'center
   c.alpha = 0;
   layer.addChild(c);
   gsap.to(c, { alpha: 1, y: c.y - 10, duration: 0.2 });
-  gsap.to(c, { alpha: 0, duration: 0.3, delay: isCenter ? 1.2 : 1.6, onComplete: () => { if (!c.destroyed) c.destroy(); } });
+  gsap.to(c, { alpha: 0, duration: 0.3, delay: isCenter ? 1.2 : 1.6, onComplete: () => { if (!c.destroyed) c.destroy({ children: true }); } });
 }
 
 export function dim(scene: Scene, to: number, ms: number): Promise<void> {
