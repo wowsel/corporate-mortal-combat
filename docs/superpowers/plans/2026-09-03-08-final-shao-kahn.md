@@ -12,10 +12,11 @@
 
 ## Global Constraints
 
-- Шао Кан: терпение 260, атака 16, слабость `agree`, иммунитет `data`, `final: true`, `events: []`. Единственный босс с `final: true`, он последний.
+- Шао Кан: терпение 190, атака 14, слабость `agree`, иммунитет `data`, `final: true`, `events: []`. Единственный босс с `final: true`, он последний. (Исходные 260/16 из первой версии спеки непроходимы: при лояльности 70 и стрессе 40 урон 41 → 7 ходов, босс за 6 ответов снимает ≈122 из 100.) Шанг Цунг на этапе 7 — 185/13 по той же причине.
+- Ориентир при тюнинге: `T = ceil(patience / round((10 + stat × 0.15) × 2))` ходов до победы; ожидаемый урон босса за ход `1.125 × (attack + stress × 0.05)`; игрок переживает `T − 1` ответов, поглощённый урон должен быть 60–90 из 100.
 - «Ударить» включается только после `FINISH HIM` (уже в движке); контент этого не трогает.
 - Все dev-записи (`src/content/ranks/dev.ts`, `bg_dev_throne`, `pt_dev2_*`, `sp_dev2_*`) удаляются на этом этапе.
-- Ориентир баланса при «правильной» стратегии (всегда слабость): победа над каждым боссом в 60–85% симуляций при статах, которые даёт честное прохождение; при случайной стратегии — 25–50%. Регулируются только `patience` и `attack` боссов.
+- Ориентир баланса при «правильной» стратегии (всегда слабость): каждый босс берётся с первого раза ≥ 60%, два последних — не более 95%; промоушен ≥ 50%. При случайной стратегии: промоушен ≤ 40%, первый босс ≥ 30%, последний ≤ 20%. Бой при слабости 3–9 ходов. Ранние боссы при правильной стратегии могут браться в 100% — это дизайн, не баг. Регулируются только `patience` и `attack` боссов.
 - Коммит после каждой задачи.
 
 ---
@@ -44,8 +45,8 @@ export const RANK_DEPUTY: Rank = {
     id: 'shao_kahn',
     name: 'Шао Кан',
     title: 'Генеральный директор Внешнего Мира',
-    patience: 260,
-    attack: 16,
+    patience: 190,
+    attack: 14,
     weakness: 'agree',
     immunity: 'data',
     final: true,
@@ -154,7 +155,7 @@ ${ending.epilogue ? `
   </div>` : ''}
 ```
 
-где `portraitStyle` возвращает `background-image:url(...)` или `background:${placeholderBg(id)}`. Стили:
+где `portraitStyle` возвращает `background-image:url(...)` или `background:${placeholderBg(id)}`. В начале `mount` добавить `await ctx.assets.loadGroup('endings');` — иллюстрация и портрет Джакса не мигают при Выгорании на ранге 0 (вызов идемпотентен). Текст эпилога вставлять через `textContent` созданного элемента, а не через шаблон `innerHTML`. Стили:
 
 ```css
 .epilogue { display: flex; gap: 14px; align-items: flex-start; margin-top: 12px; padding: 12px; border: 1px solid rgba(201,163,74,0.35); background: rgba(255,255,255,0.03); }
@@ -186,22 +187,26 @@ JAX: head of corporate security — a very tall broad Black man with a shaved he
 
 «A CEO's office that is half throne room: a black stone throne behind a huge dark wooden executive desk with three monitors and a nameplate; tall arched windows with red drapes overlooking a stormy city; wall of trophies — skulls, a shattered Earthrealm globe, framed quarterly charts; iron braziers next to a printer; a map poster with the single word OUTWORLD. Empty of people, dramatic warm side light, lower third free for UI.»
 
+Все новые записи: `model: "bytedance-seed/seedream-5-0-pro"`, `generated: false`, `group: "rank5"` (Джакс — `endings`), `file` без префикса `assets/`: `img/bg/throne_office.webp`, `img/portraits/shao_neutral.webp`, `img/portraits/shao_angry.webp`, `img/sprites/shao_<pose>.webp`, `img/portraits/jax_neutral.webp`. Блоки SHAO KAHN и JAX вставляются в промпты целиком. Поле `references` обязательно — генератор берёт референсы только из него, `dependsOn` задаёт лишь порядок.
+
 - [ ] **Step 2: Портреты Шао Кана** (`pt_shao_neutral`, `pt_shao_angry`, 512×512, character `shao_kahn`)
+
+`pt_shao_neutral`: `references: ["assets/reference/post-hero-and-shao-kahn.png"]`. `pt_shao_angry`: `references: ["assets/reference/post-hero-and-shao-kahn.png", "pt_shao_neutral"]`, `dependsOn: ["pt_shao_neutral"]`.
 
 neutral: «Head-and-shoulders portrait of SHAO KAHN looking down at camera with imperial contempt, helmet on, red eyes glowing softly; blurred throne office behind.» angry (`dependsOn: pt_shao_neutral`): «Same figure and framing; roaring, mouth open showing teeth, eyes blazing red, cape flaring.»
 
 - [ ] **Step 3: Спрайты Шао Кана** (700×900, `character: shao_kahn`, chroma `#FF00FF`, `flip: false`, файлы `img/sprites/shao_<pose>.webp`)
 
-| id | dependsOn | prompt |
-|----|-----------|--------|
-| `sp_shao_idle` | `pt_shao_neutral` | «Full body head to boots, SHAO KAHN standing wide-legged with arms crossed, three-quarter view facing LEFT, a laser pointer in one huge fist. Isolated on a flat uniform solid magenta background (#FF00FF), no floor, no shadow, even studio light from the right. **Cape kept close to the body.**» |
-| `sp_shao_attack` | `sp_shao_idle` | «Same figure as the reference sprite. SHAO KAHN lunging LEFT, slamming a giant fist down onto an invisible desk, papers exploding, mouth open in a roar. Same magenta background, same scale.» |
-| `sp_shao_hurt` | `sp_shao_idle` | «Same figure. SHAO KAHN staggering back to the RIGHT, one hand to the helmet, cape swinging, surprised anger. Same magenta background, same scale.» |
-| `sp_shao_defeated` | `sp_shao_idle` | «Same figure. SHAO KAHN on one knee, head bowed, one hand on the floor, the other holding out a signed contract; helmet slightly tilted. Same magenta background, same scale.» |
+| id | dependsOn | references | prompt |
+|----|-----------|------------|--------|
+| `sp_shao_idle` | `pt_shao_neutral` | стиль + `pt_shao_neutral` | «Full body head to boots, SHAO KAHN standing wide-legged with arms crossed, three-quarter view facing LEFT, a laser pointer in one huge fist. Isolated on a flat uniform solid magenta background (#FF00FF), no floor, no shadow, even studio light from the right. **Cape kept close to the body.**» |
+| `sp_shao_attack` | `sp_shao_idle` | стиль + `pt_shao_neutral` + `sp_shao_idle` | «Same figure as the reference sprite. SHAO KAHN lunging LEFT, slamming a giant fist down onto an invisible desk, papers exploding, mouth open in a roar. Same magenta background, same scale.» |
+| `sp_shao_hurt` | `sp_shao_idle` | стиль + `pt_shao_neutral` + `sp_shao_idle` | «Same figure. SHAO KAHN staggering back to the RIGHT, one hand to the helmet, cape swinging, surprised anger. Same magenta background, same scale.» |
+| `sp_shao_defeated` | `sp_shao_idle` | стиль + `pt_shao_neutral` + `sp_shao_idle` | «Same figure. SHAO KAHN on one knee, head bowed, one hand on the floor, the other holding out a signed contract; helmet slightly tilted. Same magenta background, same scale.» |
 
 - [ ] **Step 4: Джакс** (`pt_jax_neutral`, group `endings`, 512×512, character `jax`)
 
-«Head-and-shoulders portrait of JAX in a dim office corridor lit by an emergency light, looking at camera with a tired, unimpressed expression, one chrome hand raised in a “come with me” gesture.»
+`references: ["assets/reference/post-hero-and-shao-kahn.png"]`. «Head-and-shoulders portrait of JAX in a dim office corridor lit by an emergency light, looking at camera with a tired, unimpressed expression, one chrome hand raised in a “come with me” gesture.»
 
 - [ ] **Step 5: Удалить dev-записи** (`bg_dev_throne`, `pt_dev2_neutral`, `pt_dev2_angry`, `sp_dev2_*`).
 
@@ -234,7 +239,7 @@ git add -A && git commit -m "assets(final): throne office, Shao Kahn, Jax"
 - Create: `tools/simulate.ts`, `test/balance.test.ts`
 
 **Interfaces:**
-- `simulateRun(ranks, strategy, rng): { reachedRank: number; ending: EndingId; turnsPerBoss: number[]; defeats: number }` — чистая функция поверх `state.ts` и `battle.ts`: для каждой ступени выбирает варианты событий по стратегии (`'first' | 'random' | 'best'`), потом бьётся выбранной боевой стратегией (`'weakness' | 'random' | 'neutral'`) до победы или Выгорания.
+- `simulateRun(ranks, ev, fs, rng): { ending: EndingId; firstTry: boolean[]; turns: number[]; stressAtBoss: number[]; defeats: number; reachedRank: number }` — чистая функция поверх `state.ts` и `battle.ts`: для каждой ступени выбирает варианты событий по стратегии (`'first' | 'random' | 'best'`), потом бьётся выбранной боевой стратегией (`'weakness' | 'random' | 'neutral'`) до победы или Выгорания.
 - CLI `npx tsx tools/simulate.ts [runs=500]` печатает таблицу: босс → доля побед с первого раза, средние ходы, средний стресс на входе.
 
 - [ ] **Step 1: `tools/simulate.ts`**
@@ -243,7 +248,8 @@ git add -A && git commit -m "assets(final): throne office, Shao Kahn, Jax"
 import { availableMoves, createBattle, resolveTurn } from '../src/battle';
 import { CONTENT } from '../src/content';
 import { afterBattle, applyChoice, checkEnding, createInitialState, currentEvent, visibleChoices } from '../src/state';
-import type { Boss, EndingId, GameState, Rank } from '../src/types';
+import { pathToFileURL } from 'node:url';
+import type { Boss, EndingId, GameState, Rank, Stats } from '../src/types';
 
 export type EventStrategy = 'first' | 'random' | 'best';
 export type FightStrategy = 'weakness' | 'random' | 'neutral';
@@ -258,7 +264,7 @@ function pickChoice(state: GameState, choices: ReturnType<typeof visibleChoices>
   if (strat === 'random') return choices[Math.floor(rng() * choices.length)]!;
   // best: максимизируем сумму позитивных статов минус стресс
   return [...choices].sort((a, b) => score(b.effects) - score(a.effects))[0]!;
-  function score(e?: Partial<Record<string, number>>) { if (!e) return 0; return (e['loyalty'] ?? 0) + (e['reputation'] ?? 0) + (e['competence'] ?? 0) - 2 * (e['stress'] ?? 0); }
+  function score(e?: Partial<Stats>) { if (!e) return 0; return (e.loyalty ?? 0) + (e.reputation ?? 0) + (e.competence ?? 0) - 2 * (e.stress ?? 0); }
 }
 
 function fight(state: GameState, boss: Boss, strat: FightStrategy, rng: () => number): { outcome: 'win' | 'lose'; turns: number } {
@@ -297,7 +303,7 @@ export function simulateRun(ranks: Rank[], ev: EventStrategy, fs: FightStrategy,
     const end: EndingId | null = checkEnding(s, ranks);
     if (end) return { ending: end, firstTry, turns, stressAtBoss, defeats, reachedRank: s.rank };
   }
-  return { ending: 'burnout' as EndingId, firstTry, turns, stressAtBoss, defeats, reachedRank: s.rank };
+  throw new Error(`simulateRun: no ending after 200 steps (rank ${s.rank}, stress ${s.stats.stress})`);
 }
 
 export function summarize(ranks: Rank[], ev: EventStrategy, fs: FightStrategy, runs: number) {
@@ -307,7 +313,12 @@ export function summarize(ranks: Rank[], ev: EventStrategy, fs: FightStrategy, r
   for (let i = 0; i < runs; i++) {
     const r = simulateRun(ranks, ev, fs, rng);
     if (r.ending === 'promotion') promotions++;
-    r.firstTry.forEach((w, k) => { tries[k]!++; if (w) wins[k]!++; turnSum[k]! += r.turns[k]!; stressSum[k]! += r.stressAtBoss[k]!; });
+    r.firstTry.forEach((w, k) => {
+      const t = r.turns[k], st = r.stressAtBoss[k];
+      if (t === undefined || st === undefined) throw new Error(`bookkeeping mismatch at rank ${k}`);
+      tries[k] = (tries[k] ?? 0) + 1; if (w) wins[k] = (wins[k] ?? 0) + 1;
+      turnSum[k] = (turnSum[k] ?? 0) + t; stressSum[k] = (stressSum[k] ?? 0) + st;
+    });
   }
   return {
     promotionRate: promotions / runs,
@@ -315,7 +326,7 @@ export function summarize(ranks: Rank[], ev: EventStrategy, fs: FightStrategy, r
   };
 }
 
-if (process.argv[1]?.endsWith('simulate.ts')) {
+if (pathToFileURL(process.argv[1] ?? '').href === import.meta.url) {
   const runs = Number(process.argv[2] ?? 500);
   for (const [ev, fs] of [['best', 'weakness'], ['random', 'random'], ['first', 'neutral']] as const) {
     const s = summarize(CONTENT.ranks, ev, fs, runs);
@@ -333,19 +344,24 @@ import { CONTENT } from '../src/content';
 import { summarize } from '../tools/simulate';
 
 describe('balance', () => {
-  it('при правильной стратегии каждый босс берётся с первого раза в 60–95%, промоушен ≥ 50%', () => {
+  const n = CONTENT.ranks.length;
+  it('правильная стратегия: каждый босс ≥ 60% с первого раза, два последних ≤ 95%, промоушен ≥ 50%', () => {
     const s = summarize(CONTENT.ranks, 'best', 'weakness', 300);
-    for (const b of s.bosses) { expect(b.firstTryWin, b.boss).toBeGreaterThanOrEqual(0.6); expect(b.firstTryWin, b.boss).toBeLessThanOrEqual(0.95); }
+    s.bosses.forEach((b, k) => {
+      expect(b.firstTryWin, b.boss).toBeGreaterThanOrEqual(0.6);
+      if (k >= n - 2) expect(b.firstTryWin, b.boss).toBeLessThanOrEqual(0.95); // ранние боссы могут браться в 100% — это дизайн
+    });
     expect(s.promotionRate).toBeGreaterThanOrEqual(0.5);
   });
-  it('при случайной стратегии игра не тривиальна: промоушен ≤ 40%, но первый босс берётся ≥ 30%', () => {
+  it('случайная стратегия: промоушен ≤ 40%, первый босс ≥ 30%, последний ≤ 20%', () => {
     const s = summarize(CONTENT.ranks, 'random', 'random', 300);
     expect(s.promotionRate).toBeLessThanOrEqual(0.4);
     expect(s.bosses[0]!.firstTryWin).toBeGreaterThanOrEqual(0.3);
+    expect(s.bosses[n - 1]!.firstTryWin).toBeLessThanOrEqual(0.2);
   });
-  it('бой при слабости длится 4–9 ходов', () => {
+  it('бой при слабости длится 3–9 ходов', () => {
     const s = summarize(CONTENT.ranks, 'best', 'weakness', 300);
-    for (const b of s.bosses) { expect(b.avgTurns, b.boss).toBeGreaterThanOrEqual(4); expect(b.avgTurns, b.boss).toBeLessThanOrEqual(9); }
+    for (const b of s.bosses) { expect(b.avgTurns, b.boss).toBeGreaterThanOrEqual(3); expect(b.avgTurns, b.boss).toBeLessThanOrEqual(9); }
   });
 });
 ```
@@ -353,7 +369,7 @@ describe('balance', () => {
 - [ ] **Step 3: Прогон и тюнинг**
 
 Run: `npx tsx tools/simulate.ts 1000`
-Если тест красный — менять только `patience` и `attack` конкретного босса в его файле ступени (шаг 10 терпения / 1 атаки), повторять до зелёного. Записать финальную таблицу боссов в README (раздел «Баланс») и обновить таблицу в спеке, если числа изменились.
+Если тест красный — менять только `patience` и `attack` конкретного босса в его файле ступени, ориентируясь на формулы из Global Constraints (сначала считать `T` и поглощённый урон, потом менять), повторять до зелёного. Намёк на слабость Шао Кана даёт его `intro` («кто с ним согласен», «не интересуют цифры») — тест `content.test.ts` проверяет `boss.intro` у ступени без событий; плюс последнее событие ступени 4 должно упоминать, что император любит согласных. Записать финальную таблицу боссов в README (раздел «Баланс») и обновить таблицу в спеке, если числа изменились.
 
 ```bash
 git add -A && git commit -m "test: balance simulation across the whole ladder"
@@ -409,7 +425,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    environment: { name: github-pages, url: ${{ steps.deployment.outputs.page_url }} }
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
@@ -417,8 +435,7 @@ jobs:
 
 - [ ] **Step 2: Проверка сборки локально**
 
-Run: `npm run build && npx vite preview`
-Открыть превью, пройти первую ступень: ассеты грузятся по относительным путям (`base: './'`), звук работает.
+Run: `npm run build && (cd .. && python3 -m http.server 8080)` и открыть `http://localhost:8080/corporate-mortal-combat/dist/` — это имитирует подпуть GitHub Pages, чего `vite preview` не делает. Проверить: `public/assets/**` попали в `dist/assets/**`, бандлы в `dist/bundle/`, картинки и звук грузятся, первая ступень проходится.
 
 - [ ] **Step 3: Репозиторий и Pages**
 
