@@ -97,7 +97,7 @@ export function createBattleScreen(): Screen {
             case 'dim': await dim(scene, s.to, s.ms); break;
             case 'grayscale': await grayscale(scene, s.to, s.ms); break;
             case 'timeScale': scene.setTimeScale(s.to); break;
-            case 'wait': await wait(s.ms); break;
+            case 'wait': await wait(scene, s.ms); break;
             default: { const never: never = s; void never; break; }
           }
         }

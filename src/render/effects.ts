@@ -3,26 +3,49 @@ import { ColorMatrixFilter, Container, FillGradient, Graphics, Text, TextStyle }
 import { GlowFilter } from 'pixi-filters';
 import { H, W, type Scene } from './scene';
 
-const wait = (ms: number) => new Promise<void>(res => { gsap.delayedCall(ms / 1000, res); });
+type Settle = { onComplete: () => void; onInterrupt: () => void };
 
-export function flash(scene: Scene, color: string, ms: number): Promise<void> {
+/**
+ * Создаёт твин через `make`, регистрирует его в реестре сцены и ждёт завершения.
+ * Резолвится `true` при нормальном завершении и `false`, если твин убили в `scene.unmount()`.
+ * Все эффекты, чей промис ждёт контроллер боя, обязаны идти через эту обёртку:
+ * иначе после unmount промис не разрешится и цикл шагов зависнет навсегда.
+ */
+function settle(scene: Scene, make: (cb: Settle) => gsap.core.Tween): Promise<boolean> {
+  return new Promise<boolean>(res => {
+    let done = false;
+    const finish = (ok: boolean) => { if (!done) { done = true; res(ok); } };
+    scene.track(make({ onComplete: () => finish(true), onInterrupt: () => finish(false) }));
+  });
+}
+
+/** Пауза на прокси-твине (а не delayedCall): её тоже надо убивать при unmount. */
+function delay(scene: Scene, ms: number): Promise<boolean> {
+  const st = { v: 0 };
+  return settle(scene, cb => gsap.to(st, { v: 1, duration: ms / 1000, ease: 'none', ...cb }));
+}
+
+async function wait(scene: Scene, ms: number): Promise<void> { await delay(scene, ms); }
+
+export async function flash(scene: Scene, color: string, ms: number): Promise<void> {
   const g = new Graphics().rect(0, 0, W, H).fill({ color });
   g.alpha = 0.85;
   scene.layers.overlay.addChild(g);
-  return new Promise(res => gsap.to(g, { alpha: 0, duration: ms / 1000, ease: 'power1.out', onComplete: () => { g.destroy(); res(); } }));
+  await settle(scene, cb => gsap.to(g, { alpha: 0, duration: ms / 1000, ease: 'power1.out', ...cb }));
+  if (!g.destroyed) g.destroy();
 }
 
-export function shake(scene: Scene, amp: number, ms: number): Promise<void> {
+export async function shake(scene: Scene, amp: number, ms: number): Promise<void> {
   const w = scene.layers.world;
   const ox = W / 2, oy = H / 2;
   const st = { p: 0 }; // прокси вместо this.progress(): под strict `this` в onUpdate не типизирован
-  return new Promise(res => {
-    gsap.to(st, {
-      p: 1, duration: ms / 1000, ease: 'none',
-      onUpdate: () => { const k = 1 - st.p; w.position.set(ox + (Math.random() * 2 - 1) * amp * k, oy + (Math.random() * 2 - 1) * amp * k); },
-      onComplete: () => { w.position.set(ox, oy); res(); },
-    });
-  });
+  // прокси не является целью killTweensOf(world) — без реестра твин продолжал бы дёргать сцену после unmount
+  await settle(scene, cb => gsap.to(st, {
+    p: 1, duration: ms / 1000, ease: 'none',
+    onUpdate: () => { const k = 1 - st.p; w.position.set(ox + (Math.random() * 2 - 1) * amp * k, oy + (Math.random() * 2 - 1) * amp * k); },
+    ...cb,
+  }));
+  w.position.set(ox, oy);
 }
 
 export function particles(scene: Scene, at: 'hero' | 'boss' | 'screen', kind: 'paper' | 'sparks' | 'confetti'): void {
@@ -71,10 +94,13 @@ export async function banner(scene: Scene, text: string): Promise<void> {
   t.anchor.set(0.5); t.position.set(W / 2, H / 2 - 40);
   t.filters = [new GlowFilter({ distance: 24, outerStrength: 2.5, color: 0xffc94d })];
   scene.layers.banners.addChild(t);
-  await new Promise<void>(res => gsap.fromTo(t.scale, { x: 3, y: 3 }, { x: 1, y: 1, duration: 0.25, ease: 'power3.out', onComplete: res }));
+  const drop = () => { if (!t.destroyed) t.destroy(); };
+  // после unmount ни один следующий шаг баннера не должен создавать новых твинов
+  if (!(await settle(scene, cb => gsap.fromTo(t.scale, { x: 3, y: 3 }, { x: 1, y: 1, duration: 0.25, ease: 'power3.out', ...cb })))) return drop();
   void shake(scene, 6, 200);
-  await wait(900);
-  await new Promise<void>(res => gsap.to(t, { alpha: 0, duration: 0.3, onComplete: () => { if (!t.destroyed) t.destroy(); res(); } }));
+  if (!(await delay(scene, 900))) return drop();
+  await settle(scene, cb => gsap.to(t, { alpha: 0, duration: 0.3, ...cb }));
+  drop();
 }
 
 export function speechLine(scene: Scene, text: string, style: 'bubble' | 'center'): void {
@@ -101,7 +127,8 @@ export function dim(scene: Scene, to: number, ms: number): Promise<void> {
   const layer = scene.layers.overlay;
   let g = layer.getChildByLabel('dim') as Graphics | null;
   if (!g) { g = new Graphics().rect(0, 0, W, H).fill({ color: 0x000000 }); g.label = 'dim'; g.alpha = 0; layer.addChildAt(g, 0); }
-  return new Promise(res => gsap.to(g!, { alpha: to, duration: ms / 1000, onComplete: res }));
+  const target = g;
+  return settle(scene, cb => gsap.to(target, { alpha: to, duration: ms / 1000, ...cb })).then(() => {});
 }
 
 export function grayscale(scene: Scene, to: number, ms: number): Promise<void> {
@@ -111,7 +138,9 @@ export function grayscale(scene: Scene, to: number, ms: number): Promise<void> {
   let f = (root.filters as ColorMatrixFilter[] | null)?.find(x => x instanceof ColorMatrixFilter);
   if (!f) { f = new ColorMatrixFilter(); root.filters = [f]; }
   const state = { v: 0 };
-  return new Promise(res => gsap.to(state, { v: to, duration: ms / 1000, onUpdate: () => { f!.reset(); f!.saturate(-state.v, false); }, onComplete: res }));
+  const filter = f;
+  // прокси state вне killTweensOf: без реестра фильтр продолжал бы обновляться после unmount
+  return settle(scene, cb => gsap.to(state, { v: to, duration: ms / 1000, onUpdate: () => { filter.reset(); filter.saturate(-state.v, false); }, ...cb })).then(() => {});
 }
 
 export { wait };

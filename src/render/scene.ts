@@ -14,12 +14,14 @@ export interface FighterView {
   moveTo(dx: number, ms: number): Promise<void>;
 }
 
+type Track = (t: gsap.core.Tween | gsap.core.Timeline) => void;
+
 class Fighter implements FighterView {
   container = new Container();
   private sprite = new Sprite(Texture.EMPTY);
   private textures: Record<string, Texture> = {};
   private breath: gsap.core.Tween | null = null;
-  constructor(public readonly baseX: number, private readonly flip: boolean) {
+  constructor(public readonly baseX: number, private readonly flip: boolean, private readonly track: Track) {
     this.sprite.anchor.set(0.5, 1);
     this.container.addChild(this.sprite);
     this.container.position.set(baseX, GROUND_Y);
@@ -36,10 +38,12 @@ class Fighter implements FighterView {
   }
   setPose(pose: string) { this.sprite.texture = this.textures[pose] ?? this.textures['idle'] ?? Texture.EMPTY; }
   moveTo(dx: number, ms: number) {
-    return new Promise<void>(res => { gsap.to(this.container, { x: this.baseX + dx, duration: ms / 1000, ease: 'power2.out', onComplete: res }); });
+    // onInterrupt: при unmount твин убивают — промис обязан разрешиться, иначе шаг хореографии зависнет навсегда
+    return new Promise<void>(res => {
+      this.track(gsap.to(this.container, { x: this.baseX + dx, duration: ms / 1000, ease: 'power2.out', onComplete: res, onInterrupt: res }));
+    });
   }
   stopBreath() { this.breath?.kill(); this.breath = null; }
-  destroy() { this.stopBreath(); this.container.destroy({ children: true }); }
 }
 
 class Bar {
@@ -50,7 +54,7 @@ class Bar {
   private nameText: Text;
   private titleText: Text;
   private value = 1; private ghostValue = 1;
-  constructor(private readonly x: number, private readonly width: number, private readonly rtl: boolean) {
+  constructor(private readonly x: number, private readonly width: number, private readonly rtl: boolean, private readonly track: Track) {
     this.frame.rect(0, 0, width, 26).fill({ color: 0x111111 }).stroke({ color: 0xc9a34a, width: 2 });
     this.nameText = new Text({ text: '', style: new TextStyle({ fontFamily: 'Impact, Arial Black, sans-serif', fontSize: 20, fill: 0xf1e6c8, letterSpacing: 1 }) });
     this.titleText = new Text({ text: '', style: new TextStyle({ fontFamily: 'sans-serif', fontSize: 12, fill: 0x9a927f }) });
@@ -70,8 +74,8 @@ class Bar {
   set(v: number, ms: number): Promise<void> {
     const target = Math.max(0, Math.min(1, v));
     return new Promise(res => {
-      gsap.to(this, { value: target, duration: ms / 1000, ease: 'power2.out', onUpdate: () => this.redraw(), onComplete: res });
-      gsap.to(this, { ghostValue: target, duration: (ms + 600) / 1000, delay: 0.15, ease: 'power1.out', onUpdate: () => this.redraw() });
+      this.track(gsap.to(this, { value: target, duration: ms / 1000, ease: 'power2.out', onUpdate: () => this.redraw(), onComplete: res, onInterrupt: res }));
+      this.track(gsap.to(this, { ghostValue: target, duration: (ms + 600) / 1000, delay: 0.15, ease: 'power1.out', onUpdate: () => this.redraw() }));
     });
   }
 }
@@ -85,6 +89,12 @@ export interface Scene {
   setBar(who: 'hero' | 'boss', value: number, max: number, ms: number): Promise<void>;
   camera(zoom: number, ms: number): Promise<void>;
   setTimeScale(v: number): void;
+  /**
+   * Реестр твинов сцены: всё, что зарегистрировано, убивается в unmount.
+   * Твины, чей промис ждёт хореография, обязаны отдавать `onInterrupt` рядом с `onComplete` —
+   * иначе после unmount промис не разрешится и цикл шагов зависнет.
+   */
+  track(t: gsap.core.Tween | gsap.core.Timeline): void;
   layers: { root: Container; world: Container; fx: Container; banners: Container; overlay: Container };
   readonly app: Application;
   fighterPoint(who: 'hero' | 'boss'): { x: number; y: number };
@@ -107,10 +117,16 @@ export function getScene(): Scene {
   const overlay = new Container();
   const vignette = new Graphics();
   const frameMask = new Graphics();
-  const hero = new Fighter(HERO_X, false);
-  const boss = new Fighter(BOSS_X, true);
-  const heroBar = new Bar(40, 500, false);
-  const bossBar = new Bar(W - 40 - 500, 500, true);
+  const tracked = new Set<gsap.core.Tween | gsap.core.Timeline>();
+  const track: Track = t => {
+    // подчистка завершённых: реестр живёт от mount до unmount, за бой в него попадают сотни твинов
+    for (const x of tracked) if (x.progress() === 1 && !x.isActive()) tracked.delete(x);
+    tracked.add(t);
+  };
+  const hero = new Fighter(HERO_X, false, track);
+  const boss = new Fighter(BOSS_X, true, track);
+  const heroBar = new Bar(40, 500, false, track);
+  const bossBar = new Bar(W - 40 - 500, 500, true, track);
   const heroPortrait = new Sprite(Texture.EMPTY);
   const bossPortrait = new Sprite(Texture.EMPTY);
   const timerText = new Text({ text: '99', style: new TextStyle({ fontFamily: 'Impact, Arial Black, sans-serif', fontSize: 44, fill: 0xf1e6c8 }) });
@@ -146,8 +162,8 @@ export function getScene(): Scene {
   };
 
   const cameraTween = (zoom: number, ms: number) => new Promise<void>(res => {
-    gsap.to(world.scale, { x: zoom, y: zoom, duration: ms / 1000, ease: 'power2.out', onComplete: res });
-    gsap.to(bg, { x: W / 2 - (zoom - 1) * 40, duration: ms / 1000, ease: 'power2.out' });
+    track(gsap.to(world.scale, { x: zoom, y: zoom, duration: ms / 1000, ease: 'power2.out', onComplete: res, onInterrupt: res }));
+    track(gsap.to(bg, { x: W / 2 - (zoom - 1) * 40, duration: ms / 1000, ease: 'power2.out' }));
   });
 
   instance = {
@@ -170,13 +186,16 @@ export function getScene(): Scene {
     },
     unmount() {
       gsap.globalTimeline.timeScale(1);
+      // сначала реестр: kill() зовёт onInterrupt, промисы шагов разрешаются и цикл в battle-экране выходит по !alive
+      for (const t of tracked) t.kill();
+      tracked.clear();
       gsap.killTweensOf([world, world.scale, bg, hero.container, boss.container, heroBar, bossBar]);
       (hero as Fighter).stopBreath(); (boss as Fighter).stopBreath();
       // убить твины эффектов до уничтожения их объектов, иначе onComplete вызовет destroy() повторно
       for (const layer of [fx, banners, overlay]) {
         gsap.killTweensOf(layer.children);
         for (const c of layer.children) gsap.killTweensOf(c.scale);
-        layer.removeChildren().forEach(c => c.destroy({ children: true }));
+        layer.removeChildren().forEach(c => { if (!c.destroyed) c.destroy({ children: true }); });
       }
       if (resizeHandler) app.renderer.off('resize', resizeHandler);
       resizeHandler = null;
@@ -201,6 +220,7 @@ export function getScene(): Scene {
     setBar(who, value, max, ms) { return (who === 'hero' ? heroBar : bossBar).set(value / (max || 1), ms); },
     camera: cameraTween,
     setTimeScale(v) { gsap.globalTimeline.timeScale(v); },
+    track,
     fighterPoint(who) {
       const f = who === 'hero' ? hero : boss;
       return { x: f.container.x, y: f.container.y - 260 };
@@ -210,6 +230,7 @@ export function getScene(): Scene {
       timer?.kill();
       const t = { v: 99 }; // прокси-объект: `this.progress()` в onUpdate не компилируется под strict
       timer = gsap.to(t, { v: 0, duration: 99, ease: 'none', onUpdate: () => { const v = Math.max(0, Math.ceil(t.v)); if (v !== last) { last = v; timerText.text = String(v); } } });
+      track(timer);
     },
     stopTimer() { timer?.kill(); timer = null; },
   };
