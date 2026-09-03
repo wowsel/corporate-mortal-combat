@@ -1,0 +1,15 @@
+:root {
+  --bg: #0b0a0c;
+  --panel: rgba(20, 16, 18, 0.92);
+  --gold: #c9a34a;
+  --blood: #8b1e1e;
+  --text: #e8e2d6;
+  --muted: #9a927f;
+  --font-ui: "Segoe UI", system-ui, sans-serif;
+  --font-display: Impact, "Arial Black", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-ui); }
+#app { position: fixed; inset: 0; overflow: hidden; }
+button { font: inherit; cursor: pointer; }
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; }
