@@ -25,7 +25,7 @@ export function createEventScreen(): Screen {
       const bg = ctx.assets.getImageUrl(rank.background);
       el.innerHTML = `
         <div class="hud-slot"></div>
-        <div class="vn-stage" style="${bg ? `background-image:url(${bg})` : `background:${placeholderBg(rank.background)}`}">
+        <div class="vn-stage" style="${bg ? `background-image:url('${bg}')` : `background:${placeholderBg(rank.background)}`}">
           <div class="vn-portrait"></div>
           <div class="vn-dialog">
             <div class="vn-name"></div>
@@ -50,7 +50,7 @@ export function createEventScreen(): Screen {
 
       const setPortrait = (id: string) => {
         const url = ctx.assets.getImageUrl(id);
-        portrait.style.background = url ? `url(${url}) center/cover no-repeat` : placeholderBg(id);
+        portrait.style.background = url ? `url('${url}') center/cover no-repeat` : placeholderBg(id);
         portrait.dataset.id = id;
         portrait.classList.remove('bump'); void portrait.offsetWidth; portrait.classList.add('bump');
       };
@@ -85,7 +85,7 @@ export function createEventScreen(): Screen {
         choicesEl.classList.add('show');
         let picked = false;
         keyHandler = e => {
-          if (e.ctrlKey || e.metaKey || e.altKey) return;
+          if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
           if (picked) return;
           const n = Number(e.key);
           if (n >= 1 && n <= list.length) { picked = true; pick(event, list[n - 1]!); }

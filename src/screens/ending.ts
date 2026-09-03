@@ -12,7 +12,7 @@ export function createEndingScreen(): Screen {
       el.className = `screen ending ending-${id}`;
       const art = ctx.assets.getImageUrl(ending.illustration);
       el.innerHTML = `
-        <div class="ending-art" style="${art ? `background-image:url(${art})` : `background:${placeholderBg(ending.illustration)}`}"></div>
+        <div class="ending-art" style="${art ? `background-image:url('${art}')` : `background:${placeholderBg(ending.illustration)}`}"></div>
         <div class="ending-panel">
           <h1>${ending.title}</h1>
           <p>${ending.text}</p>

@@ -1,8 +1,8 @@
 .hud { display: flex; align-items: center; gap: 24px; padding: 10px 18px; background: linear-gradient(180deg, rgba(0,0,0,0.85), rgba(0,0,0,0.55)); border-bottom: 1px solid rgba(201,163,74,0.35); z-index: 5; }
 .hud-title { font-family: var(--font-display); font-size: 20px; letter-spacing: 1px; color: var(--gold); }
 .hud-week { font-size: 12px; color: var(--muted); }
-.hud-stats { display: flex; gap: 18px; flex: 1; }
-.hud-stat { position: relative; display: grid; grid-template-columns: 110px 1fr 32px; align-items: center; gap: 8px; font-size: 12px; min-width: 220px; }
+.hud-stats { display: flex; flex-wrap: wrap; gap: 8px 18px; flex: 1; min-width: 0; }
+.hud-stat { position: relative; display: grid; grid-template-columns: 100px 1fr 28px; align-items: center; gap: 8px; font-size: 12px; flex: 1 1 160px; min-width: 160px; }
 .hud-bar { height: 10px; background: #222; border: 1px solid #444; }
 .hud-fill { height: 100%; background: linear-gradient(90deg, #7a5a1e, var(--gold)); transition: width 400ms ease; }
 .hud-stat[data-key="stress"] .hud-fill { background: linear-gradient(90deg, #5a1010, var(--blood)); }
@@ -10,4 +10,4 @@
 .hud-pop { position: absolute; right: 0; top: -14px; font-weight: bold; animation: hud-pop 900ms ease-out forwards; }
 .hud-pop.up { color: #7fc97f; } .hud-pop.down { color: #e06060; }
 @keyframes hud-pop { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-18px); } }
-.hud-mute { background: transparent; border: 1px solid #555; color: var(--text); padding: 4px 8px; }
+.hud-mute { flex: 0 0 auto; background: transparent; border: 1px solid #555; color: var(--text); padding: 4px 8px; }

@@ -1,6 +1,17 @@
 import { Texture } from 'pixi.js';
 import type { AssetGroup, Manifest } from './types';
 
+/**
+ * Контракт хранилища ассетов. На этапе 1 это заглушка, но реальный загрузчик этапа 2
+ * обязан вести себя ровно так — экраны написаны в расчёте на эти гарантии:
+ * - `loadGroup` никогда не реджектится: сбой отдельного ассета логируется и заменяется заглушкой;
+ *   `onProgress` вызывается монотонно и всегда заканчивается ровно на 1;
+ * - `prefetchGroup` — fire-and-forget: не бросает, ничего не возвращает, ошибки глотает;
+ * - `getTexture` никогда не возвращает null: для незагруженного id отдаётся текстура-заглушка;
+ * - `getImageUrl` возвращает null, если картинки нет, иначе URL, безопасный для подстановки
+ *   в CSS `url('…')` (без кавычек, скобок и переводов строк внутри);
+ * - `getAudioBuffer` возвращает null, если звука нет.
+ */
 export interface AssetStore {
   loadGroup(group: AssetGroup, onProgress?: (p: number) => void): Promise<void>;
   prefetchGroup(group: AssetGroup): void;
