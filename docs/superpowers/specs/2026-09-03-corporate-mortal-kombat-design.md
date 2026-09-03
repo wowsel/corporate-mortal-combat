@@ -25,7 +25,9 @@
 
 - **Vite + TypeScript**, строгий режим. Сборка `vite build` в `dist/`.
 - **PixiJS 8** — рендер экрана боя: сценограф, спрайты, контейнеры-слои,
-  фильтры (серый экран при поражении, свечение баннеров), тикер, авто-dpr.
+  тикер, авто-dpr. `ColorMatrixFilter` из ядра для серого экрана,
+  `GlowFilter` из пакета `pixi-filters` для баннеров — единственная
+  дополнительная зависимость рендера.
 - **GSAP** — твины и таймлайны хореографии боя.
 - **Vitest** — тесты чистой логики и данных.
 - Экраны старта, событий, результата и концовок — HTML/CSS, без Pixi.
@@ -48,20 +50,19 @@
 | `index.html` | Корневой контейнер, подключение `src/main.ts` |
 | `src/main.ts` | Точка входа: валидирует контент, создаёт `ctx`, монтирует стартовый экран |
 | `src/styles/*.css` | Базовые стили, HUD, экраны событий/старта/результата/концовок |
-| `src/types.ts` | Типы: `GameState`, `Stats`, `Rank`, `GameEvent`, `Choice`, `Boss`, `Move`, `BattleState`, `TurnResult`, `AssetEntry` |
+| `src/types.ts` | Типы: `GameState`, `Stats`, `Rank`, `GameEvent`, `Choice`, `Boss`, `Move`, `MoveId`, `HeroPose`, `BossPose`, `BattleState`, `TurnResult`, `Step`, `SoundName`, `AssetEntry` |
 | `src/state.ts` | Чистые функции состояния: `createInitialState`, `applyChoice`, `advance`, `afterBattle`, `checkEnding`, `visibleChoices`, `currentEvent` |
 | `src/battle.ts` | Чистая боевая формула: `createBattle`, `moveDamage`, `bossDamage`, `resolveTurn`, `availableMoves` |
 | `src/choreo.ts` | Чистая функция: `TurnResult` → декларативный список шагов анимации с длительностями |
 | `src/engine.ts` | Роутер экранов: `go(screen)`, монтирует/демонтирует, единственный владелец `state` |
 | `src/screens/start.ts` | Титульный экран, прогресс загрузки, разблокировка звука |
 | `src/screens/event.ts` | Визуальная новелла: фон, портрет, печатание, карточки, реакция |
-| `src/screens/battle.ts` | Контроллер боя: фазы, ввод, исполняет шаги хореографии через `scene` и `audio` |
-| `src/screens/result.ts` | Панель исхода поверх канваса, изменение статов, «Дальше» |
+| `src/screens/battle.ts` | Контроллер боя: фазы, ввод, исполняет шаги хореографии через `scene` и `audio`, в фазе `over` показывает панель результата |
 | `src/screens/ending.ts` | Иллюстрация, текст, «Начать карьеру заново» |
 | `src/hud.ts` | HUD статов для событий и результата, анимация изменений |
 | `src/render/scene.ts` | Pixi-приложение: слои, камера, спрайты бойцов, полоски, таймер, `timeScale` |
 | `src/render/effects.ts` | Тряска, вспышка, партиклы, летящие цифры, баннеры, виньетка, slow-mo |
-| `src/audio.ts` | Web Audio: синтез звуков, mute в `localStorage` |
+| `src/audio.ts` | Web Audio: синтез эффектов, декодирование и зацикливание музыки с кроссфейдом, реплики диктора, mute в `localStorage` |
 | `src/assets.ts` | Загрузчик по манифесту: `loadGroup`, `prefetchGroup`, заглушки |
 | `src/content/index.ts` | Собирает `RANKS`, экспортирует `MOVES`, `STRIKE_MOVE`, `ENDINGS` |
 | `src/content/schema.ts` | `validateContent(ranks, manifest): string[]` |
@@ -69,7 +70,7 @@
 | `assets/manifest.json` | Все ассеты: id, группа, файл, размер, якорь, промпт, референсы, зависимости |
 | `assets/img/**` | Сгенерированные WebP |
 | `assets/reference/` | Референсы стиля |
-| `tools/gen-assets.ts` | Генерация недостающих картинок из манифеста |
+| `tools/gen-assets.ts` | Генерация недостающих ассетов из манифеста: картинки через Image API, музыка и голос через chat completions с аудио-выводом |
 | `tools/postprocess.py` | Хромакей с despill, групповой кроп поз, ресайз, WebP |
 | `tools/check-assets.ts` | Отчёт: какие записи манифеста ещё не сгенерированы |
 | `test/*.test.ts` | Тесты `state`, `battle`, `choreo`, `schema`, манифеста |
@@ -80,16 +81,22 @@ Pixi и GSAP и покрываются тестами. Экраны и ренд�
 ## Экраны и движок
 
 `engine.ts` хранит `state` и текущий экран. Каждый экран реализует
-`{ mount(root: HTMLElement, ctx: Ctx): void; unmount(): void }`, где
-`ctx = { state, content, assets, audio, go, setState }`. Переход `go(name)`
-вызывает `unmount` старого и `mount` нового. Никакой игровой логики в
-`engine.ts` нет, только маршрутизация и владение состоянием.
+`{ mount(root: HTMLElement, ctx: Ctx): Promise<void>; unmount(): void }`,
+где `ctx = { getState, setState, content, assets, audio, go }`. Переход
+`go(name)` вызывает `unmount` старого, ждёт `mount` нового (бой инициализирует
+Pixi асинхронно). Никакой игровой логики в `engine.ts` нет, только
+маршрутизация и владение состоянием. Данные между экранами передаются только
+через `GameState`.
 
 ```
-start → event ⇄ battle → result → event | ending
-                                     ↓
-                                  restart → start
+start → event ⇄ battle → event | ending
+                            ↓
+                     restart → start
 ```
+
+Экрана «результат» в роутере нет: панель исхода — часть экрана боя, она
+появляется в оверлее поверх канваса, когда отыгран баннер, и её кнопка
+«Дальше» вызывает `go('event')` или `go('ending')`.
 
 - **start** — титульный арт (герой и Шао Кан пожимают руки), логотип
   «CORPORATE MORTAL KOMBAT» в стиле драконьей эмблемы с офисным зажимом для
@@ -103,12 +110,10 @@ start → event ⇄ battle → result → event | ending
   спрайты, партиклы, полоски, таймер, баннеры, виньетка. В оверлее: карточки
   приёмов с тултипом, кнопка mute, панель результата. Координаты мыши на
   канвасе не нужны.
-- **result** — панель в оверлее боя: баннер исхода уже отыгран на канвасе,
-  панель показывает изменение статов и кнопку «Дальше».
 - **ending** — иллюстрация, заголовок, текст, кнопка «Начать карьеру заново».
 
-HUD (event, result): должность, неделя, четыре стата полосками с анимацией и
-всплывающими `+10`/`−5`.
+HUD (событие и панель результата): должность, неделя, четыре стата
+полосками с анимацией и всплывающими `+10`/`−5`.
 
 ## Состояние игры
 
@@ -120,6 +125,7 @@ interface GameState {
   stats: Stats;              // loyalty, reputation, competence, stress: 0..100
   flags: Set<string>;
   seenEvents: Set<string>;   // источник признака «повтор события»
+  lastBattle: { bossId: string; outcome: 'win' | 'lose' | 'fatality' } | null;
 }
 ```
 
@@ -135,15 +141,16 @@ interface GameState {
 - `applyChoice(state, event, choice)`: `setFlag` ставится всегда; из `effects`
   при повторе события (`seenEvents.has(event.id)`) применяется только
   `stress`; событие добавляется в `seenEvents`; `step += 1`; `week += 1`.
-- `afterBattle(state, outcome)`: победа — `stress −10`, если босс не финальный
-  `rank += 1`, `step = 0`; поражение — `stress +25`, `step = 0`, ранг не
-  меняется. `week += 1` в обоих случаях. Победа над финальным боссом ранг не
-  меняет: концовку определяет `checkEnding`.
-- `checkEnding(state, ranks, lastBattle?)` возвращает `'burnout'`, если
-  `stress >= 100`; `'fatality'`, если `lastBattle.outcome === 'fatality'`;
-  `'promotion'`, если `lastBattle.outcome === 'win'` и босс финальный; иначе
-  `null`. Вызывается из экранов `event` и `result` после каждого перехода.
-  Внутри `applyChoice` и `resolveTurn` концовки не проверяются.
+- `afterBattle(state, boss, outcome)`: записывает `lastBattle`. Победа —
+  `stress −10`, если босс не финальный `rank += 1`, `step = 0`; поражение —
+  `stress +25`, `step = 0`, ранг не меняется; fatality — статы и ранг не
+  меняются. `week += 1` во всех случаях.
+- `checkEnding(state, ranks)` возвращает `'burnout'`, если `stress >= 100`;
+  `'fatality'`, если `lastBattle?.outcome === 'fatality'`; `'promotion'`, если
+  `lastBattle?.outcome === 'win'` и босс с `lastBattle.bossId` финальный;
+  иначе `null`. Вызывается экраном события после выбора и экраном боя после
+  `afterBattle`. `applyChoice` сбрасывает `lastBattle` в `null`. Внутри
+  `applyChoice` и `resolveTurn` концовки не проверяются.
 
 ## Статы
 
@@ -217,8 +224,12 @@ interface TurnResult {
 }
 ```
 
-`createBattle(boss)` заполняет `BattleState`. `resolveTurn(battle, move,
-stats, boss, rng = Math.random)`: приём `strike` → `outcome: 'fatality'`,
+`createBattle(boss)` заполняет `BattleState`. `availableMoves(boss, battle)`
+возвращает `{ move, enabled }[]`: четыре базовых приёма всегда включены,
+`strike` присутствует только у финального босса и включён только при
+`battle.finishHim`. `resolveTurn(battle, move, stats, boss, rng =
+Math.random)`: приём `strike` допустим только когда `availableMoves` его
+включает, иначе бросает ошибку; допустимый `strike` → `outcome: 'fatality'`,
 `boss: null`. Иначе урон игрока; если `patience ≤ 0` → `'win'`, босс не
 отвечает. Иначе ответ босса; если `confidence ≤ 0` → `'lose'`, иначе
 `'continue'`. `lineIndex` для реплик выбирается через `rng`, чтобы контроллер
@@ -277,25 +288,32 @@ interface Boss {
 `choreo.ts` превращает `TurnResult` в список шагов:
 
 ```ts
+type HeroPose = 'idle' | 'attack' | 'hurt' | 'win';
+type BossPose = 'idle' | 'attack' | 'hurt' | 'defeated';
 type Step =
-  | { t: 'pose'; who: 'hero' | 'boss'; pose: Pose }
-  | { t: 'move'; who: 'hero' | 'boss'; dx: number; ms: number }
-  | { t: 'camera'; zoom: number; ms: number }
+  | { t: 'pose'; who: 'hero'; pose: HeroPose }
+  | { t: 'pose'; who: 'boss'; pose: BossPose }
+  | { t: 'move'; who: 'hero' | 'boss'; dx: number; ms: number }   // dx относительно базовой позиции, 0 = вернуться
+  | { t: 'camera'; zoom: number; ms: number }                      // 1 = вернуться
   | { t: 'flash'; ms: number; color: string }
   | { t: 'shake'; ms: number; amp: number }
-  | { t: 'particles'; at: 'hero' | 'boss'; kind: 'paper' | 'sparks' }
+  | { t: 'particles'; at: 'hero' | 'boss' | 'screen'; kind: 'paper' | 'sparks' | 'confetti' }
   | { t: 'damage'; at: 'hero' | 'boss'; value: number; muted: boolean }
   | { t: 'bar'; who: 'hero' | 'boss'; to: number; ms: number }
-  | { t: 'line'; who: 'boss'; text: string }
-  | { t: 'banner'; text: string }
+  | { t: 'line'; text: string; style: 'bubble' | 'center' }
+  | { t: 'banner'; text: BannerText }
   | { t: 'sound'; name: SoundName; gain?: number }
+  | { t: 'voice'; id: string }                                     // реплика диктора
   | { t: 'dim'; to: number; ms: number }
-  | { t: 'timeScale'; to: number; ms: number }
+  | { t: 'grayscale'; to: number; ms: number }
+  | { t: 'timeScale'; to: number }
   | { t: 'wait'; ms: number };
 ```
 
 Шаги идут последовательно; шаг с `ms` ждёт своей длительности, остальные
-мгновенные. Это чистые данные, `choreo.test.ts` проверяет их без Pixi:
+мгновенные. Каждый ход заканчивается шагами возврата: `move dx: 0`,
+`camera zoom: 1`, `pose idle`. `timeScale` действует до следующего
+`timeScale` или до конца боя. Это чистые данные, `choreo.test.ts` проверяет их без Pixi:
 удар по иммунитету не содержит `flash` и `shake`, спецприём содержит `dim`,
 победа содержит `timeScale` 0.5 и баннер, у финального босса при переходе
 `finishHim` появляется баннер `FINISH HIM`.
@@ -310,9 +328,10 @@ type Step =
 **Ход босса.** Симметрично, тряска ×1.5. Спецприём: `dim` до 0.4, красная
 вспышка, реплика крупно по центру, затем удар.
 
-**Победа.** Босс `defeated`, герой `win`, `timeScale` 0.5 на 1 с, баннер,
-конфетти из бумажек, звук `win`. **Поражение.** Герой `hurt`, серый фильтр
-на сцене, баннер, звук `lose`.
+**Победа.** Босс `defeated`, герой `win`, `timeScale` 0.5, `wait` 1000,
+`timeScale` 1, баннер, `particles at: 'screen', kind: 'confetti'`, звук
+`win`. **Поражение.** Герой `hurt`, `grayscale` до 1 за 600 мс, баннер, звук
+`lose`.
 
 **Баннеры.** `ROUND 1` и `FIGHT!` в начале, исход в конце, `FINISH HIM` при
 переходе `finishHim`. Тяжёлый гротеск с металлическим градиентом, появление
@@ -328,18 +347,28 @@ type Step =
 приёмов активны только в `awaitInput`; вход в `resolveTurn` защищён проверкой
 фазы, а не состоянием кнопок. Хоткеи 1–5. Контроллер берёт `TurnResult`,
 получает шаги из `choreo`, исполняет их по очереди: шаги рендера уходят в
-`scene`/`effects`, `sound` — в `audio`, `wait` — таймер GSAP. После
-последнего шага фаза `awaitInput` или `over`, в `over` монтируется панель
-результата.
+`scene`/`effects`, `sound` и `voice` — в `audio`, `wait` —
+`gsap.delayedCall`, поэтому slow-mo замедляет и паузы, это намеренно. После
+последнего шага фаза `awaitInput` или `over`; в `over` контроллер вызывает
+`afterBattle`, `checkEnding` и показывает панель результата в оверлее.
 
 ## Рендер
 
-`scene.ts` создаёт `Pixi.Application` с `resizeTo` контейнера и
-`autoDensity`, логическая сцена 1280×720 масштабируется корневым контейнером.
+`scene.ts` создаёт `Pixi.Application` один раз за сессию (ленивый
+синглтон, `await app.init({ resizeTo: container, autoDensity: true,
+resolution: devicePixelRatio })`) и при монтировании боя вставляет его канвас
+в контейнер. При `unmount` канвас извлекается из DOM, сцена очищается,
+активные твины убиваются (`gsap.killTweensOf` по сцене), текстуры не
+уничтожаются — они принадлежат `assets.ts`. Логическая сцена 1280×720 живёт
+в корневом контейнере с `scale = min(w / 1280, h / 720)` и центрированием;
+пересчёт на событии `resize` приложения. DOM-оверлей — абсолютно
+позиционированный элемент того же родителя с `aspect-ratio: 16/9`, его
+раскладка в процентах, поэтому отдельного масштабирования ему не нужно.
+
 Слои: `background`, `shadows`, `fighters`, `fx`, `hud`, `banners`,
-`vignette`. Единственный тикер — Pixi. `timeScale` — поле сцены, применяется
-к `gsap.globalTimeline.timeScale`; при `unmount` возвращается 1, приложение
-уничтожается.
+`vignette`. Тикера два и это осознанно: Pixi рисует, GSAP анимирует свойства
+объектов сцены и сам гонит свой rAF. `timeScale` применяется к
+`gsap.globalTimeline.timeScale`, при `unmount` возвращается 1.
 
 Спрайты бойцов рисуются от якоря (точка ног из манифеста), поэтому смена
 позы не двигает персонажа. Герой смотрит вправо, боссы влево.
@@ -350,7 +379,8 @@ type Step =
 
 ## Звук
 
-`audio.ts` синтезирует всё через Web Audio, файлов нет:
+Звуковые эффекты `audio.ts` синтезирует через Web Audio, файлов для них
+нет:
 
 - `hit` — шумовой удар с низкой синусоидой, громкость от урона.
 - `immune` — глухой короткий «бум».
@@ -381,9 +411,17 @@ type Step =
 Файлы `assets/audio/vo_*.mp3`, играют вместе с баннером. Если файл не
 загрузился — баннер молча.
 
-Аудиозаписи лежат в том же манифесте с `kind: "music" | "voice"`, полем
-`prompt` и своей моделью; `gen-assets.ts` обрабатывает их тем же проходом,
-без постобработки. Бюджет: 6 клипов по 0.04 $, 8 реплик по ~0.01 $.
+Аудиозаписи лежат в том же манифесте с `kind: "music" | "voice"`, полями
+`prompt`, `model`, `duration` (секунды) и `group`; поля `size`, `anchor`,
+`chroma`, `flip`, `references` для них отсутствуют. Группы: `mu_title` и все
+`vo_*` — `core`; `mu_office`, `mu_battle` — `rank0`; `mu_council` — `rank3`;
+`mu_final` — `rank5`; `mu_ending` — `endings`. `gen-assets.ts` ведёт для них
+отдельный проход: `POST /api/v1/chat/completions` с `modalities: ["text",
+"audio"]`, аудио из `message.audio.data` (base64) сохраняется как есть, без
+постобработки; точная форма ответа для Lyria уточняется на этапе 2 пробным
+запросом. `audio.ts` декодирует файлы в `AudioBuffer`, музыку зацикливает
+двумя источниками с кроссфейдом 1 с. Бюджет: 6 клипов по 0.04 $, диктор
+тарифицируется по токенам, ориентир до 0.1 $ на все реплики.
 
 Кнопка mute в HUD и оверлее боя, состояние в `localStorage` под ключом
 `cmk.muted`.
@@ -412,8 +450,9 @@ type Step =
 `kind`: `sprite | portrait | background | illustration | music | voice`.
 `group`: `core`
 (герой, титул, UI), `rank0..rank5`, `endings`. `references` — пути к файлам
-или id других записей; `dependsOn` перечисляет id, которые должны быть
-сгенерированы раньше.
+или id других записей; для id подставляется сырой `assets/raw/<id>.png`
+(до вырезания фона), а не WebP с альфой. `dependsOn` перечисляет id, которые
+должны быть сгенерированы раньше.
 
 | Тип | Штук | Размер | Описание |
 |-----|------|--------|----------|
@@ -428,9 +467,12 @@ type Step =
 | Музыка | 6 | 30 с, mp3 | см. раздел «Звук» |
 | Диктор | 8 | 1–2 с, mp3 | см. раздел «Звук» |
 
-Итого 54 картинки и 14 аудиофайлов. Бюджет веса: спрайт ≤ 250 КБ, портрет
-≤ 100 КБ, фон и иллюстрация ≤ 400 КБ, музыкальный клип ≤ 600 КБ, сумма
-≤ 12 МБ. WebP качество 72 для фонов, 80 для спрайтов. Стоимость: картинки
+Итого 54 картинки и 14 аудиофайлов. Бюджет веса на файл: спрайт ≤ 150 КБ,
+портрет ≤ 80 КБ, фон и иллюстрация ≤ 300 КБ, музыкальный клип ≤ 400 КБ,
+реплика ≤ 40 КБ. Потолок суммы: 28 × 150 + 16 × 80 + 10 × 300 + 6 × 400 +
+8 × 40 = 11 200 КБ, тест проверяет сумму ≤ 11.5 МБ. На титуле грузятся
+только `core` и `rank0` — около 3 МБ. WebP качество 72 для фонов, 80 для
+спрайтов, mp3 96 кбит/с. Стоимость: картинки
 на Seedream 5.0 Pro по несколько центов, музыка по 0.04 $, диктор по ~0.01 $;
 с запасом на пересъёмку ×2 укладываемся в 5 долларов из 10 на счёте.
 
