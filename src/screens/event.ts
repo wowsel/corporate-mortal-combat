@@ -50,8 +50,7 @@ export function createEventScreen(): Screen {
 
       const setPortrait = (id: string) => {
         const url = ctx.assets.getImageUrl(id);
-        portrait.style.backgroundImage = url ? `url(${url})` : '';
-        portrait.style.background = url ? '' : placeholderBg(id);
+        portrait.style.background = url ? `url(${url}) center/cover no-repeat` : placeholderBg(id);
         portrait.dataset.id = id;
         portrait.classList.remove('bump'); void portrait.offsetWidth; portrait.classList.add('bump');
       };
@@ -84,9 +83,12 @@ export function createEventScreen(): Screen {
           return b;
         }));
         choicesEl.classList.add('show');
+        let picked = false;
         keyHandler = e => {
+          if (e.ctrlKey || e.metaKey || e.altKey) return;
+          if (picked) return;
           const n = Number(e.key);
-          if (n >= 1 && n <= list.length) pick(event, list[n - 1]!);
+          if (n >= 1 && n <= list.length) { picked = true; pick(event, list[n - 1]!); }
         };
         window.addEventListener('keydown', keyHandler);
       };
@@ -98,7 +100,11 @@ export function createEventScreen(): Screen {
         const next = applyChoice(ctx.getState(), event, choice);
         ctx.setState(next);
         hud.update(next, rank.title);
+        let done = false;
         const proceed = () => {
+          if (done) return;
+          done = true;
+          if (keyHandler) { window.removeEventListener('keydown', keyHandler); keyHandler = null; }
           const ending = checkEnding(ctx.getState(), ctx.content.ranks);
           if (ending) { ctx.go('ending'); return; }
           ctx.go(currentEvent(ctx.getState(), ctx.content.ranks) ? 'event' : 'battle');
@@ -108,7 +114,10 @@ export function createEventScreen(): Screen {
           typeText(choice.reaction.text, () => {
             nextBtn.hidden = false;
             nextBtn.onclick = proceed;
-            keyHandler = e => { if (e.key === 'Enter') proceed(); };
+            keyHandler = e => {
+              if (e.ctrlKey || e.metaKey || e.altKey) return;
+              if (e.key === 'Enter') proceed();
+            };
             window.addEventListener('keydown', keyHandler);
           });
         } else proceed();
