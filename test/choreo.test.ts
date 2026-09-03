@@ -189,6 +189,7 @@ describe('bannerFor / outcomeSteps', () => {
       { t: 'flash', ms: 120, color: '#c81e1e' },
       { t: 'sound', name: 'hit', gain: 1 },
       { t: 'pose', who: 'boss', pose: 'defeated' },
+      { t: 'bar', who: 'boss', to: 0, ms: 200 },
       { t: 'shake', ms: 600, amp: 24 },
       { t: 'particles', at: 'boss', kind: 'sparks' },
       { t: 'banner', text: 'FATALITY' },

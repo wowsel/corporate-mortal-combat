@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { availableMoves, bossDamage, createBattle, moveDamage, resolveTurn } from '../src/battle';
+import { availableMoves, baseDamage, bossDamage, createBattle, moveDamage, resolveTurn } from '../src/battle';
 import { MOVES, STRIKE_MOVE } from '../src/content/moves';
 import type { Stats } from '../src/types';
 import { makeBoss } from './fixtures';
@@ -20,6 +20,27 @@ describe('moveDamage', () => {
     expect(moveDamage(move('joke'), { ...stats, reputation: 0, stress: 100 }, b)).toBe(5); // 10 + 0 - 5 = 5, пол 3 не срабатывает
     const imm = makeBoss({ weakness: 'agree', immunity: 'joke' });
     expect(moveDamage(move('joke'), { ...stats, reputation: 0, stress: 100 }, imm)).toBe(1); // 5 * 0.25 = 1.25 → 1
+  });
+});
+
+describe('baseDamage', () => {
+  // ни слабость, ни иммунитет не совпадают ни с одним базовым приёмом: множитель ровно 1
+  const neutral = makeBoss({ weakness: 'strike', immunity: 'strike' });
+  const statSets: Stats[] = [
+    stats,
+    { loyalty: 0, reputation: 0, competence: 0, stress: 0 },
+    { loyalty: 100, reputation: 100, competence: 100, stress: 100 },
+  ];
+  for (const st of statSets) {
+    for (const m of MOVES) {
+      it(`moveDamage = round(baseDamage) для ${m.id} при stress=${st.stress}`, () => {
+        expect(moveDamage(m, st, neutral)).toBe(Math.round(baseDamage(m, st)));
+      });
+    }
+  }
+  it('strike без стата даёт 0', () => expect(baseDamage(STRIKE_MOVE, stats)).toBe(0));
+  it('пол 3 у шутки при предельном стрессе', () => {
+    expect(baseDamage(move('joke'), { loyalty: 0, reputation: 0, competence: 0, stress: 200 })).toBe(3);
   });
 });
 

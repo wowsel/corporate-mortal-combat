@@ -11,10 +11,18 @@ export function createBattle(boss: Boss): BattleState {
   };
 }
 
-export function moveDamage(move: Move, stats: Stats, boss: Boss): number {
+/**
+ * Урон приёма до множителей босса, без округления — единственный источник формулы.
+ * UI боя показывает по нему подсказку «≈N», `moveDamage` домножает на слабость/иммунитет.
+ */
+export function baseDamage(move: Move, stats: Stats): number {
   if (move.stat === null) return 0;
-  let base = 10 + stats[move.stat] * 0.15;
-  if (move.id === 'joke') base = Math.max(3, base - stats.stress * 0.05);
+  const base = 10 + stats[move.stat] * 0.15;
+  return move.id === 'joke' ? Math.max(3, base - stats.stress * 0.05) : base;
+}
+
+export function moveDamage(move: Move, stats: Stats, boss: Boss): number {
+  const base = baseDamage(move, stats);
   let mult = 1;
   if (move.id === boss.weakness) mult = 2;
   else if (move.id === boss.immunity) mult = 0.25;

@@ -1,5 +1,5 @@
 import { gsap } from 'gsap';
-import { availableMoves, createBattle, resolveTurn } from '../battle';
+import { availableMoves, baseDamage, createBattle, resolveTurn } from '../battle';
 import { introSteps, outcomeSteps, turnSteps } from '../choreo';
 import type { Ctx, Screen } from '../engine';
 import { createHud } from '../hud';
@@ -69,8 +69,9 @@ export function createBattleScreen(): Screen {
           const b = document.createElement('button');
           b.className = `move-card ${move.id === 'strike' ? 'strike' : ''}`;
           b.disabled = !enabled || phase !== 'awaitInput';
-          const expected = move.stat ? Math.round(10 + state.stats[move.stat] * 0.15 - (move.id === 'joke' ? state.stats.stress * 0.05 : 0)) : 0;
-          b.innerHTML = `<span class="move-key">${i + 1}</span><span class="move-name">${move.name}</span><span class="move-stat">${move.stat ? `≈${Math.max(3, expected)}` : ''}</span>`;
+          // подсказка считается той же формулой, что и бой: без множителей босса, их игрок узнаёт по удару
+          const expected = Math.round(baseDamage(move, state.stats));
+          b.innerHTML = `<span class="move-key">${i + 1}</span><span class="move-name">${move.name}</span><span class="move-stat">${move.stat ? `≈${expected}` : ''}</span>`;
           b.title = enabled ? move.hint : 'Не при свидетелях.';
           b.addEventListener('click', () => void onMove(move));
           return b;

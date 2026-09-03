@@ -1,3 +1,9 @@
+// Хореография боя: чистые функции «результат хода → список шагов».
+// Контроллер (src/screens/battle.ts) исполняет шаги последовательно, но не все ждёт:
+// `move`, `camera`, `dim`, `grayscale`, `banner`, `wait` — ожидаются (await);
+// `flash`, `shake`, `bar`, а также `pose`, `particles`, `damage`, `line`, `sound`, `voice`, `timeScale`
+// запускаются и не ожидаются — они намеренно накладываются на следующий шаг:
+// вспышка светит поверх отлёта босса, тряска идёт под цифру урона, полоска утекает под реплику.
 import type { BannerText, BattleState, Boss, Step, TurnResult } from './types';
 
 const WHITE = '#ffffff';
@@ -128,7 +134,7 @@ export function outcomeSteps(r: TurnResult, boss: Boss): Step[] {
   return [
     { t: 'pose', who: 'hero', pose: 'attack' }, { t: 'move', who: 'hero', dx: 200, ms: 120 },
     { t: 'flash', ms: 120, color: RED }, { t: 'sound', name: 'hit', gain: 1 },
-    { t: 'pose', who: 'boss', pose: 'defeated' }, { t: 'shake', ms: 600, amp: 24 },
+    { t: 'pose', who: 'boss', pose: 'defeated' }, { t: 'bar', who: 'boss', to: 0, ms: 200 }, { t: 'shake', ms: 600, amp: 24 },
     { t: 'particles', at: 'boss', kind: 'sparks' },
     { t: 'banner', text: banner }, { t: 'voice', id: voiceId }, { t: 'sound', name: 'banner' },
     { t: 'wait', ms: 1800 },
