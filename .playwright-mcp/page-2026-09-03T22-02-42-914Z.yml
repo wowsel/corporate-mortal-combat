@@ -1,6 +1,0 @@
-- generic [ref=e5]:
-  - heading "CORPORATE MORTAL KOMBAT" [level=1] [ref=e6]:
-    - generic [ref=e7]: CORPORATE
-    - generic [ref=e8]: MORTAL KOMBAT
-  - paragraph [ref=e9]: Никто не приходит утром в офис и не кидается в директора фаерболами.С боссами приходится ладить.
-  - button "Начать карьеру" [ref=e12] [cursor=pointer]
