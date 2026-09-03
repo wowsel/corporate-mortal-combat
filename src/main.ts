@@ -18,7 +18,11 @@ const root = document.getElementById('app')!;
 const manifest = manifestJson as Manifest;
 const errors = validateContent(CONTENT.ranks, manifest);
 if (errors.length) {
-  root.innerHTML = `<pre style="padding:24px;color:#e66">Ошибки контента:\n${errors.join('\n')}</pre>`;
+  const pre = document.createElement('pre');
+  pre.style.padding = '24px';
+  pre.style.color = '#e66';
+  pre.textContent = `Ошибки контента:\n${errors.join('\n')}`;
+  root.replaceChildren(pre);
 } else {
   const assets = createAssetStore(manifest);
   const audio = createAudio(assets);

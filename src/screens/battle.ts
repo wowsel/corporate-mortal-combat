@@ -8,7 +8,9 @@ import { getScene, type Scene } from '../render/scene';
 import { afterBattle, checkEnding, currentRank } from '../state';
 import type { BattleState, Boss, Move, Step } from '../types';
 
-type Phase = 'intro' | 'awaitInput' | 'playerAnim' | 'bossAnim' | 'over';
+// bossAnim не выделен: turnSteps отдаёт ход одним списком шагов, разрезать его по границе
+// ответа босса нельзя без изменения хореографии — вся анимация хода живёт в playerAnim
+type Phase = 'intro' | 'awaitInput' | 'playerAnim' | 'over';
 
 export function createBattleScreen(): Screen {
   let scene: Scene | null = null;
@@ -140,7 +142,7 @@ export function createBattleScreen(): Screen {
       };
 
       onKey(e => {
-        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
         const n = Number(e.key);
         if (phase !== 'awaitInput' || !(n >= 1 && n <= 5)) return;
         const list = availableMoves(boss, battle);

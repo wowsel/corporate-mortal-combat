@@ -14,4 +14,4 @@
 .move-stat { color: var(--muted); font-size: 0.85em; }
 .result-panel { position: absolute; left: 50%; top: 58%; transform: translateX(-50%); width: 60%; background: var(--panel); border: 1px solid rgba(201,163,74,0.5); padding: 20px 28px; display: flex; flex-direction: column; gap: 12px; align-items: center; }
 .result-title { font-family: var(--font-display); color: var(--gold); margin: 0; letter-spacing: 2px; }
-.result-hud .hud { background: transparent; border: 0; padding: 0; }
+.result-hud.hud { background: transparent; border: 0; padding: 0; }

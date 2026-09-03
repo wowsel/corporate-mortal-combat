@@ -9,6 +9,7 @@
   --font-display: Impact, "Arial Black", sans-serif;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-ui); }
 #app { position: fixed; inset: 0; overflow: hidden; }
 button { font: inherit; cursor: pointer; }
