@@ -20,7 +20,8 @@ export function createAudio(assets: AssetStore): Audio {
   let muted = safeRead() === '1';
   let music: { src: AudioBufferSourceNode; gain: GainNode; id: string } | null = null;
   let lastType = 0;
-  let pending: (() => void) | null = null;
+  type Slot = 'sfx' | 'voice' | 'music';
+  const pending: Record<Slot, (() => void) | null> = { sfx: null, voice: null, music: null };
 
   function safeRead(): string | null { try { return localStorage.getItem(MUTE_KEY); } catch { return null; } }
   function safeWrite(v: string) { try { localStorage.setItem(MUTE_KEY, v); } catch { /* ignore */ } }
@@ -38,14 +39,14 @@ export function createAudio(assets: AssetStore): Audio {
     return ctx;
   }
 
-  function runWhenReady(ac: AudioContext, fn: () => void) {
+  function runWhenReady(slot: Slot, ac: AudioContext, fn: () => void) {
     if (ac.state === 'running') { fn(); return; }
     if (ac.state === 'closed') return;
-    pending = fn;
+    pending[slot] = fn;
     const mine = fn;
     void ac.resume().then(() => {
-      if (pending === mine) {
-        pending = null;
+      if (pending[slot] === mine) {
+        pending[slot] = null;
         if (ac.state === 'running') mine();
       }
     }).catch(() => {});
@@ -118,7 +119,7 @@ export function createAudio(assets: AssetStore): Audio {
 
   function playSfx(name: SoundName, gain: number) {
     const ac = ensure(); if (!ac || !master) return;
-    runWhenReady(ac, () => {
+    runWhenReady('sfx', ac, () => {
       try { sfx[name](ac, gain); } catch (e) { console.warn('sfx failed', name, e); }
     });
   }
@@ -148,14 +149,14 @@ export function createAudio(assets: AssetStore): Audio {
       const buf = assets.getAudioBuffer(id);
       if (!buf) return;
       const ac = ensure(); if (!ac || !master) return;
-      runWhenReady(ac, () => { playBuffer(ac, buf, 0.9); });
+      runWhenReady('voice', ac, () => { playBuffer(ac, buf, 0.9); });
     },
     playMusic(id) {
       if (music?.id === id) return;
       const buf = assets.getAudioBuffer(id);
       if (!buf) return;
       const ac = ensure(); if (!ac || !master) return;
-      runWhenReady(ac, () => {
+      runWhenReady('music', ac, () => {
         const old = music; music = null;
         if (old) { old.gain.gain.setTargetAtTime(0, ac.currentTime, 0.4); old.src.stop(ac.currentTime + 1.2); }
         const started = playBuffer(ac, buf, 0); if (!started) return;
@@ -165,6 +166,7 @@ export function createAudio(assets: AssetStore): Audio {
       });
     },
     stopMusic() {
+      pending.music = null;
       const ac = ctx; const old = music; music = null;
       if (old && ac) { old.gain.gain.setTargetAtTime(0, ac.currentTime, 0.4); old.src.stop(ac.currentTime + 1.2); }
     },
