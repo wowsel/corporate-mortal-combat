@@ -27,7 +27,18 @@ export function makeEvent(over: Partial<GameEvent> = {}): GameEvent {
 export function makeRank(over: Partial<Rank> = {}): Rank {
   return {
     id: 'r0', title: 'Стажёр', background: 'bg_test',
-    events: [makeEvent({ id: 'ev1' }), makeEvent({ id: 'ev2' })],
+    // ev1 sets 'flag_a' without requiring anything itself; ev2 (default makeEvent()) requires
+    // 'flag_a' on its third choice — satisfied because ev1 runs first, not because ev2 sets it too.
+    events: [
+      makeEvent({
+        id: 'ev1',
+        choices: [
+          { text: 'А', effects: { loyalty: 10, stress: 5 }, setFlag: 'flag_a' },
+          { text: 'Б', effects: { competence: 10 } },
+        ],
+      }),
+      makeEvent({ id: 'ev2' }),
+    ],
     boss: makeBoss(),
     ...over,
   };

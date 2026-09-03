@@ -40,6 +40,14 @@ describe('validateContent', () => {
     const ranks = makeRanks(); ranks[0] = makeRank({ events: [ev, makeEvent({ id: 'ev2' })] });
     expect(validateContent(ranks, manifest).join()).toMatch(/ghost/);
   });
+  it('requiresFlag ссылается на флаг, который ставится только в более позднем событии — ошибка', () => {
+    const early = makeEvent({ id: 'ev_early' });
+    early.choices = [{ text: 'x' }, { text: 'y', requiresFlag: 'later_flag' }];
+    const late = makeEvent({ id: 'ev_late' });
+    late.choices = [{ text: 'x', setFlag: 'later_flag' }, { text: 'y' }];
+    const ranks = makeRanks(); ranks[0] = makeRank({ events: [early, late] });
+    expect(validateContent(ranks, manifest).join()).toMatch(/later_flag/);
+  });
   it('меньше 2 или больше 4 вариантов', () => {
     const ev = makeEvent(); ev.choices = [{ text: 'x' }];
     const ranks = makeRanks(); ranks[0] = makeRank({ events: [ev, makeEvent({ id: 'ev2' })] });

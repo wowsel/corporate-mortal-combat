@@ -90,6 +90,7 @@ function bossAttack(r: TurnResult, boss: Boss): Step[] {
 }
 
 export function turnSteps(r: TurnResult, boss: Boss, prev: BattleState): Step[] {
+  if (r.outcome === 'fatality') return [];
   const steps: Step[] = [...playerAttack(r, boss)];
   if (r.outcome === 'continue' || r.outcome === 'lose') {
     steps.push(...returnSteps('hero'), ...bossAttack(r, boss));

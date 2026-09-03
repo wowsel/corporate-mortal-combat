@@ -48,6 +48,18 @@ describe('turnSteps: обычный удар', () => {
     const shake = s.find(x => x.t === 'shake') as Extract<Step, { t: 'shake' }>;
     expect(shake.amp).toBeCloseTo(8.5);
   });
+  it('порядок: вспышка перед цифрой урона, а контрудар босса — перед возвратом в idle', () => {
+    const flashIdx = s.findIndex(x => x.t === 'flash');
+    const damageIdx = s.findIndex(x => x.t === 'damage' && x.at === 'boss');
+    const bossAttackIdx = s.findIndex(x => x.t === 'pose' && x.who === 'boss' && x.pose === 'attack');
+    const bossDamageIdx = s.findIndex(x => x.t === 'damage' && x.at === 'hero');
+    const heroIdleIdx = s.map((x, i) => ({ x, i })).filter(({ x }) => x.t === 'pose' && x.pose === 'idle').pop()!.i;
+    expect(flashIdx).toBeGreaterThanOrEqual(0);
+    expect(damageIdx).toBeGreaterThan(flashIdx);
+    expect(bossAttackIdx).toBeGreaterThan(damageIdx);
+    expect(bossDamageIdx).toBeGreaterThan(bossAttackIdx);
+    expect(heroIdleIdx).toBeGreaterThan(bossDamageIdx);
+  });
 });
 
 describe('turnSteps: иммунитет', () => {
@@ -56,7 +68,9 @@ describe('turnSteps: иммунитет', () => {
   const r = resolveTurn(b0, move('joke'), stats, boss, () => 0.9);
   const s = turnSteps(r, boss, b0);
   it('нет вспышки, тряски и партиклов на ударе игрока; цифра серая; звук immune; реплика immune', () => {
-    const playerPart = s.slice(0, s.findIndex(x => x.t === 'pose' && x.who === 'boss' && x.pose === 'attack'));
+    const bossAttackIdx = s.findIndex(x => x.t === 'pose' && x.who === 'boss' && x.pose === 'attack');
+    expect(bossAttackIdx).toBeGreaterThan(0);
+    const playerPart = s.slice(0, bossAttackIdx);
     expect(has(playerPart, x => x.t === 'flash')).toBe(false);
     expect(has(playerPart, x => x.t === 'shake')).toBe(false);
     expect(has(playerPart, x => x.t === 'particles')).toBe(false);
@@ -78,6 +92,18 @@ describe('turnSteps: спецприём босса', () => {
     expect(has(s, x => x.t === 'line' && x.style === 'center' && x.text === 'Вот тебе!')).toBe(true);
     expect(has(s, x => x.t === 'sound' && x.name === 'special')).toBe(true);
   });
+  it('порядок: dim 0.4 -> реплика по центру -> красная вспышка -> dim 0 -> атака босса', () => {
+    const dimOnIdx = s.findIndex(x => x.t === 'dim' && x.to === 0.4);
+    const centerLineIdx = s.findIndex(x => x.t === 'line' && x.style === 'center');
+    const preFlashIdx = s.findIndex(x => x.t === 'flash' && x.color === '#c81e1e');
+    const dimOffIdx = s.findIndex(x => x.t === 'dim' && x.to === 0);
+    const attackPoseIdx = s.findIndex(x => x.t === 'pose' && x.who === 'boss' && x.pose === 'attack');
+    expect(dimOnIdx).toBeGreaterThanOrEqual(0);
+    expect(centerLineIdx).toBeGreaterThan(dimOnIdx);
+    expect(preFlashIdx).toBeGreaterThan(centerLineIdx);
+    expect(dimOffIdx).toBeGreaterThan(preFlashIdx);
+    expect(attackPoseIdx).toBeGreaterThan(dimOffIdx);
+  });
 });
 
 describe('turnSteps: добивающий удар', () => {
@@ -95,10 +121,18 @@ describe('turnSteps: FINISH HIM', () => {
   const b0 = { ...createBattle(boss), patience: 25 };
   const r = resolveTurn(b0, move('data'), stats, boss, () => 0.9);
   it('баннер FINISH HIM появляется при переходе finishHim и не повторяется', () => {
-    expect(has(turnSteps(r, boss, b0), x => x.t === 'banner' && x.text === 'FINISH HIM')).toBe(true);
+    const s0 = turnSteps(r, boss, b0);
+    expect(has(s0, x => x.t === 'banner' && x.text === 'FINISH HIM')).toBe(true);
     const b1 = { ...b0, finishHim: true };
     const r2 = resolveTurn(b1, move('data'), stats, boss, () => 0.9);
     expect(has(turnSteps(r2, boss, b1), x => x.t === 'banner' && x.text === 'FINISH HIM')).toBe(false);
+  });
+  it('порядок: FINISH HIM появляется после контратаки босса', () => {
+    const s0 = turnSteps(r, boss, b0);
+    const bossDamageIdx = s0.findIndex(x => x.t === 'damage' && x.at === 'hero');
+    const finishBannerIdx = s0.findIndex(x => x.t === 'banner' && x.text === 'FINISH HIM');
+    expect(bossDamageIdx).toBeGreaterThanOrEqual(0);
+    expect(finishBannerIdx).toBeGreaterThan(bossDamageIdx);
   });
 });
 
@@ -110,36 +144,68 @@ describe('bannerFor / outcomeSteps', () => {
     expect(bannerFor({ ...r, battle: { ...r.battle, hitImmune: true } })).toBe('PROMOTION!!!');
     expect(bannerFor({ ...r, battle: { ...r.battle, bossSpecialHit: true } })).toBe('PROMOTION!!!');
   });
-  it('победа: defeated, win, slow-mo, баннер, конфетти, звук win', () => {
+  it('победа: точная последовательность шагов', () => {
     const r = resolveTurn(createBattle(boss), move('data'), stats, boss, () => 0.9);
     const s = outcomeSteps(r, boss);
-    expect(has(s, x => x.t === 'pose' && x.who === 'boss' && x.pose === 'defeated')).toBe(true);
-    expect(has(s, x => x.t === 'pose' && x.who === 'hero' && x.pose === 'win')).toBe(true);
-    expect(has(s, x => x.t === 'timeScale' && x.to === 0.5)).toBe(true);
-    expect(has(s, x => x.t === 'timeScale' && x.to === 1)).toBe(true);
-    expect(has(s, x => x.t === 'banner' && x.text === 'FLAWLESS PRESENTATION')).toBe(true);
-    expect(has(s, x => x.t === 'particles' && x.at === 'screen' && x.kind === 'confetti')).toBe(true);
-    expect(has(s, x => x.t === 'sound' && x.name === 'win')).toBe(true);
-    expect(has(s, x => x.t === 'line' && x.text === 'Ладно…')).toBe(true);
+    expect(s).toEqual([
+      { t: 'pose', who: 'boss', pose: 'defeated' },
+      { t: 'pose', who: 'hero', pose: 'win' },
+      { t: 'timeScale', to: 0.5 },
+      { t: 'wait', ms: 1000 },
+      { t: 'timeScale', to: 1 },
+      { t: 'line', text: 'Ладно…', style: 'bubble' },
+      { t: 'banner', text: 'FLAWLESS PRESENTATION' },
+      { t: 'voice', id: 'vo_flawless' },
+      { t: 'sound', name: 'banner' },
+      { t: 'sound', name: 'win' },
+      { t: 'particles', at: 'screen', kind: 'confetti' },
+      { t: 'wait', ms: 1500 },
+    ]);
   });
-  it('поражение: hurt, grayscale, PERFORMANCE REVIEW, звук lose', () => {
+  it('поражение: точная последовательность шагов', () => {
     const big = makeBoss({ patience: 1000, attack: 200 });
     const r = resolveTurn(createBattle(big), move('data'), stats, big, () => 0.9);
     const s = outcomeSteps(r, big);
     expect(bannerFor(r)).toBe('PERFORMANCE REVIEW');
-    expect(has(s, x => x.t === 'grayscale' && x.to === 1)).toBe(true);
-    expect(has(s, x => x.t === 'banner' && x.text === 'PERFORMANCE REVIEW')).toBe(true);
-    expect(has(s, x => x.t === 'sound' && x.name === 'lose')).toBe(true);
+    expect(s).toEqual([
+      { t: 'pose', who: 'hero', pose: 'hurt' },
+      { t: 'grayscale', to: 1, ms: 600 },
+      { t: 'banner', text: 'PERFORMANCE REVIEW' },
+      { t: 'voice', id: 'vo_performance_review' },
+      { t: 'sound', name: 'banner' },
+      { t: 'sound', name: 'lose' },
+      { t: 'wait', ms: 1500 },
+    ]);
   });
-  it('fatality: FATALITY, красная вспышка, сильная тряска', () => {
+  it('fatality: точная последовательность шагов', () => {
     const fb = makeBoss({ final: true });
     const b = { ...createBattle(fb), finishHim: true };
     const r = resolveTurn(b, STRIKE_MOVE, stats, fb, () => 0.9);
     const s = outcomeSteps(r, fb);
     expect(bannerFor(r)).toBe('FATALITY');
-    expect(has(s, x => x.t === 'banner' && x.text === 'FATALITY')).toBe(true);
-    expect(has(s, x => x.t === 'shake' && x.amp >= 20)).toBe(true);
-    expect(has(s, x => x.t === 'pose' && x.who === 'boss' && x.pose === 'defeated')).toBe(true);
+    expect(s).toEqual([
+      { t: 'pose', who: 'hero', pose: 'attack' },
+      { t: 'move', who: 'hero', dx: 200, ms: 120 },
+      { t: 'flash', ms: 120, color: '#c81e1e' },
+      { t: 'sound', name: 'hit', gain: 1 },
+      { t: 'pose', who: 'boss', pose: 'defeated' },
+      { t: 'shake', ms: 600, amp: 24 },
+      { t: 'particles', at: 'boss', kind: 'sparks' },
+      { t: 'banner', text: 'FATALITY' },
+      { t: 'voice', id: 'vo_fatality' },
+      { t: 'sound', name: 'banner' },
+      { t: 'wait', ms: 1800 },
+    ]);
+  });
+  it('turnSteps на fatality: не проигрывает фиктивный удар героя, вся анимация — в outcomeSteps', () => {
+    const fb = makeBoss({ final: true });
+    const b = { ...createBattle(fb), finishHim: true };
+    const r = resolveTurn(b, STRIKE_MOVE, stats, fb, () => 0.9);
+    const ts = turnSteps(r, fb, b);
+    expect(ts).toEqual([]);
+    expect(has(ts, x => x.t === 'damage')).toBe(false);
+    expect(has(ts, x => x.t === 'pose' && x.who === 'boss' && x.pose === 'hurt')).toBe(false);
+    expect(has(outcomeSteps(r, fb), x => x.t === 'banner' && x.text === 'FATALITY')).toBe(true);
   });
   it('outcomeSteps пуст при continue', () => {
     const r = resolveTurn(createBattle(makeBoss()), move('data'), stats, makeBoss(), () => 0.9);

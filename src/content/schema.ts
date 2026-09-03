@@ -4,7 +4,6 @@ export function validateContent(ranks: Rank[], manifest: Manifest): string[] {
   const errors: string[] = [];
   const assetIds = new Set(manifest.entries.map(e => e.id));
   const setFlags = new Set<string>();
-  const requiredFlags: { flag: string; where: string }[] = [];
   const seenIds = new Map<string, string>();
 
   const asset = (id: string, where: string) => {
@@ -32,11 +31,15 @@ export function validateContent(ranks: Rank[], manifest: Manifest): string[] {
       asset(ev.speaker.portrait, ew);
       if (ev.choices.length < 2 || ev.choices.length > 4) errors.push(`${ew}: choices must be 2..4`);
       if (ev.choices[0]?.requiresFlag) errors.push(`${ew}: first choice must not have requiresFlag`);
+      // Check requiresFlag against flags set by *previous* events only — a flag set by a
+      // choice in this same event is not yet in effect when the choice is being made.
       ev.choices.forEach((c, k) => {
-        if (c.setFlag) setFlags.add(c.setFlag);
-        if (c.requiresFlag) requiredFlags.push({ flag: c.requiresFlag, where: `${ew} choice[${k}]` });
+        if (c.requiresFlag && !setFlags.has(c.requiresFlag)) {
+          errors.push(`${ew} choice[${k}]: requiresFlag "${c.requiresFlag}" is never set before this event`);
+        }
         if (c.reaction) asset(c.reaction.portrait, `${ew} choice[${k}] reaction`);
       });
+      ev.choices.forEach(c => { if (c.setFlag) setFlags.add(c.setFlag); });
     });
 
     const b = rank.boss;
@@ -49,8 +52,5 @@ export function validateContent(ranks: Rank[], manifest: Manifest): string[] {
     for (const [k, arr] of Object.entries(b.lines)) if (arr.length === 0) errors.push(`${bw}: lines.${k} is empty`);
   });
 
-  for (const r of requiredFlags) {
-    if (!setFlags.has(r.flag)) errors.push(`${r.where}: requiresFlag "${r.flag}" is never set`);
-  }
   return errors;
 }
