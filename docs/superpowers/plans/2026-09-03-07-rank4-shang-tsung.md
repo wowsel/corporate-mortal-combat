@@ -48,7 +48,7 @@ export const RANK_DIRECTOR: Rank = {
       title: 'Утечка',
       speaker: { name: 'Рептилия', portrait: 'pt_reptile_neutral' },
       text: 'Директор, есссть минутка? Рептилия, IT-поддержка, тикет номер 6660. Квартальный отчёт вашего департамента утёк. Целиком. С комментариями. Кто-то открыл файл ночью с планшета, который в логах светится зелёным. Я никого не обвиняю, но в здании только один человек с таким планшетом, и он называет себя директором по трансссформации.',
-      repeatText: 'Снова Рептилия, снова тикет 6660. Отчёт утёк опять — на этот раз с вашими правками. «Я всё ещё никого не обвиняю», — шипит он и косится на зелёный огонёк в глубине серверной.',
+      repeatText: 'Сссснова я, тикет 6660. Отчёт утёк опять, теперь уже с вашими правками. Я всё ещё никого не обвиняю. Я просто смотрю вон на тот зелёный огонёк в глубине серверной. И на вас.',
       choices: [
         {
           text: 'Немедленно завести инцидент по регламенту безопасности',
@@ -78,8 +78,8 @@ export const RANK_DIRECTOR: Rank = {
       id: 'director_intrigue',
       title: 'Интрига',
       speaker: { name: 'Шанг Цунг', portrait: 'pt_shang_neutral' },
-      text: 'Полночь, серверная. Шанг Цунг сидит за каменным алтарём с тремя мониторами и жестом приглашает присесть на соседний. «Директор. Не бойтесь, алтарь заземлён. У меня предложение: кабинет Синдел скоро освободится, и я хочу, чтобы мы взяли его вместе. Взамен мелочь — ваш проект переезжает в мой департамент трансформации. Подпишите на планшете, он сам всё считает». Планшет светится зелёным. «И, чтобы вы понимали, с кем говорите: обвинять меня бесполезно — я коллекционирую обвинения как трофеи, вон полка. Переводить стрелки — тоже, я сам их перевожу лучше всех в компании. А вот отчёты с цифрами уберите со стола. У меня на данные аллергия».',
-      repeatText: 'Полночь, серверная, тот же алтарь. «Вы вернулись. Значит, обдумали». Шанг Цунг подвигает планшет. «Напомню: обвинения и переводы стрелок — мимо, это моя стихия. Факты и цифры — вот чего я не переношу. Поэтому давайте без них».',
+      text: 'Полночь. Присаживайтесь — нет, не на тот алтарь, он под напряжением. Кабинет Синдел скоро освободится, и я хочу занять его вместе с вами. Взамен мелочь: ваш проект переезжает в мой департамент трансформации. Подпишите на планшете, он сам всё посчитает. И чтобы вы понимали, с кем говорите: обвинять меня бесполезно — я коллекционирую обвинения, вон полка. Переводить на меня стрелки тоже не советую: стрелки перевожу я, и лучше всех в компании. А вот отчёты с цифрами уберите со стола. У меня на данные аллергия.',
+      repeatText: 'Вы вернулись. Значит, обдумали. Планшет всё ещё здесь, подпись всё ещё нужна. Напомню: обвинения и переводы стрелок — мимо, это моя стихия. А вот факты, графики и цифры я не переношу. Поэтому давайте без них.',
       choices: [
         {
           text: 'Вежливо отказаться и уйти',
@@ -122,11 +122,13 @@ export const RANK_DIRECTOR: Rank = {
     portraits: { neutral: 'pt_shang_neutral', angry: 'pt_shang_angry' },
     intro: 'Присаживайтесь. Нет, не туда — там продакшен. Итак: ваш проект мне нужен. Вы — не особенно. Начнём трансформацию.',
     lines: {
+      // hit звучит и как реакция на удар героя, и как реплика Шанг Цунга в его собственной атаке —
+      // фразы должны работать в обе стороны
       hit: [
-        'Цифры. Как вульгарно. Продолжайте.',
-        'Этот график… откуда он? Он настоящий? Уберите.',
-        'Отчёт заверен. Заверенное не трансформируется. Неприятно.',
-        'Ваши данные ранят сильнее, чем я рассчитывал. Почти как правда.',
+        'Цифры. Как вульгарно.',
+        'Допустим. Записал в план трансформации.',
+        'Интересная позиция. Она у вас последняя?',
+        'Дальше. У меня ещё четыре департамента.',
       ],
       immune: [
         'Обвинение? Прекрасно. Ставлю на полку, к остальным.',
@@ -134,7 +136,7 @@ export const RANK_DIRECTOR: Rank = {
         'Переводить стрелки на директора по трансформации… Стрелки — это тоже трансформация. Мне нравится.',
       ],
       special: [
-        'Лицо Шанг Цунга плывёт и становится вашим. «Думаю, мой проект лучше передать департаменту трансформации», — говорит он вашим голосом. Планшет записал.',
+        'Смотрите: моё лицо становится вашим. И вашим голосом я говорю: «Передаю проект департаменту трансформации». Планшет уже записал.',
         'Узнаёте? Это вы на корпоративе. «Готов на всё ради компании». Всё — это всё, директор.',
       ],
       defeated: [
@@ -197,6 +199,8 @@ REPTILE: a lizard-man system administrator from IT support of Outworld Corp. Gre
 
 Портрет angry Шанг Цунга: «…the left half of his face is mid-morph into a bare skull with a green glow in the eye socket» — узнаваемая фишка колдуна-перевёртыша. Кожа Рептилии зелёная, что далеко от ключа `#FF00FF`; для него спрайтов нет, поэтому хромакей ему не нужен, но запрет на розовое сохраняем ради единого стиля.
 
+**Блоки SHANG TSUNG и REPTILE вставляются в каждый промпт целиком.** Генератор ничего не подставляет: в `manifest.json` не должно остаться текста `<описание>`.
+
 - [ ] **Step 1: Фон**
 
 ```json
@@ -204,7 +208,7 @@ REPTILE: a lizard-man system administrator from IT support of Outworld Corp. Gre
   "id": "bg_server_dungeon", "kind": "background", "group": "rank4", "size": [1600, 900], "resolution": "2K",
   "file": "img/bg/server_dungeon.webp", "model": "bytedance-seed/seedream-5-0-pro", "generated": false,
   "references": ["assets/reference/post-hero-and-shao-kahn.png"],
-  "prompt": "Wide establishing shot of a corporate data center built inside a medieval stone dungeon: rows of black server racks with blinking green and amber status LEDs stand between massive stone pillars and arched vaults; iron chains and burning wall torches hang next to neatly bundled network cables; a stone sacrificial altar is used as a sysadmin desk with three monitors, a mechanical keyboard and a coffee mug; human skulls sit on top of the racks as decor; thin white fog rolls across the stone floor. Lighting: cold green server glow mixed with warm orange torchlight, no pink or magenta light. Empty of people. Wide-angle, eye level, deep depth of field, clean composition with the lower third free for UI."
+  "prompt": "Wide establishing shot of a corporate data center built inside a medieval stone dungeon: rows of black server racks with blinking green and amber status LEDs stand between massive stone pillars and arched vaults; iron chains and burning wall torches hang next to neatly bundled network cables; a stone sacrificial altar is used as a sysadmin desk with three monitors, a mechanical keyboard and a coffee mug; human skulls sit on top of the racks as decor; thin white fog rolls across the stone floor. Lighting: cold green server glow mixed with warm orange torchlight, no pink or magenta light. Empty of people. Wide-angle, eye level, deep depth of field, clean composition with the lower third free for UI. Monitor screens show abstract green graphs and unreadable glyphs; no readable text, no labels, no signage, no logos anywhere in the image."
 }
 ```
 
@@ -215,19 +219,19 @@ REPTILE: a lizard-man system administrator from IT support of Outworld Corp. Gre
   "id": "pt_reptile_neutral", "kind": "portrait", "group": "rank4", "size": [512, 512], "character": "reptile",
   "file": "img/portraits/reptile_neutral.webp", "model": "bytedance-seed/seedream-5-0-pro", "generated": false,
   "references": ["assets/reference/post-hero-and-shao-kahn.png"],
-  "prompt": "Head-and-shoulders portrait, looking at camera sideways from under the hood with a suspicious narrow-eyed look, mouth slightly open showing a forked tongue tip. REPTILE: <описание>. Background: blurred server room, racks with green status LEDs, a skull on top of a rack."
+  "prompt": "Head-and-shoulders portrait, looking at camera sideways from under the hood with a suspicious narrow-eyed look, mouth slightly open showing a forked tongue tip. REPTILE: a lizard-man system administrator from IT support of Outworld Corp. Green scaly reptilian skin, yellow slit-pupil eyes, no hair; wears a dark green hoodie with the hood pulled up over his head, a black headset with a microphone, a corporate lanyard, and holds a tangled bundle of colorful ethernet cables (blue, yellow, grey — no pink). Hunched, wary, slightly annoyed. NO pink, NO magenta anywhere. Background: blurred server room, racks with green status LEDs, a skull on top of a rack."
 },
 {
   "id": "pt_shang_neutral", "kind": "portrait", "group": "rank4", "size": [512, 512], "character": "shang_tsung",
   "file": "img/portraits/shang_neutral.webp", "model": "bytedance-seed/seedream-5-0-pro", "generated": false,
   "references": ["assets/reference/post-hero-and-shao-kahn.png"],
-  "prompt": "Head-and-shoulders portrait, looking directly at camera with a thin knowing smile and slightly raised eyebrow, chin lifted, hands folded so the gold rings are visible at the bottom of the frame. SHANG_TSUNG: <описание>. Background: blurred stone dungeon wall with a torch and a rack of green server LEDs, faint green glow from below lighting his face."
+  "prompt": "Head-and-shoulders portrait, looking directly at camera with a thin knowing smile and slightly raised eyebrow, chin lifted, hands folded so the gold rings are visible at the bottom of the frame. SHANG_TSUNG: a sinister sorcerer reimagined as Director of Transformation of Outworld Corp, a man in his 50s. Long straight black hair slicked back, thin moustache and a pointed goatee, pale gaunt face with sharp cheekbones, eyes glowing a faint toxic green. Black silk mandarin-collar business suit with subtle gold dragon embroidery on the chest and cuffs, many heavy gold rings on both hands, a corporate lanyard with a badge. Holds a black tablet whose screen glows an eerie green like a soul-stealing artifact. Calm, theatrical, predatory. NO pink, NO magenta anywhere in the outfit or lighting. Background: blurred stone dungeon wall with a torch and a rack of green server LEDs, faint green glow from below lighting his face."
 },
 {
   "id": "pt_shang_angry", "kind": "portrait", "group": "rank4", "size": [512, 512], "character": "shang_tsung",
   "file": "img/portraits/shang_angry.webp", "model": "bytedance-seed/seedream-5-0-pro", "generated": false,
   "references": ["assets/reference/post-hero-and-shao-kahn.png", "pt_shang_neutral"], "dependsOn": ["pt_shang_neutral"],
-  "prompt": "Same man, same framing and background as the reference portrait. He snarls with bared teeth; the left half of his face is mid-morph into a bare grey skull, skin peeling away like smoke, the empty eye socket glowing bright toxic green; the right eye blazes green. Green energy wisps rise from his collar. SHANG_TSUNG: <описание>."
+  "prompt": "Same man, same framing and background as the reference portrait. He snarls with bared teeth; the left half of his face is mid-morph into a bare grey skull, skin peeling away like smoke, the empty eye socket glowing bright toxic green; the right eye blazes green. Green energy wisps rise from his collar. SHANG_TSUNG: a sinister sorcerer reimagined as Director of Transformation of Outworld Corp, a man in his 50s. Long straight black hair slicked back, thin moustache and a pointed goatee, pale gaunt face with sharp cheekbones, eyes glowing a faint toxic green. Black silk mandarin-collar business suit with subtle gold dragon embroidery on the chest and cuffs, many heavy gold rings on both hands, a corporate lanyard with a badge. Holds a black tablet whose screen glows an eerie green like a soul-stealing artifact. Calm, theatrical, predatory. NO pink, NO magenta anywhere in the outfit or lighting."
 }
 ```
 
@@ -235,12 +239,14 @@ REPTILE: a lizard-man system administrator from IT support of Outworld Corp. Gre
 
 | id | dependsOn | references | prompt |
 |----|-----------|------------|--------|
-| `sp_shang_idle` | `pt_shang_neutral` | стиль + `pt_shang_neutral` | «Full body, head to shoes fully visible, SHANG_TSUNG standing in a relaxed theatrical pose, three-quarter view facing LEFT, one hand holding the green-glowing tablet against his chest, the other hand raised with fingers spread as if about to cast a spell, faint green wisps around the fingers, polished black shoes. Isolated on a flat uniform solid magenta background (#FF00FF), no floor, no shadow on the background, even studio lighting from the right.» |
-| `sp_shang_attack` | `sp_shang_idle` | стиль + `pt_shang_neutral` + `sp_shang_idle` | «Same man as the reference sprite. SHANG_TSUNG lunging forward to the LEFT, thrusting the glowing tablet out toward the viewer's left like a weapon, other hand clawing the air, green energy streaming from the tablet, hair flying, snarling. Same magenta background, same framing scale.» |
-| `sp_shang_hurt` | `sp_shang_idle` | то же | «Same man. SHANG_TSUNG recoiling backward to the RIGHT, clutching the tablet to his chest with both hands, its screen flickering and cracking, head turned away, face contorted, one gold ring flying off. Same magenta background, same framing scale.» |
-| `sp_shang_defeated` | `sp_shang_idle` | то же | «Same man. SHANG_TSUNG on one knee, hunched, propping himself up with one hand on the floor, the tablet lying dark and cracked beside him, hair falling over his face, the faint green glow in his eyes dying out, exhausted sneer. Same magenta background, same framing scale.» |
+| `sp_shang_idle` | `pt_shang_neutral` | стиль + `pt_shang_neutral` | «Full body, head to shoes fully visible, SHANG_TSUNG standing in a relaxed theatrical pose, three-quarter view facing LEFT, one hand holding the green-glowing tablet against his chest, the other hand raised with fingers spread as if about to cast a spell, faint green wisps around the fingers, polished black shoes, the long hair and the whole silhouette entirely inside the frame with a margin, nothing cropped at the canvas edge. Isolated on a flat uniform solid magenta background (#FF00FF), no floor, no shadow on the background, even studio lighting from the right.» |
+| `sp_shang_attack` | `pt_shang_neutral`, `sp_shang_idle` | стиль + `pt_shang_neutral` + `sp_shang_idle` | «Same man as the reference sprite, still facing LEFT at the same three-quarter angle. SHANG_TSUNG lunging forward to the LEFT, thrusting the glowing tablet out like a weapon, other hand clawing the air, green energy streaming from the tablet, hair and the hem of the silk jacket flying but fully inside the frame with a margin on all sides, snarling. Same magenta background, same framing scale.» |
+| `sp_shang_hurt` | `pt_shang_neutral`, `sp_shang_idle` | то же | «Same man, still facing LEFT at the same three-quarter angle. SHANG_TSUNG recoiling backward (his back moves to the RIGHT), clutching the tablet to his chest with both hands, its screen flickering and cracking, head turned away, face contorted, one gold ring flying off, hair fully inside the frame. Same magenta background, same framing scale.» |
+| `sp_shang_defeated` | `pt_shang_neutral`, `sp_shang_idle` | то же | «Same man, still facing LEFT. SHANG_TSUNG on one knee, hunched, propping himself up with one hand on the floor, the tablet lying dark and cracked beside him, hair falling over his face, the faint green glow in his eyes dying out, exhausted sneer. Same magenta background, same framing scale.» |
 
 Поза `defeated` ниже остальных — групповой кроп прижимает все позы к одной линии низа, это нормально: персонаж «осядет» на землю. Зелёное свечение планшета — дальний от мадженты цвет, despill его не тронет.
+
+Каждый id из `references` обязан быть и в `dependsOn`, иначе падает `test/manifest.test.ts`. Все записи спрайтов: `kind: "sprite"`, `group: "rank4"`, `model: "bytedance-seed/seedream-5-0-pro"`, `generated: false`, `size: [700, 900]`, `character: "shang_tsung"`, `chroma: "#FF00FF"`, `flip: false`.
 
 - [ ] **Step 4: Тесты и коммит (вместе с Task 1)**
 
@@ -271,7 +277,21 @@ Run: `npm run gen -- --group rank4`
 - [ ] **Step 3: Тесты**
 
 Run: `npm test`
-Expected: тест бюджета PASS (спрайты ≤ 150 КБ, портреты ≤ 80 КБ, фон ≤ 300 КБ, сумма ≤ 11.5 МБ). Если спрайт больше — перекодировать вручную: `python3 -c "from PIL import Image; im=Image.open('public/assets/img/sprites/shang_idle.webp'); im.save('public/assets/img/sprites/shang_idle.webp','WEBP',quality=70,method=6)"` для каждого превышающего файла. Тёмный фон подземелья с туманом обычно тяжёлый — при превышении 300 КБ перекодировать фон с `quality=65`.
+Expected: тест бюджета PASS (спрайты ≤ 150 КБ, портреты ≤ 80 КБ, фон ≤ 300 КБ, сумма ≤ 11.5 МБ). Если спрайт больше — перезапустить постобработку по сырым PNG с меньшим качеством (а не пережимать готовый WebP):
+
+```bash
+python3 tools/postprocess.py character --out-dir public/assets/img/sprites --size 700x900 --chroma FF00FF --quality 72 \
+  sp_shang_idle=assets/raw/sp_shang_idle.png sp_shang_attack=assets/raw/sp_shang_attack.png \
+  sp_shang_hurt=assets/raw/sp_shang_hurt.png sp_shang_defeated=assets/raw/sp_shang_defeated.png
+```
+
+Скрипт пишет файлы как `<id>.webp` (`sp_shang_idle.webp`), а в манифесте они `shang_<pose>.webp` — переименовать вручную (`gen-assets.ts` делает это сам, а при прямом вызове нет).
+
+Тёмный фон подземелья с туманом обычно тяжёлый — при превышении 300 КБ так же перегнать его из сырого PNG с меньшим качеством:
+
+```bash
+python3 tools/postprocess.py plain --out public/assets/img/bg/server_dungeon.webp --size 1600x900 --quality 65 assets/raw/bg_server_dungeon.png
+```
 
 ```bash
 git add -A && git commit -m "assets(rank4): server dungeon background, Reptile portrait, Shang Tsung portraits and sprites"
@@ -282,7 +302,7 @@ git add -A && git commit -m "assets(rank4): server dungeon background, Reptile p
 ### Task 4: Прогон в игре
 
 - [ ] **Step 1:** `npm run dev`. Дойти до ступени 4 (или временно стартовать с `rank: 4` в `createInitialState` — не коммитить). Оба события на фоне серверной-подземелья: в «Утечке» портрет Рептилии, в «Интриге» — Шанг Цунга; реакция с портретом angry на первом варианте «Интриги»; варианты с `kitana_owes_you`, `intern_joker`, `sindel_budget_ally`, `baraka_respect` видны только при наличии флагов. Второй вариант «Интриги» ставит `shang_secret` (проверить в консоли: `state.flags`). В сети (DevTools → Network) видно, что при входе в события ступени начали грузиться `il_ending_*` — префетч `endings` отработал без правок движка.
-- [ ] **Step 2:** Бой: Шанг Цунг слева-направо смотрит на героя, позы меняются без прыжков, зелёное свечение планшета видно на тёмном фоне. «Сослаться на данные» — двойной урон, «Перевести стрелки» — серая цифра и реплика из `immune`. Спецприём — `dim`, красная вспышка и реплика про ваше лицо по центру. Победа за 6–8 ходов при слабости (терпение 185), поражение — стресс +25, повтор с `repeatText` обоих событий.
+- [ ] **Step 2:** Бой: Шанг Цунг слева-направо смотрит на героя, позы меняются без прыжков, зелёное свечение планшета видно на тёмном фоне. «Сослаться на данные» — двойной урон, «Перевести стрелки» — серая цифра и реплика из `immune`. Спецприём — `dim`, красная вспышка и реплика про ваше лицо по центру. Босс 185/13: победа за 6 ходов при компетентности ≥ 37 ((10 + 0.15×37)×2 ≈ 31, 6×31 = 186), за 5 ходов при компетентности ≥ 57. Босс снимает 13 + стресс×0.05 (при стрессе 60 ≈ 16, ожидаемо ≈ 18 за ход со спецприёмом), герой держится 5–6 ответов — запас один ход. Проверить на плейтесте компетентность и стресс на входе; если бой непроходим при разумной игре — не трогать 185/13, а поднять компетентность в вариантах ступени (событие 1, вариант 1: competence 15; событие 2, вариант 2: competence 15) и/или снизить дельты стресса до +5. Поражение — стресс +25, повтор с `repeatText` обоих событий.
 - [ ] **Step 3:** Скриншоты `docs/screenshots/stage7-event.png`, `docs/screenshots/stage7-battle.png`. README: статус «этап 7 из 8», потраченная сумма.
 
 ```bash
