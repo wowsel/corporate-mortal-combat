@@ -31,8 +31,15 @@ Vanilla JS (ES modules), HTML/CSS, Canvas 2D для экрана боя. Тес�
 | `src/battle.js` | Чистая боевая формула: урон приёма, ответ босса, исход хода |
 | `src/engine.js` | State machine, DOM-биндинги, переходы между экранами |
 | `src/render.js` | Canvas: силуэты, полоски, таймер, надписи с тряской |
-| `src/content.js` | Данные: ступени, события, боссы, приёмы, концовки |
-| `test/*.test.js` | Тесты для `state.js` и `battle.js` |
+| `src/render/helmets.js` | Реестр рисовалок шлемов: `HELMETS[name](ctx, x, y, color)` |
+| `src/content/index.js` | Собирает `RANKS` из файлов ступеней, экспортирует `MOVES`, `ENDINGS` |
+| `src/content/schema.js` | `validateContent(ranks)` |
+| `src/content/ranks/NN-<slug>.js` | Одна ступень: должность, два события, босс |
+| `test/*.test.js` | Тесты для `state.js`, `battle.js`, `schema.js` |
+
+Разработка идёт поэтапно: план ядра, затем по одному плану на ступень.
+Каждая ступень добавляет свой файл в `src/content/ranks/` и свой шлем в
+`helmets.js`, движок не трогает.
 
 `state.js` и `battle.js` не трогают DOM и покрываются тестами. `engine.js` и
 `render.js` проверяются глазами в браузере.
