@@ -1,0 +1,22 @@
+{
+  "stylePrefix": "",
+  "entries": [
+    { "id": "bg_dev", "kind": "background", "group": "rank0", "file": "assets/img/bg/dev.webp", "model": "", "prompt": "", "generated": false },
+    { "id": "bg_dev_throne", "kind": "background", "group": "rank5", "file": "assets/img/bg/dev_throne.webp", "model": "", "prompt": "", "generated": false },
+    { "id": "pt_dev_neutral", "kind": "portrait", "group": "rank0", "file": "assets/img/portraits/dev_neutral.webp", "model": "", "prompt": "", "generated": false },
+    { "id": "pt_dev_angry", "kind": "portrait", "group": "rank0", "file": "assets/img/portraits/dev_angry.webp", "model": "", "prompt": "", "generated": false },
+    { "id": "sp_dev_idle", "kind": "sprite", "group": "rank0", "file": "assets/img/sprites/dev_idle.webp", "model": "", "prompt": "", "generated": false },
+    { "id": "sp_dev_attack", "kind": "sprite", "group": "rank0", "file": "assets/img/sprites/dev_attack.webp", "model": "", "prompt": "", "generated": false },
+    { "id": "sp_dev_hurt", "kind": "sprite", "group": "rank0", "file": "assets/img/sprites/dev_hurt.webp", "model": "", "prompt": "", "generated": false },
+    { "id": "sp_dev_defeated", "kind": "sprite", "group": "rank0", "file": "assets/img/sprites/dev_defeated.webp", "model": "", "prompt": "", "generated": false },
+    { "id": "pt_dev2_neutral", "kind": "portrait", "group": "rank5", "file": "assets/img/portraits/dev2_neutral.webp", "model": "", "prompt": "", "generated": false },
+    { "id": "pt_dev2_angry", "kind": "portrait", "group": "rank5", "file": "assets/img/portraits/dev2_angry.webp", "model": "", "prompt": "", "generated": false },
+    { "id": "sp_dev2_idle", "kind": "sprite", "group": "rank5", "file": "assets/img/sprites/dev2_idle.webp", "model": "", "prompt": "", "generated": false },
+    { "id": "sp_dev2_attack", "kind": "sprite", "group": "rank5", "file": "assets/img/sprites/dev2_attack.webp", "model": "", "prompt": "", "generated": false },
+    { "id": "sp_dev2_hurt", "kind": "sprite", "group": "rank5", "file": "assets/img/sprites/dev2_hurt.webp", "model": "", "prompt": "", "generated": false },
+    { "id": "sp_dev2_defeated", "kind": "sprite", "group": "rank5", "file": "assets/img/sprites/dev2_defeated.webp", "model": "", "prompt": "", "generated": false },
+    { "id": "il_ending_promotion", "kind": "illustration", "group": "endings", "file": "assets/img/il/ending_promotion.webp", "model": "", "prompt": "", "generated": false },
+    { "id": "il_ending_burnout", "kind": "illustration", "group": "endings", "file": "assets/img/il/ending_burnout.webp", "model": "", "prompt": "", "generated": false },
+    { "id": "il_ending_fatality", "kind": "illustration", "group": "endings", "file": "assets/img/il/ending_fatality.webp", "model": "", "prompt": "", "generated": false }
+  ]
+}
