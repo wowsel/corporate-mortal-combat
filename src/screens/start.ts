@@ -3,6 +3,8 @@ import { createInitialState } from '../state';
 import { placeholderBg } from './event';
 
 export function createStartScreen(): Screen {
+  let goTimer: number | null = null;
+
   return {
     async mount(root, ctx: Ctx) {
       const el = document.createElement('div');
@@ -17,7 +19,12 @@ export function createStartScreen(): Screen {
           <button class="btn-primary" disabled>Начать карьеру</button>
         </div>`;
       root.appendChild(el);
-      const fill = el.querySelector<HTMLElement>('.progress-fill')!;
+      // автоплей до жеста запрещён: первое касание титула разблокирует контекст и включает тему
+      el.addEventListener('pointerdown', () => {
+        ctx.audio.unlock();
+        ctx.audio.playMusic('mu_title');
+      }, { once: true });
+      const fill =el.querySelector<HTMLElement>('.progress-fill')!;
       const btn = el.querySelector<HTMLButtonElement>('.btn-primary')!;
       // по контракту loadGroup не реджектится; ловим на всякий случай — иначе исключение
       // оборвёт mount и стартовый экран останется с выключенной кнопкой навсегда
@@ -30,12 +37,19 @@ export function createStartScreen(): Screen {
       fill.style.width = '100%';
       btn.disabled = false;
       btn.addEventListener('click', () => {
+        // кнопка гасится сразу: двойной клик за 1200 мс не должен дать два перехода
+        btn.disabled = true;
         ctx.audio.unlock();
-        ctx.audio.playMusic('mu_title'); // на этапе 1 файла нет, вызов безвреден; событие переключит на mu_office
-        ctx.setState(createInitialState());
-        ctx.go('event');
+        ctx.audio.playVoice('vo_title');
+        goTimer = window.setTimeout(() => {
+          goTimer = null;
+          ctx.setState(createInitialState());
+          ctx.go('event');
+        }, 1200);
       });
     },
-    unmount() {},
+    unmount() {
+      if (goTimer !== null) { clearTimeout(goTimer); goTimer = null; }
+    },
   };
 }

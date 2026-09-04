@@ -19,6 +19,9 @@ export function createAudio(assets: AssetStore): Audio {
   let master: GainNode | null = null;
   let muted = safeRead() === '1';
   let music: { src: AudioBufferSourceNode; gain: GainNode; id: string } | null = null;
+  // желаемый трек: playMusic асинхронен (декод), поэтому сравнивать надо с намерением,
+  // а не с уже играющим music?.id — иначе два монтирования экрана запустят два источника
+  let wantedMusic: string | null = null;
   let lastType = 0;
   type Slot = 'sfx' | 'voice' | 'music';
   const pending: Record<Slot, (() => void) | null> = { sfx: null, voice: null, music: null };
@@ -129,7 +132,30 @@ export function createAudio(assets: AssetStore): Audio {
     const src = ac.createBufferSource(); src.buffer = buf;
     const gain = ac.createGain(); gain.gain.value = gainValue;
     src.connect(gain); gain.connect(master); src.start();
+    // без этого узлы отыгравшего источника остаются висеть в графе
+    src.onended = () => { try { src.disconnect(); gain.disconnect(); } catch { /* ignore */ } };
     return { src, gain };
+  }
+
+  const decoded = new Map<string, AudioBuffer>();
+  async function bufferFor(id: string): Promise<AudioBuffer | null> {
+    const ac = ensure(); if (!ac) return null;
+    const cached = decoded.get(id); if (cached) return cached;
+    const data = assets.getAudioData(id); if (!data) return null;
+    try {
+      const buf = await ac.decodeAudioData(data.slice(0));
+      decoded.set(id, buf);
+      return buf;
+    } catch (e) { console.warn('decode failed', id, e); return null; }
+  }
+
+  // затухание должно реально дойти до нуля до stop(): setTargetAtTime оставляет ~5% и даёт щелчок
+  function fadeOutAndStop(ac: AudioContext, node: { src: AudioBufferSourceNode; gain: GainNode }) {
+    const t = ac.currentTime;
+    node.gain.gain.cancelScheduledValues(t);
+    node.gain.gain.setValueAtTime(node.gain.gain.value, t);
+    node.gain.gain.linearRampToValueAtTime(0, t + 0.8);
+    node.src.stop(t + 0.85);
   }
 
   return {
@@ -146,29 +172,35 @@ export function createAudio(assets: AssetStore): Audio {
       lastType = now; playSfx('type', 1);
     },
     playVoice(id) {
-      const buf = assets.getAudioBuffer(id);
-      if (!buf) return;
-      const ac = ensure(); if (!ac || !master) return;
-      runWhenReady('voice', ac, () => { playBuffer(ac, buf, 0.9); });
+      void bufferFor(id).then(buf => {
+        if (!buf) return;
+        const ac = ensure(); if (!ac || !master) return;
+        runWhenReady('voice', ac, () => { playBuffer(ac, buf, 0.9); });
+      });
     },
     playMusic(id) {
-      if (music?.id === id) return;
-      const buf = assets.getAudioBuffer(id);
-      if (!buf) return;
-      const ac = ensure(); if (!ac || !master) return;
-      runWhenReady('music', ac, () => {
-        const old = music; music = null;
-        if (old) { old.gain.gain.setTargetAtTime(0, ac.currentTime, 0.4); old.src.stop(ac.currentTime + 1.2); }
-        const started = playBuffer(ac, buf, 0); if (!started) return;
-        started.src.loop = true;
-        started.gain.gain.setTargetAtTime(0.5, ac.currentTime, 0.4);
-        music = { ...started, id };
+      if (wantedMusic === id) return;
+      wantedMusic = id;
+      void bufferFor(id).then(buf => {
+        // пока шёл декод, экран мог смениться (или музыку остановили) — не включаем чужой трек
+        if (!buf || wantedMusic !== id) return;
+        const ac = ensure(); if (!ac || !master) return;
+        runWhenReady('music', ac, () => {
+          if (wantedMusic !== id) return;
+          const old = music; music = null;
+          if (old) fadeOutAndStop(ac, old);
+          const started = playBuffer(ac, buf, 0); if (!started) return;
+          started.src.loop = true;
+          started.gain.gain.setTargetAtTime(0.5, ac.currentTime, 0.4);
+          music = { ...started, id };
+        });
       });
     },
     stopMusic() {
       pending.music = null;
+      wantedMusic = null;
       const ac = ctx; const old = music; music = null;
-      if (old && ac) { old.gain.gain.setTargetAtTime(0, ac.currentTime, 0.4); old.src.stop(ac.currentTime + 1.2); }
+      if (old && ac) fadeOutAndStop(ac, old);
     },
   };
 }

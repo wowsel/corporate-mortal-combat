@@ -1,25 +1,30 @@
-import { Texture } from 'pixi.js';
-import type { AssetGroup, Manifest } from './types';
+import { Assets, Texture } from 'pixi.js';
+import type { AssetEntry, AssetGroup, Manifest } from './types';
 
 /**
- * Контракт хранилища ассетов. На этапе 1 это заглушка, но реальный загрузчик этапа 2
- * обязан вести себя ровно так — экраны написаны в расчёте на эти гарантии:
+ * Контракт хранилища ассетов. Экраны написаны в расчёте на эти гарантии:
  * - `loadGroup` никогда не реджектится: сбой отдельного ассета логируется и заменяется заглушкой;
  *   `onProgress` вызывается монотонно и всегда заканчивается ровно на 1;
  * - `prefetchGroup` — fire-and-forget: не бросает, ничего не возвращает, ошибки глотает;
  * - `getTexture` никогда не возвращает null: для незагруженного id отдаётся текстура-заглушка;
  * - `getImageUrl` возвращает null, если картинки нет, иначе URL, безопасный для подстановки
  *   в CSS `url('…')` (без кавычек, скобок и переводов строк внутри);
- * - `getAudioBuffer` возвращает null, если звука нет.
+ * - `getAudioData` возвращает null, если звука нет (декодированием занимается audio.ts);
+ * - `getAnchor` возвращает точку крепления спрайта в пикселях исходной картинки или null.
+ * Записи с `generated: false` считаются загруженными мгновенно: файлов ещё нет,
+ * запрашивать их нельзя (ни сетевых запросов, ни предупреждений в консоли).
  */
 export interface AssetStore {
   loadGroup(group: AssetGroup, onProgress?: (p: number) => void): Promise<void>;
   prefetchGroup(group: AssetGroup): void;
   getImageUrl(id: string): string | null;
   getTexture(id: string): Texture;
-  getAudioBuffer(id: string): AudioBuffer | null;
+  getAudioData(id: string): ArrayBuffer | null;
+  getAnchor(id: string): [number, number] | null;
   has(id: string): boolean;
 }
+
+const BASE = `${import.meta.env.BASE_URL}assets/`;
 
 function hashColor(id: string): string {
   let h = 0;
@@ -43,29 +48,65 @@ export function placeholderCanvas(id: string, w: number, h: number): HTMLCanvasE
 export function createAssetStore(manifest: Manifest): AssetStore {
   const entries = new Map(manifest.entries.map(e => [e.id, e]));
   const textures = new Map<string, Texture>();
+  const audio = new Map<string, ArrayBuffer>();
+  const loaded = new Set<string>();
+  const groupPromises = new Map<AssetGroup, Promise<void>>();
 
-  const sizeFor = (id: string): [number, number] => {
-    const e = entries.get(id);
-    if (e?.size) return e.size;
-    if (e?.kind === 'background' || e?.kind === 'illustration') return [1600, 900];
-    if (e?.kind === 'portrait') return [512, 512];
-    return [700, 900];
-  };
+  const urlOf = (e: AssetEntry) => `${BASE}${e.file}`;
+  const sizeFor = (e: AssetEntry | undefined): [number, number] =>
+    e?.size ?? (e?.kind === 'portrait' ? [512, 512] : e?.kind === 'sprite' ? [700, 900] : [1600, 900]);
+
+  async function loadOne(e: AssetEntry): Promise<void> {
+    if (loaded.has(e.id) || !e.generated) return;
+    try {
+      if (e.kind === 'music' || e.kind === 'voice') {
+        const res = await fetch(urlOf(e));
+        if (!res.ok) throw new Error(String(res.status));
+        audio.set(e.id, await res.arrayBuffer());
+      } else {
+        const tex = await Assets.load<Texture>({ alias: e.id, src: urlOf(e) });
+        textures.set(e.id, tex);
+      }
+    } catch (err) {
+      console.warn(`asset ${e.id} failed to load, using placeholder`, err);
+    } finally {
+      loaded.add(e.id);
+    }
+  }
+
+  function loadGroup(group: AssetGroup, onProgress?: (p: number) => void): Promise<void> {
+    const existing = groupPromises.get(group);
+    if (existing) { onProgress?.(1); return existing; }
+    const list = manifest.entries.filter(e => e.group === group);
+    let done = 0;
+    const p = Promise.all(list.map(e => loadOne(e).then(() => {
+      done += 1;
+      onProgress?.(list.length ? done / list.length : 1);
+    }))).then(() => { onProgress?.(1); });
+    groupPromises.set(group, p);
+    return p;
+  }
 
   return {
-    async loadGroup(_group, onProgress) { onProgress?.(1); },
-    prefetchGroup() {},
-    getImageUrl() { return null; },
-    getTexture(id) {
-      let t = textures.get(id);
-      if (!t) {
-        const [w, h] = sizeFor(id);
-        t = Texture.from(placeholderCanvas(id, w, h));
-        textures.set(id, t);
-      }
-      return t;
+    loadGroup,
+    prefetchGroup(group) { void loadGroup(group); },
+    getImageUrl(id) {
+      const e = entries.get(id);
+      return e && e.generated ? urlOf(e) : null;
     },
-    getAudioBuffer() { return null; },
+    getTexture(id) {
+      const t = textures.get(id);
+      if (t) return t;
+      let ph = textures.get(`__ph_${id}`);
+      if (!ph) {
+        const [w, h] = sizeFor(entries.get(id));
+        ph = Texture.from(placeholderCanvas(id, w, h));
+        textures.set(`__ph_${id}`, ph);
+      }
+      return ph;
+    },
+    getAudioData(id) { return audio.get(id) ?? null; },
+    getAnchor(id) { return entries.get(id)?.anchor ?? null; },
     has(id) { return entries.has(id); },
   };
 }
