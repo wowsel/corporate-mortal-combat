@@ -19,16 +19,31 @@ export async function withRetry<T>(fn: () => Promise<T>, tries = 3): Promise<T> 
       last = e;
       // 400/401/402/403 — неверный запрос, ключ или нет средств: повтор бессмыслен
       if (e instanceof ApiError && e.status >= 400 && e.status < 404) break;
-      await new Promise(r => setTimeout(r, 2000 * (i + 1)));
+      // Спать после последней попытки незачем — дальше только throw.
+      if (i < tries - 1) await new Promise(r => setTimeout(r, 2000 * (i + 1)));
     }
   }
   throw last;
 }
 
+/**
+ * Тип картинки определяется по сигнатуре файла, а не по расширению: Seedream
+ * отдаёт JPEG, который пайплайн сохраняет под именем `.png`, и по расширению
+ * такой файл был бы помечен как `image/png`. Расширение — только запасной путь.
+ */
+export function sniffImageMime(buf: Buffer, path = ''): string {
+  if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image/jpeg';
+  if (buf.length >= 8 && buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) return 'image/png';
+  if (buf.length >= 12 && buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') return 'image/webp';
+  const lower = path.toLowerCase();
+  if (lower.endsWith('.png')) return 'image/png';
+  if (lower.endsWith('.webp')) return 'image/webp';
+  return 'image/jpeg';
+}
+
 export function toDataUrl(path: string): string {
   const buf = readFileSync(path);
-  const mime = path.endsWith('.png') ? 'image/png' : path.endsWith('.webp') ? 'image/webp' : 'image/jpeg';
-  return `data:${mime};base64,${buf.toString('base64')}`;
+  return `data:${sniffImageMime(buf, path)};base64,${buf.toString('base64')}`;
 }
 
 export interface ImageRequest {
@@ -130,31 +145,42 @@ export async function generateAudio(req: AudioRequest, key: string): Promise<{ a
   const reader = res.body.getReader();
   const dec = new TextDecoder();
   let buf = '';
-  const chunks: string[] = [];
+  // Каждая SSE-дельта закодирована в base64 независимо, поэтому куски декодируются
+  // по отдельности: склейка строк до декодирования обрывается на первом же `=`.
+  const chunks: Buffer[] = [];
   let cost: number | null = null;
   let reported: string | null = null;
+
+  const handleLine = (raw: string) => {
+    const line = raw.trim();
+    if (!line.startsWith('data:')) return;
+    const payload = line.slice(5).trim();
+    if (payload === '[DONE]') return;
+    try {
+      const j = JSON.parse(payload) as { choices?: { delta?: { audio?: { data?: string; format?: string } } }[]; usage?: { cost?: number } };
+      const a = j.choices?.[0]?.delta?.audio;
+      if (a?.data) chunks.push(Buffer.from(a.data, 'base64'));
+      if (a?.format) reported = a.format;
+      if (j.usage?.cost !== undefined) cost = j.usage.cost;
+    } catch { /* keep-alive или мусор */ }
+  };
+
   for (;;) {
     const { value, done } = await reader.read();
     if (done) break;
     buf += dec.decode(value, { stream: true });
     let nl: number;
     while ((nl = buf.indexOf('\n')) >= 0) {
-      const line = buf.slice(0, nl).trim(); buf = buf.slice(nl + 1);
-      if (!line.startsWith('data:')) continue;
-      const payload = line.slice(5).trim();
-      if (payload === '[DONE]') continue;
-      try {
-        const j = JSON.parse(payload) as { choices?: { delta?: { audio?: { data?: string; format?: string } } }[]; usage?: { cost?: number } };
-        const a = j.choices?.[0]?.delta?.audio;
-        if (a?.data) chunks.push(a.data);
-        if (a?.format) reported = a.format;
-        if (j.usage?.cost !== undefined) cost = j.usage.cost;
-      } catch { /* keep-alive или мусор */ }
+      handleLine(buf.slice(0, nl)); buf = buf.slice(nl + 1);
     }
   }
+  // Хвост без завершающего перевода строки: иначе теряется последний кадр usage.
+  buf += dec.decode();
+  for (const line of buf.split('\n')) handleLine(line);
+
   if (!chunks.length) throw new Error('audio: stream contained no audio chunks');
 
-  const raw = Buffer.from(chunks.join(''), 'base64');
+  const raw = Buffer.concat(chunks);
   const format = reported ?? requested;
   if (format === 'pcm16') return { audio: pcm16ToWav(raw), format: 'wav', cost };
   return { audio: raw, format, cost };
