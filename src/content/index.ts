@@ -6,6 +6,7 @@ import { RANK_INTERN } from './ranks/00-intern';
 import { RANK_JUNIOR } from './ranks/01-junior';
 import { RANK_SPECIALIST } from './ranks/02-specialist';
 import { RANK_LEAD } from './ranks/03-lead';
+import { RANK_DIRECTOR } from './ranks/04-director';
 
 export interface Content {
   ranks: Rank[];
@@ -14,7 +15,7 @@ export interface Content {
   strike: Move;
 }
 
-export const RANKS: Rank[] = [RANK_INTERN, RANK_JUNIOR, RANK_SPECIALIST, RANK_LEAD, ...DEV_RANKS];
+export const RANKS: Rank[] = [RANK_INTERN, RANK_JUNIOR, RANK_SPECIALIST, RANK_LEAD, RANK_DIRECTOR, ...DEV_RANKS];
 export { ENDINGS, MOVES, STRIKE_MOVE };
 
 export const CONTENT: Content = { ranks: RANKS, endings: ENDINGS, moves: MOVES, strike: STRIKE_MOVE };

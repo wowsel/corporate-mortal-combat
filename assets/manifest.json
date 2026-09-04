@@ -766,6 +766,176 @@
       "prompt": "Same woman, still facing LEFT. SINDEL sunk onto one knee, propping herself on the closed ledger, golden headband tilted, hair pooled over her shoulders, red pen dropped beside her, signing an approval page with visible reluctance and dignity. SINDEL: a tall regal woman in her fifties, Chief Financial Officer of Outworld Corp, with the bearing of a queen. Very long flowing white hair with a single black streak, pale skin, dramatic dark smoky eye makeup, thin dark lips. Her hair is rendered as solid opaque strands with a clean silhouette — no wispy fly-away strands, no translucent or semi-transparent elements anywhere in the costume. Black and silver high-collared executive gown cut like a long tailored blazer, silver embroidery on the collar, a wide dark leather belt with a silver buckle; the lining and accents are deep indigo / dark violet (NOT pink, NOT magenta, NOT purple-pink — they must contrast with a magenta chroma background). A golden crown-like headband holds her hair back. She holds a thick leather-bound budget ledger and a red pen. Imperious, cold, composed. Same magenta background, same framing scale. The entire figure, including all of her hair and the hem of the gown, is fully inside the frame, nothing cropped at the edges. Palette strictly black, silver, white, gold and deep indigo — absolutely no pink, no magenta, no purple-pink anywhere on the character or her hair."
     },
     {
+      "id": "bg_server_dungeon",
+      "kind": "background",
+      "group": "rank4",
+      "size": [
+        1600,
+        900
+      ],
+      "resolution": "2K",
+      "file": "img/bg/server_dungeon.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png"
+      ],
+      "prompt": "Wide establishing shot of a corporate data center built inside a medieval stone dungeon: rows of black server racks with blinking green and amber status LEDs stand between massive stone pillars and arched vaults; iron chains and burning wall torches hang next to neatly bundled network cables; a stone sacrificial altar is used as a sysadmin desk with three monitors, a mechanical keyboard and a coffee mug; human skulls sit on top of the racks as decor; thin white fog rolls across the stone floor. Lighting: cold green server glow mixed with warm orange torchlight, no pink or magenta light. Empty of people. Wide-angle, eye level, deep depth of field (override the shallow depth of field of the style prefix for this establishing shot), clean composition with the lower third free for UI. Monitor screens show abstract green graphs and unreadable glyphs; no readable text, no labels, no signage, no logos anywhere in the image."
+    },
+    {
+      "id": "pt_reptile_neutral",
+      "kind": "portrait",
+      "group": "rank4",
+      "character": "reptile",
+      "size": [
+        512,
+        512
+      ],
+      "file": "img/portraits/reptile_neutral.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png"
+      ],
+      "prompt": "Head-and-shoulders portrait, looking at camera sideways from under the hood with a suspicious narrow-eyed look, mouth slightly open showing a forked tongue tip. REPTILE: a lizard-man system administrator from IT support of Outworld Corp. Green scaly reptilian skin, yellow slit-pupil eyes, no hair; wears a dark green hoodie with the hood pulled up over his head, a black headset with a microphone, a corporate lanyard, and holds a tangled bundle of colorful ethernet cables (blue, yellow, grey — no pink). Hunched, wary, slightly annoyed. NO pink, NO magenta anywhere. Background: blurred server room, racks with green status LEDs, a skull on top of a rack."
+    },
+    {
+      "id": "pt_shang_neutral",
+      "kind": "portrait",
+      "group": "rank4",
+      "character": "shang_tsung",
+      "size": [
+        512,
+        512
+      ],
+      "file": "img/portraits/shang_neutral.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png"
+      ],
+      "prompt": "Head-and-shoulders portrait, looking directly at camera with a thin knowing smile and slightly raised eyebrow, chin lifted, hands folded so the gold rings are visible at the bottom of the frame. SHANG_TSUNG: a sinister sorcerer reimagined as Director of Transformation of Outworld Corp, a man in his 50s. Long straight black hair slicked back, thin moustache and a pointed goatee, pale gaunt face with sharp cheekbones, eyes glowing a faint toxic green. Black silk mandarin-collar business suit with subtle gold dragon embroidery on the chest and cuffs, many heavy gold rings on both hands, a corporate lanyard with a badge. Holds a black tablet whose screen glows an eerie green like a soul-stealing artifact. Calm, theatrical, predatory. NO pink, NO magenta anywhere in the outfit or lighting. Background: blurred stone dungeon wall with a torch and a rack of green server LEDs, faint green glow from below lighting his face."
+    },
+    {
+      "id": "pt_shang_angry",
+      "kind": "portrait",
+      "group": "rank4",
+      "character": "shang_tsung",
+      "size": [
+        512,
+        512
+      ],
+      "file": "img/portraits/shang_angry.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_shang_neutral"
+      ],
+      "dependsOn": [
+        "pt_shang_neutral"
+      ],
+      "prompt": "Same man, same framing and background as the reference portrait. He snarls with bared teeth; the left half of his face is mid-morph into a bare grey skull, skin peeling away like smoke, the empty eye socket glowing bright toxic green; the right eye blazes green. Green energy wisps rise from his collar. SHANG_TSUNG: a sinister sorcerer reimagined as Director of Transformation of Outworld Corp, a man in his 50s. Long straight black hair slicked back, thin moustache and a pointed goatee, pale gaunt face with sharp cheekbones, eyes glowing a faint toxic green. Black silk mandarin-collar business suit with subtle gold dragon embroidery on the chest and cuffs, many heavy gold rings on both hands, a corporate lanyard with a badge. Holds a black tablet whose screen glows an eerie green like a soul-stealing artifact. Calm, theatrical, predatory. NO pink, NO magenta anywhere in the outfit or lighting."
+    },
+    {
+      "id": "sp_shang_idle",
+      "kind": "sprite",
+      "group": "rank4",
+      "character": "shang_tsung",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/shang_idle.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_shang_neutral"
+      ],
+      "dependsOn": [
+        "pt_shang_neutral"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Full body, head to shoes fully visible, SHANG_TSUNG standing in a relaxed theatrical pose, three-quarter view facing LEFT, one hand holding the green-glowing tablet against his chest, the other hand raised with fingers spread as if about to cast a spell, faint green wisps around the fingers, polished black shoes, the long hair and the whole silhouette entirely inside the frame with a margin, nothing cropped at the canvas edge. Isolated on a flat uniform solid magenta background (#FF00FF), no floor, no shadow on the background, even studio lighting from the right. SHANG_TSUNG: a sinister sorcerer reimagined as Director of Transformation of Outworld Corp, a man in his 50s. Long straight black hair slicked back, thin moustache and a pointed goatee, pale gaunt face with sharp cheekbones, eyes glowing a faint toxic green. Black silk mandarin-collar business suit with subtle gold dragon embroidery on the chest and cuffs, many heavy gold rings on both hands, a corporate lanyard with a badge. Holds a black tablet whose screen glows an eerie green like a soul-stealing artifact. Calm, theatrical, predatory. NO pink, NO magenta anywhere in the outfit or lighting."
+    },
+    {
+      "id": "sp_shang_attack",
+      "kind": "sprite",
+      "group": "rank4",
+      "character": "shang_tsung",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/shang_attack.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_shang_neutral",
+        "sp_shang_idle"
+      ],
+      "dependsOn": [
+        "pt_shang_neutral",
+        "sp_shang_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Same man as the reference sprite, still facing LEFT at the same three-quarter angle. SHANG_TSUNG lunging forward to the LEFT, thrusting the glowing tablet out like a weapon, other hand clawing the air, green energy streaming from the tablet, hair and the hem of the silk jacket flying but fully inside the frame with a margin on all sides, snarling. Same magenta background, same framing scale. SHANG_TSUNG: a sinister sorcerer reimagined as Director of Transformation of Outworld Corp, a man in his 50s. Long straight black hair slicked back, thin moustache and a pointed goatee, pale gaunt face with sharp cheekbones, eyes glowing a faint toxic green. Black silk mandarin-collar business suit with subtle gold dragon embroidery on the chest and cuffs, many heavy gold rings on both hands, a corporate lanyard with a badge. Holds a black tablet whose screen glows an eerie green like a soul-stealing artifact. Calm, theatrical, predatory. NO pink, NO magenta anywhere in the outfit or lighting."
+    },
+    {
+      "id": "sp_shang_hurt",
+      "kind": "sprite",
+      "group": "rank4",
+      "character": "shang_tsung",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/shang_hurt.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_shang_neutral",
+        "sp_shang_idle"
+      ],
+      "dependsOn": [
+        "pt_shang_neutral",
+        "sp_shang_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Same man, still facing LEFT at the same three-quarter angle. SHANG_TSUNG recoiling backward (his back moves to the RIGHT), clutching the tablet to his chest with both hands, its screen flickering and cracking, head turned away, face contorted, one gold ring flying off, hair fully inside the frame. Same magenta background, same framing scale. SHANG_TSUNG: a sinister sorcerer reimagined as Director of Transformation of Outworld Corp, a man in his 50s. Long straight black hair slicked back, thin moustache and a pointed goatee, pale gaunt face with sharp cheekbones, eyes glowing a faint toxic green. Black silk mandarin-collar business suit with subtle gold dragon embroidery on the chest and cuffs, many heavy gold rings on both hands, a corporate lanyard with a badge. Holds a black tablet whose screen glows an eerie green like a soul-stealing artifact. Calm, theatrical, predatory. NO pink, NO magenta anywhere in the outfit or lighting."
+    },
+    {
+      "id": "sp_shang_defeated",
+      "kind": "sprite",
+      "group": "rank4",
+      "character": "shang_tsung",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/shang_defeated.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_shang_neutral",
+        "sp_shang_idle"
+      ],
+      "dependsOn": [
+        "pt_shang_neutral",
+        "sp_shang_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Same man, still facing LEFT. SHANG_TSUNG on one knee, hunched, propping himself up with one hand on the floor, the tablet lying dark and cracked beside him, hair falling over his face, the faint green glow in his eyes dying out, exhausted sneer. Same magenta background, same framing scale. SHANG_TSUNG: a sinister sorcerer reimagined as Director of Transformation of Outworld Corp, a man in his 50s. Long straight black hair slicked back, thin moustache and a pointed goatee, pale gaunt face with sharp cheekbones, eyes glowing a faint toxic green. Black silk mandarin-collar business suit with subtle gold dragon embroidery on the chest and cuffs, many heavy gold rings on both hands, a corporate lanyard with a badge. Holds a black tablet whose screen glows an eerie green like a soul-stealing artifact. Calm, theatrical, predatory. NO pink, NO magenta anywhere in the outfit or lighting."
+    },
+    {
       "id": "bg_dev_throne",
       "kind": "background",
       "group": "rank5",
