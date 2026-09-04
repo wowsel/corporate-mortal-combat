@@ -353,7 +353,7 @@
       ],
       "file": "img/il/title.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "prompt": "HERO: a slim man in his early 40s, curly dark brown hair, round wire-rim glasses, thin goatee, tired polite face; brown tweed three-piece suit with waistcoat, beige shirt, dark red striped tie, small \"Employee of the Month\" badge on the lapel. Same face and outfit as the man in the reference image. Wide cinematic shot: HERO shaking hands with Shao Kahn — a towering muscular warlord in a horned skull helmet, spiked pauldrons and red cape — in a cramped manager's office with skull trophies, a map poster labelled OUTWORLD (single word, correct spelling) and an \"Employee of the Month\" frame. Both look at camera. Composition leaves the upper third empty for a logo.",
+      "prompt": "HERO: a slim man in his early 40s, curly dark brown hair, round wire-rim glasses, thin goatee, tired polite face; brown tweed three-piece suit with waistcoat, beige shirt, dark red striped tie, small \"Employee of the Month\" badge on the lapel. Same face and outfit as the man in the reference image. Wide cinematic shot: HERO shaking hands with Shao Kahn — a towering muscular warlord in a horned skull helmet, spiked pauldrons and red cape — in a cramped manager's office with skull trophies, a map poster labelled OUTWORLD (single word, correct spelling) and an \"Employee of the Month\" frame. Both look at camera. Composition leaves the upper third empty for a logo. The only text in the image is the single word OUTWORLD on the map poster and the small \"Employee of the Month\" frame title; no other text, captions or watermarks.",
       "resolution": "2K",
       "references": [
         "assets/reference/post-hero-and-shao-kahn.png",

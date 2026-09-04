@@ -1,6 +1,7 @@
 .env
 assets/raw/*
 !assets/raw/.gitkeep
+!assets/raw/pt_hero_neutral.png
 node_modules/
 dist/
 .playwright-mcp/
