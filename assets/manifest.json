@@ -613,6 +613,159 @@
       "prompt": "KITANA: an elegant Edenian princess serving as a senior executive of Outworld Corp. Tall, poised, regal posture. Royal-blue tailored blazer and matching pencil skirt with subtle silver thread embroidery along the lapels and cuffs, white silk blouse, a corporate lanyard with a badge. An opaque matte royal-blue silk veil-mask (deep sapphire blue, almost navy; NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta, NOT purple — it must contrast strongly with a magenta chroma background) covers her nose and mouth, fastened at the temples with a thin silver chain. Long straight black hair worn loose with a silver hair ornament shaped like a small fan. Calm, commanding brown eyes with precise dark eyeliner. Her signature steel fans are replaced by two folding hand fans made of laminated presentation slides clipped together — when open they show colorful charts and bar graphs, when closed they look like a stack of clipboards. Composed, aristocratic, quietly dangerous. Palette strictly royal blue, navy, white, silver and black — absolutely no pink, no magenta, no purple anywhere on the character. Same woman, still facing LEFT. KITANA down on one knee, half-collapsed but upright and dignified, both slide-fans lying open on the ground close beside her, silver hair ornament slipped loose, veil intact, one hand pressed to her chest, the other holding out a signed document. Same magenta background, same framing scale."
     },
     {
+      "id": "bg_council",
+      "kind": "background",
+      "group": "rank3",
+      "size": [
+        1600,
+        900
+      ],
+      "resolution": "2K",
+      "file": "img/bg/council.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png"
+      ],
+      "prompt": "Wide establishing shot of the boardroom of Outworld Corp, the council hall: a long polished black stone table, high-backed dark chairs shaped like thrones, a huge wall screen showing a simple bar chart with no readable text or labels, a heavy iron chandelier with candles, iron banners with a dragon emblem on the walls, skulls and bone ornaments on the table and shelves as ordinary decor, a wall poster with the single word OUTWORLD. A floor-to-ceiling window behind the head of the table looks out over a grim dark city skyline under a stormy sky. Dim, cold lighting from the screen and the window. Empty of people. Wide-angle, eye level, deep depth of field (override the shallow depth of field of the style prefix for this establishing shot), clean composition with the lower third free for UI. Exception to the no-text rule: the single word OUTWORLD on the wall poster is required; no other text anywhere."
+    },
+    {
+      "id": "pt_sindel_neutral",
+      "kind": "portrait",
+      "group": "rank3",
+      "character": "sindel",
+      "size": [
+        512,
+        512
+      ],
+      "file": "img/portraits/sindel_neutral.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png"
+      ],
+      "prompt": "Head-and-shoulders portrait, looking directly at camera with a cold appraising gaze, chin slightly raised, lips closed. SINDEL: a tall regal woman in her fifties, Chief Financial Officer of Outworld Corp, with the bearing of a queen. Very long flowing white hair with a single black streak, pale skin, dramatic dark smoky eye makeup, thin dark lips. Her hair is rendered as solid opaque strands with a clean silhouette — no wispy fly-away strands, no translucent or semi-transparent elements anywhere in the costume. Black and silver high-collared executive gown cut like a long tailored blazer, silver embroidery on the collar, a wide dark leather belt with a silver buckle; the lining and accents are deep indigo / dark violet (NOT pink, NOT magenta, NOT purple-pink — they must contrast with a magenta chroma background). A golden crown-like headband holds her hair back. She holds a thick leather-bound budget ledger and a red pen. Imperious, cold, composed. Hair falling straight down over her shoulders. Background: blurred dark boardroom with a glowing bar-chart screen and a skull on the stone table. Palette strictly black, silver, white, gold and deep indigo — absolutely no pink, no magenta, no purple-pink anywhere on the character or her hair."
+    },
+    {
+      "id": "pt_sindel_angry",
+      "kind": "portrait",
+      "group": "rank3",
+      "character": "sindel",
+      "size": [
+        512,
+        512
+      ],
+      "file": "img/portraits/sindel_angry.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_sindel_neutral"
+      ],
+      "dependsOn": [
+        "pt_sindel_neutral"
+      ],
+      "prompt": "Same woman, same framing and background as the reference portrait. Her mouth is wide open in a deafening sonic scream, eyes blazing, brows drawn down; her long white hair is blown straight back and upward as if by a shockwave, the red pen gripped like a dagger. SINDEL: a tall regal woman in her fifties, Chief Financial Officer of Outworld Corp, with the bearing of a queen. Very long flowing white hair with a single black streak, pale skin, dramatic dark smoky eye makeup, thin dark lips. Her hair is rendered as solid opaque strands with a clean silhouette — no wispy fly-away strands, no translucent or semi-transparent elements anywhere in the costume. Black and silver high-collared executive gown cut like a long tailored blazer, silver embroidery on the collar, a wide dark leather belt with a silver buckle; the lining and accents are deep indigo / dark violet (NOT pink, NOT magenta, NOT purple-pink — they must contrast with a magenta chroma background). A golden crown-like headband holds her hair back. She holds a thick leather-bound budget ledger and a red pen. Imperious, cold, composed. Palette strictly black, silver, white, gold and deep indigo — absolutely no pink, no magenta, no purple-pink anywhere on the character or her hair."
+    },
+    {
+      "id": "sp_sindel_idle",
+      "kind": "sprite",
+      "group": "rank3",
+      "character": "sindel",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/sindel_idle.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_sindel_neutral"
+      ],
+      "dependsOn": [
+        "pt_sindel_neutral"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Full body, head to shoes fully visible, SINDEL standing tall in an imperious CFO stance, three-quarter view facing LEFT, the closed budget ledger held against her hip in one hand, the red pen raised in the other as if about to strike out a line. SINDEL: a tall regal woman in her fifties, Chief Financial Officer of Outworld Corp, with the bearing of a queen. Very long flowing white hair with a single black streak, pale skin, dramatic dark smoky eye makeup, thin dark lips. Her hair is rendered as solid opaque strands with a clean silhouette — no wispy fly-away strands, no translucent or semi-transparent elements anywhere in the costume. Black and silver high-collared executive gown cut like a long tailored blazer, silver embroidery on the collar, a wide dark leather belt with a silver buckle; the lining and accents are deep indigo / dark violet (NOT pink, NOT magenta, NOT purple-pink — they must contrast with a magenta chroma background). A golden crown-like headband holds her hair back. She holds a thick leather-bound budget ledger and a red pen. Imperious, cold, composed. Hair kept compact, gathered behind the shoulders, falling straight down her back, not blowing across the background. Isolated on a flat uniform solid magenta background (#FF00FF), no floor, no shadow on the background, even studio lighting from the right. The entire figure, including all of her hair and the hem of the gown, is fully inside the frame, nothing cropped at the edges. Palette strictly black, silver, white, gold and deep indigo — absolutely no pink, no magenta, no purple-pink anywhere on the character or her hair."
+    },
+    {
+      "id": "sp_sindel_attack",
+      "kind": "sprite",
+      "group": "rank3",
+      "character": "sindel",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/sindel_attack.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_sindel_neutral",
+        "sp_sindel_idle"
+      ],
+      "dependsOn": [
+        "pt_sindel_neutral",
+        "sp_sindel_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Same woman as the reference sprite, still facing LEFT at the same three-quarter angle. SINDEL leaning forward to the LEFT, mouth wide open in a sonic scream, hair blown violently back to the RIGHT, the ledger flung open with pages rippling, red pen stabbing forward like a blade. SINDEL: a tall regal woman in her fifties, Chief Financial Officer of Outworld Corp, with the bearing of a queen. Very long flowing white hair with a single black streak, pale skin, dramatic dark smoky eye makeup, thin dark lips. Her hair is rendered as solid opaque strands with a clean silhouette — no wispy fly-away strands, no translucent or semi-transparent elements anywhere in the costume. Black and silver high-collared executive gown cut like a long tailored blazer, silver embroidery on the collar, a wide dark leather belt with a silver buckle; the lining and accents are deep indigo / dark violet (NOT pink, NOT magenta, NOT purple-pink — they must contrast with a magenta chroma background). A golden crown-like headband holds her hair back. She holds a thick leather-bound budget ledger and a red pen. Imperious, cold, composed. Same magenta background, same framing scale. The entire figure, including all of her hair and the hem of the gown, is fully inside the frame, nothing cropped at the edges. Palette strictly black, silver, white, gold and deep indigo — absolutely no pink, no magenta, no purple-pink anywhere on the character or her hair."
+    },
+    {
+      "id": "sp_sindel_hurt",
+      "kind": "sprite",
+      "group": "rank3",
+      "character": "sindel",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/sindel_hurt.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_sindel_neutral",
+        "sp_sindel_idle"
+      ],
+      "dependsOn": [
+        "pt_sindel_neutral",
+        "sp_sindel_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Same woman, still facing LEFT at the same three-quarter angle. SINDEL recoiling backward (her back moves to the RIGHT), one hand clutching the golden headband as it slips, the ledger loose with sheets flying out, hair whipped upward, eyes wide in outrage. SINDEL: a tall regal woman in her fifties, Chief Financial Officer of Outworld Corp, with the bearing of a queen. Very long flowing white hair with a single black streak, pale skin, dramatic dark smoky eye makeup, thin dark lips. Her hair is rendered as solid opaque strands with a clean silhouette — no wispy fly-away strands, no translucent or semi-transparent elements anywhere in the costume. Black and silver high-collared executive gown cut like a long tailored blazer, silver embroidery on the collar, a wide dark leather belt with a silver buckle; the lining and accents are deep indigo / dark violet (NOT pink, NOT magenta, NOT purple-pink — they must contrast with a magenta chroma background). A golden crown-like headband holds her hair back. She holds a thick leather-bound budget ledger and a red pen. Imperious, cold, composed. Same magenta background, same framing scale. The entire figure, including all of her hair and the hem of the gown, is fully inside the frame, nothing cropped at the edges. Palette strictly black, silver, white, gold and deep indigo — absolutely no pink, no magenta, no purple-pink anywhere on the character or her hair."
+    },
+    {
+      "id": "sp_sindel_defeated",
+      "kind": "sprite",
+      "group": "rank3",
+      "character": "sindel",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/sindel_defeated.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_sindel_neutral",
+        "sp_sindel_idle"
+      ],
+      "dependsOn": [
+        "pt_sindel_neutral",
+        "sp_sindel_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Same woman, still facing LEFT. SINDEL sunk onto one knee, propping herself on the closed ledger, golden headband tilted, hair pooled over her shoulders, red pen dropped beside her, signing an approval page with visible reluctance and dignity. SINDEL: a tall regal woman in her fifties, Chief Financial Officer of Outworld Corp, with the bearing of a queen. Very long flowing white hair with a single black streak, pale skin, dramatic dark smoky eye makeup, thin dark lips. Her hair is rendered as solid opaque strands with a clean silhouette — no wispy fly-away strands, no translucent or semi-transparent elements anywhere in the costume. Black and silver high-collared executive gown cut like a long tailored blazer, silver embroidery on the collar, a wide dark leather belt with a silver buckle; the lining and accents are deep indigo / dark violet (NOT pink, NOT magenta, NOT purple-pink — they must contrast with a magenta chroma background). A golden crown-like headband holds her hair back. She holds a thick leather-bound budget ledger and a red pen. Imperious, cold, composed. Same magenta background, same framing scale. The entire figure, including all of her hair and the hem of the gown, is fully inside the frame, nothing cropped at the edges. Palette strictly black, silver, white, gold and deep indigo — absolutely no pink, no magenta, no purple-pink anywhere on the character or her hair."
+    },
+    {
       "id": "bg_dev_throne",
       "kind": "background",
       "group": "rank5",
