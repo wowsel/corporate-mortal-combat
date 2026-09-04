@@ -20,6 +20,10 @@ export function createEventScreen(): Screen {
       if (state.rank + 1 < ctx.content.ranks.length) ctx.assets.prefetchGroup(`rank${state.rank + 1}` as AssetGroup);
       if (state.rank >= 4) ctx.assets.prefetchGroup('endings');
 
+      // фон и портрет читаются синхронно — дождаться группы ступени, иначе первое событие
+      // новой ступени отрисуется заглушками, если префетч не успел
+      await ctx.assets.loadGroup(`rank${state.rank}` as AssetGroup);
+
       const el = document.createElement('div');
       el.className = 'screen event';
       const bg = ctx.assets.getImageUrl(rank.background);

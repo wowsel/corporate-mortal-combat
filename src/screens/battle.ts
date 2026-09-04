@@ -6,7 +6,7 @@ import { createHud } from '../hud';
 import { banner, damageNumber, dim, flash, grayscale, particles, shake, speechLine, wait } from '../render/effects';
 import { getScene, type Scene } from '../render/scene';
 import { afterBattle, checkEnding, currentRank } from '../state';
-import type { BattleState, Boss, Move, Step } from '../types';
+import type { AssetGroup, BattleState, Boss, Move, Step } from '../types';
 
 // bossAnim не выделен: turnSteps отдаёт ход одним списком шагов, разрезать его по границе
 // ответа босса нельзя без изменения хореографии — вся анимация хода живёт в playerAnim
@@ -54,10 +54,15 @@ export function createBattleScreen(): Screen {
       await scene.mount(el.querySelector('.battle-canvas')!);
       if (!alive) return;
 
+      // getTexture синхронный: без ожидания группы персонаж останется заглушкой на весь бой
+      // (loadGroup дедуплицирует промисы — после префетча это бесплатно)
+      await ctx.assets.loadGroup(`rank${state.rank}` as AssetGroup);
+      if (!alive) return;
+
       const tex = (id: string) => ctx.assets.getTexture(id);
       scene.setBackground(tex(rank.background));
-      scene.setFighter('hero', { idle: tex('sp_hero_idle'), attack: tex('sp_hero_attack'), hurt: tex('sp_hero_hurt'), win: tex('sp_hero_win') }, 'Вы', rank.title, tex('pt_hero_neutral'));
-      scene.setFighter('boss', { idle: tex(boss.sprites.idle), attack: tex(boss.sprites.attack), hurt: tex(boss.sprites.hurt), defeated: tex(boss.sprites.defeated) }, boss.name, boss.title, tex(boss.portraits.neutral));
+      scene.setFighter('hero', { idle: tex('sp_hero_idle'), attack: tex('sp_hero_attack'), hurt: tex('sp_hero_hurt'), win: tex('sp_hero_win') }, 'Вы', rank.title, tex('pt_hero_neutral'), ctx.assets.getAnchor('sp_hero_idle'));
+      scene.setFighter('boss', { idle: tex(boss.sprites.idle), attack: tex(boss.sprites.attack), hurt: tex(boss.sprites.hurt), defeated: tex(boss.sprites.defeated) }, boss.name, boss.title, tex(boss.portraits.neutral), ctx.assets.getAnchor(boss.sprites.idle));
       // полоски не сбрасываются сами между боями: выставить полные значения до интро
       void scene.setBar('hero', battle.maxConfidence, battle.maxConfidence, 0);
       void scene.setBar('boss', battle.maxPatience, battle.maxPatience, 0);

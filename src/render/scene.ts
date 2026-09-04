@@ -26,11 +26,14 @@ class Fighter implements FighterView {
     this.container.addChild(this.sprite);
     this.container.position.set(baseX, GROUND_Y);
   }
-  setTextures(t: Record<string, Texture>) {
+  setTextures(t: Record<string, Texture>, anchor: [number, number] | null = null) {
     this.textures = t;
     this.setPose('idle');
     const targetH = 520;
     const tex = t['idle'] ?? Texture.EMPTY;
+    // якорь задан в пикселях исходной картинки (точка опоры — ступни); все позы одного размера
+    if (anchor) this.sprite.anchor.set(anchor[0] / Math.max(1, tex.width), anchor[1] / Math.max(1, tex.height));
+    else this.sprite.anchor.set(0.5, 1);
     const s = targetH / Math.max(1, tex.height);
     this.sprite.scale.set(this.flip ? -s : s, s);
     this.breath?.kill();
@@ -84,7 +87,7 @@ export interface Scene {
   mount(container: HTMLElement): Promise<void>;
   unmount(): void;
   setBackground(texture: Texture): void;
-  setFighter(who: 'hero' | 'boss', textures: Record<string, Texture>, name: string, title: string, portrait: Texture): void;
+  setFighter(who: 'hero' | 'boss', textures: Record<string, Texture>, name: string, title: string, portrait: Texture, anchor?: [number, number] | null): void;
   hero: FighterView; boss: FighterView;
   setBar(who: 'hero' | 'boss', value: number, max: number, ms: number): Promise<void>;
   camera(zoom: number, ms: number): Promise<void>;
@@ -210,9 +213,9 @@ export function getScene(): Scene {
       const s = Math.max(W / texture.width, H / texture.height) * 1.06;
       bg.scale.set(s);
     },
-    setFighter(who, textures, name, title, portrait) {
+    setFighter(who, textures, name, title, portrait, anchor) {
       const f = who === 'hero' ? hero : boss;
-      (f as Fighter).setTextures(textures);
+      (f as Fighter).setTextures(textures, anchor ?? null);
       (who === 'hero' ? heroBar : bossBar).setLabels(name, title);
       const p = who === 'hero' ? heroPortrait : bossPortrait;
       p.texture = portrait; p.width = 56; p.height = 56;
