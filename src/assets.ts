@@ -5,6 +5,9 @@ import type { AssetEntry, AssetGroup, Manifest } from './types';
  * Контракт хранилища ассетов. Экраны написаны в расчёте на эти гарантии:
  * - `loadGroup` никогда не реджектится: сбой отдельного ассета логируется и заменяется заглушкой;
  *   `onProgress` вызывается монотонно и всегда заканчивается ровно на 1;
+ * - повторный `loadGroup` уже запущенной группы дедуплицируется: он не перезапускает загрузку,
+ *   отдаёт тот же промис и сразу сообщает `onProgress(1)` — реальный прогресс идущей загрузки
+ *   такой вызов не видит. Полоску прогресса рисует только первый вызов (стартовый экран);
  * - `prefetchGroup` — fire-and-forget: не бросает, ничего не возвращает, ошибки глотает;
  * - `getTexture` никогда не возвращает null: для незагруженного id отдаётся текстура-заглушка;
  * - `getImageUrl` возвращает null, если картинки нет, иначе URL, безопасный для подстановки
@@ -76,6 +79,8 @@ export function createAssetStore(manifest: Manifest): AssetStore {
 
   function loadGroup(group: AssetGroup, onProgress?: (p: number) => void): Promise<void> {
     const existing = groupPromises.get(group);
+    // по контракту: догоняющий вызов не подписывается на реальный прогресс, а сразу
+    // репортит 1 — иначе пришлось бы держать список подписчиков на каждую группу
     if (existing) { onProgress?.(1); return existing; }
     const list = manifest.entries.filter(e => e.group === group);
     let done = 0;

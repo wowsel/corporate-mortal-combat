@@ -24,7 +24,7 @@ export function createStartScreen(): Screen {
         ctx.audio.unlock();
         ctx.audio.playMusic('mu_title');
       }, { once: true });
-      const fill =el.querySelector<HTMLElement>('.progress-fill')!;
+      const fill = el.querySelector<HTMLElement>('.progress-fill')!;
       const btn = el.querySelector<HTMLButtonElement>('.btn-primary')!;
       // по контракту loadGroup не реджектится; ловим на всякий случай — иначе исключение
       // оборвёт mount и стартовый экран останется с выключенной кнопкой навсегда
@@ -41,11 +41,14 @@ export function createStartScreen(): Screen {
         btn.disabled = true;
         ctx.audio.unlock();
         ctx.audio.playVoice('vo_title');
+        // пауза под реплику имеет смысл, только если реплика реально загружена;
+        // без неё (этап 1, сбой загрузки, `generated: false`) не заставляем ждать 1.2 с
+        const delay = ctx.assets.getAudioData('vo_title') !== null ? 1200 : 150;
         goTimer = window.setTimeout(() => {
           goTimer = null;
           ctx.setState(createInitialState());
           ctx.go('event');
-        }, 1200);
+        }, delay);
       });
     },
     unmount() {

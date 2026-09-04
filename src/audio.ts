@@ -139,9 +139,11 @@ export function createAudio(assets: AssetStore): Audio {
 
   const decoded = new Map<string, AudioBuffer>();
   async function bufferFor(id: string): Promise<AudioBuffer | null> {
-    const ac = ensure(); if (!ac) return null;
+    // сначала кэш и наличие данных, и только потом ensure(): иначе запрос несуществующего
+    // звука создаёт AudioContext (в Safari — до жеста пользователя, сразу в suspended)
     const cached = decoded.get(id); if (cached) return cached;
     const data = assets.getAudioData(id); if (!data) return null;
+    const ac = ensure(); if (!ac) return null;
     try {
       const buf = await ac.decodeAudioData(data.slice(0));
       decoded.set(id, buf);
@@ -152,8 +154,11 @@ export function createAudio(assets: AssetStore): Audio {
   // затухание должно реально дойти до нуля до stop(): setTargetAtTime оставляет ~5% и даёт щелчок
   function fadeOutAndStop(ac: AudioContext, node: { src: AudioBufferSourceNode; gain: GainNode }) {
     const t = ac.currentTime;
+    // значение читаем ДО cancelScheduledValues: он сбрасывает .value к последнему
+    // запланированному, и текущая громкость (например, ещё идущий setTargetAtTime) теряется
+    const v = node.gain.gain.value;
     node.gain.gain.cancelScheduledValues(t);
-    node.gain.gain.setValueAtTime(node.gain.gain.value, t);
+    node.gain.gain.setValueAtTime(v, t);
     node.gain.gain.linearRampToValueAtTime(0, t + 0.8);
     node.src.stop(t + 0.85);
   }

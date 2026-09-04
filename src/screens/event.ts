@@ -20,16 +20,15 @@ export function createEventScreen(): Screen {
       if (state.rank + 1 < ctx.content.ranks.length) ctx.assets.prefetchGroup(`rank${state.rank + 1}` as AssetGroup);
       if (state.rank >= 4) ctx.assets.prefetchGroup('endings');
 
-      // фон и портрет читаются синхронно — дождаться группы ступени, иначе первое событие
-      // новой ступени отрисуется заглушками, если префетч не успел
-      await ctx.assets.loadGroup(`rank${state.rank}` as AssetGroup);
-
+      // разметку вставляем ДО await: предыдущий экран уже размонтирован, и пока грузится
+      // группа ступени, пользователь иначе смотрит в пустой root. Гард `alive` здесь не нужен:
+      // createEngine держит флаг busy на всё время асинхронного mount (src/engine.ts),
+      // поэтому следующий переход не начнётся, пока этот mount не завершится.
       const el = document.createElement('div');
       el.className = 'screen event';
-      const bg = ctx.assets.getImageUrl(rank.background);
       el.innerHTML = `
         <div class="hud-slot"></div>
-        <div class="vn-stage" style="${bg ? `background-image:url('${bg}')` : `background:${placeholderBg(rank.background)}`}">
+        <div class="vn-stage">
           <div class="vn-portrait"></div>
           <div class="vn-dialog">
             <div class="vn-name"></div>
@@ -39,6 +38,15 @@ export function createEventScreen(): Screen {
           </div>
         </div>`;
       root.appendChild(el);
+
+      // фон и портрет читаются синхронно — дождаться группы ступени, иначе первое событие
+      // новой ступени отрисуется заглушками, если префетч не успел
+      await ctx.assets.loadGroup(`rank${state.rank}` as AssetGroup);
+
+      const stage = el.querySelector<HTMLElement>('.vn-stage')!;
+      const bg = ctx.assets.getImageUrl(rank.background);
+      if (bg) stage.style.backgroundImage = `url('${bg}')`;
+      else stage.style.background = placeholderBg(rank.background);
 
       const hud = createHud(el.querySelector('.hud-slot')!);
       hud.update(state, rank.title);
