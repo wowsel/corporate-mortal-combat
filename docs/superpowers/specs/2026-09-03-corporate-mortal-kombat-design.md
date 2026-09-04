@@ -212,6 +212,8 @@ interface Choice {
 
 ## Боевая механика
 
+> **Дополнение 2026-09-04:** бой переведён в форму диалога — реплика босса и четыре ответа героя каждый ход. Структуры `Boss.intro`/`lines.hit`/`lines.immune` и `lineIndex` игрока ниже устарели; действующее описание — `2026-09-04-battle-dialogue-design.md`.
+
 ```ts
 interface BattleState {
   confidence: number; maxConfidence: number;   // игрок, старт 100
