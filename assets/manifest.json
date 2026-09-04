@@ -460,6 +460,159 @@
       "prompt": "Same man, still facing LEFT at the same three-quarter angle. BARAKA sitting slumped on the floor, legs stretched out, both ruler-blades resting limp on the ground, closed laptop on his knees, head bowed, mouth closed for once, a small green sticky note stuck to his forehead. BARAKA: a huge hulking Tarkatan man, Team Lead at Outworld Corp. Grey-brown leathery skin, bald head with bony ridges running back over the skull, tiny fierce deep-set eyes, and an enormous mouth full of rows of long curved fangs that never fully closes. Grey business shirt with the sleeves rolled up over massive forearms, a loosened dark charcoal tie, a corporate lanyard with a badge, dark olive cargo trousers with many pockets and black work boots. Instead of arm blades he wears two long steel ruler-like blades strapped to his forearms with leather straps, engraved with measurement marks, extending well past his hands. Intimidating, impatient, oddly professional. Palette strictly greys, browns, dark olive and matte, non-reflective brushed steel — absolutely no pink, no magenta, no purple anywhere on the character. Same magenta background, same framing scale."
     },
     {
+      "id": "bg_kitchen",
+      "kind": "background",
+      "group": "rank2",
+      "size": [
+        1600,
+        900
+      ],
+      "resolution": "2K",
+      "file": "img/bg/kitchen.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png"
+      ],
+      "prompt": "Wide establishing shot of a corporate office kitchen of Outworld Corp at late afternoon: a long counter with a sink, a white water cooler with a half-empty bottle, a large fridge densely covered with sticky notes and small paper signs (all unreadable scribbles), a microwave with a faint glow, a dusty broken coffee machine with a handwritten sign taped over it (unreadable), an electric kettle shaped like a polished bone-white skull, a round table with four mismatched chairs, plastic cups, a bowl of stale cookies. Skulls and small bone ornaments stand on the shelves as ordinary decor; a wall poster shows the single word OUTWORLD above a dragon emblem. Empty of people. Wide-angle, eye level, deep depth of field (override the shallow depth of field of the style prefix for this establishing shot), clean composition with the lower third free for UI. Exception to the no-text rule: the single word OUTWORLD on the wall poster is required; no other text anywhere."
+    },
+    {
+      "id": "pt_kitana_neutral",
+      "kind": "portrait",
+      "group": "rank2",
+      "character": "kitana",
+      "size": [
+        512,
+        512
+      ],
+      "file": "img/portraits/kitana_neutral.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png"
+      ],
+      "prompt": "Head-and-shoulders portrait, looking directly at camera with a calm appraising regal gaze, chin slightly raised. KITANA: an elegant Edenian princess serving as a senior executive of Outworld Corp. Tall, poised, regal posture. Royal-blue tailored blazer and matching pencil skirt with subtle silver thread embroidery along the lapels and cuffs, white silk blouse, a corporate lanyard with a badge. An opaque matte royal-blue silk veil-mask (deep sapphire blue, almost navy; NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta, NOT purple — it must contrast strongly with a magenta chroma background) covers her nose and mouth, fastened at the temples with a thin silver chain. Long straight black hair worn loose with a silver hair ornament shaped like a small fan. Calm, commanding brown eyes with precise dark eyeliner. Her signature steel fans are replaced by two folding hand fans made of laminated presentation slides clipped together — when open they show colorful charts and bar graphs, when closed they look like a stack of clipboards. Composed, aristocratic, quietly dangerous. Palette strictly royal blue, navy, white, silver and black — absolutely no pink, no magenta, no purple anywhere on the character. Background: blurred office kitchen with a water cooler and a skull-shaped kettle on the counter."
+    },
+    {
+      "id": "pt_kitana_angry",
+      "kind": "portrait",
+      "group": "rank2",
+      "character": "kitana",
+      "size": [
+        512,
+        512
+      ],
+      "file": "img/portraits/kitana_angry.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_kitana_neutral"
+      ],
+      "dependsOn": [
+        "pt_kitana_neutral"
+      ],
+      "prompt": "Same woman, same framing and background as the reference portrait. The royal-blue veil is still on; her eyes are furious and narrowed, brows drawn down; one folding fan made of laminated presentation slides is snapped open beside her face, its charts visible. KITANA: an elegant Edenian princess serving as a senior executive of Outworld Corp. Tall, poised, regal posture. Royal-blue tailored blazer and matching pencil skirt with subtle silver thread embroidery along the lapels and cuffs, white silk blouse, a corporate lanyard with a badge. An opaque matte royal-blue silk veil-mask (deep sapphire blue, almost navy; NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta, NOT purple — it must contrast strongly with a magenta chroma background) covers her nose and mouth, fastened at the temples with a thin silver chain. Long straight black hair worn loose with a silver hair ornament shaped like a small fan. Calm, commanding brown eyes with precise dark eyeliner. Her signature steel fans are replaced by two folding hand fans made of laminated presentation slides clipped together — when open they show colorful charts and bar graphs, when closed they look like a stack of clipboards. Composed, aristocratic, quietly dangerous. Palette strictly royal blue, navy, white, silver and black — absolutely no pink, no magenta, no purple anywhere on the character."
+    },
+    {
+      "id": "sp_kitana_idle",
+      "kind": "sprite",
+      "group": "rank2",
+      "character": "kitana",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/kitana_idle.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_kitana_neutral"
+      ],
+      "dependsOn": [
+        "pt_kitana_neutral"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "KITANA: an elegant Edenian princess serving as a senior executive of Outworld Corp. Tall, poised, regal posture. Royal-blue tailored blazer and matching pencil skirt with subtle silver thread embroidery along the lapels and cuffs, white silk blouse, a corporate lanyard with a badge. An opaque matte royal-blue silk veil-mask (deep sapphire blue, almost navy; NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta, NOT purple — it must contrast strongly with a magenta chroma background) covers her nose and mouth, fastened at the temples with a thin silver chain. Long straight black hair worn loose with a silver hair ornament shaped like a small fan. Calm, commanding brown eyes with precise dark eyeliner. Her signature steel fans are replaced by two folding hand fans made of laminated presentation slides clipped together — when open they show colorful charts and bar graphs, when closed they look like a stack of clipboards. Composed, aristocratic, quietly dangerous. Palette strictly royal blue, navy, white, silver and black — absolutely no pink, no magenta, no purple anywhere on the character. Full body, head to shoes fully visible, KITANA standing in a poised negotiator stance, three-quarter view facing LEFT, both slide-fans closed and held crossed in front of her waist like folders, weight on the back heel, chin up. Isolated on a flat uniform solid magenta background (#FF00FF), no floor, no shadow on the background, even studio lighting from the right."
+    },
+    {
+      "id": "sp_kitana_attack",
+      "kind": "sprite",
+      "group": "rank2",
+      "character": "kitana",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/kitana_attack.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_kitana_neutral",
+        "sp_kitana_idle"
+      ],
+      "dependsOn": [
+        "pt_kitana_neutral",
+        "sp_kitana_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "KITANA: an elegant Edenian princess serving as a senior executive of Outworld Corp. Tall, poised, regal posture. Royal-blue tailored blazer and matching pencil skirt with subtle silver thread embroidery along the lapels and cuffs, white silk blouse, a corporate lanyard with a badge. An opaque matte royal-blue silk veil-mask (deep sapphire blue, almost navy; NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta, NOT purple — it must contrast strongly with a magenta chroma background) covers her nose and mouth, fastened at the temples with a thin silver chain. Long straight black hair worn loose with a silver hair ornament shaped like a small fan. Calm, commanding brown eyes with precise dark eyeliner. Her signature steel fans are replaced by two folding hand fans made of laminated presentation slides clipped together — when open they show colorful charts and bar graphs, when closed they look like a stack of clipboards. Composed, aristocratic, quietly dangerous. Palette strictly royal blue, navy, white, silver and black — absolutely no pink, no magenta, no purple anywhere on the character. Same woman as the reference sprite, still facing LEFT at the same three-quarter angle. KITANA stepping forward to the LEFT, one slide-fan snapped fully open and thrust forward showing a bar chart, kept fully inside the frame, the other fan held close to her shoulder, veil in place, hair settled, sharp commanding expression. Same magenta background, same framing scale."
+    },
+    {
+      "id": "sp_kitana_hurt",
+      "kind": "sprite",
+      "group": "rank2",
+      "character": "kitana",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/kitana_hurt.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_kitana_neutral",
+        "sp_kitana_idle"
+      ],
+      "dependsOn": [
+        "pt_kitana_neutral",
+        "sp_kitana_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "KITANA: an elegant Edenian princess serving as a senior executive of Outworld Corp. Tall, poised, regal posture. Royal-blue tailored blazer and matching pencil skirt with subtle silver thread embroidery along the lapels and cuffs, white silk blouse, a corporate lanyard with a badge. An opaque matte royal-blue silk veil-mask (deep sapphire blue, almost navy; NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta, NOT purple — it must contrast strongly with a magenta chroma background) covers her nose and mouth, fastened at the temples with a thin silver chain. Long straight black hair worn loose with a silver hair ornament shaped like a small fan. Calm, commanding brown eyes with precise dark eyeliner. Her signature steel fans are replaced by two folding hand fans made of laminated presentation slides clipped together — when open they show colorful charts and bar graphs, when closed they look like a stack of clipboards. Composed, aristocratic, quietly dangerous. Palette strictly royal blue, navy, white, silver and black — absolutely no pink, no magenta, no purple anywhere on the character. Same woman, still facing LEFT at the same three-quarter angle. KITANA recoiling backward (her back moves to the RIGHT), one fan knocked open in her hand, a few laminated slides falling close to her body, other hand raised to steady her veil, eyes wide in offended surprise. Same magenta background, same framing scale."
+    },
+    {
+      "id": "sp_kitana_defeated",
+      "kind": "sprite",
+      "group": "rank2",
+      "character": "kitana",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/kitana_defeated.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_kitana_neutral",
+        "sp_kitana_idle"
+      ],
+      "dependsOn": [
+        "pt_kitana_neutral",
+        "sp_kitana_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "KITANA: an elegant Edenian princess serving as a senior executive of Outworld Corp. Tall, poised, regal posture. Royal-blue tailored blazer and matching pencil skirt with subtle silver thread embroidery along the lapels and cuffs, white silk blouse, a corporate lanyard with a badge. An opaque matte royal-blue silk veil-mask (deep sapphire blue, almost navy; NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta, NOT purple — it must contrast strongly with a magenta chroma background) covers her nose and mouth, fastened at the temples with a thin silver chain. Long straight black hair worn loose with a silver hair ornament shaped like a small fan. Calm, commanding brown eyes with precise dark eyeliner. Her signature steel fans are replaced by two folding hand fans made of laminated presentation slides clipped together — when open they show colorful charts and bar graphs, when closed they look like a stack of clipboards. Composed, aristocratic, quietly dangerous. Palette strictly royal blue, navy, white, silver and black — absolutely no pink, no magenta, no purple anywhere on the character. Same woman, still facing LEFT. KITANA down on one knee, half-collapsed but upright and dignified, both slide-fans lying open on the ground close beside her, silver hair ornament slipped loose, veil intact, one hand pressed to her chest, the other holding out a signed document. Same magenta background, same framing scale."
+    },
+    {
       "id": "bg_dev_throne",
       "kind": "background",
       "group": "rank5",
