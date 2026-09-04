@@ -154,17 +154,157 @@
       ]
     },
     {
-      "id": "bg_dev",
+      "id": "bg_openspace",
       "kind": "background",
       "group": "rank0",
       "size": [
         1600,
         900
       ],
-      "file": "img/bg/dev.webp",
-      "model": "",
-      "prompt": "",
-      "generated": false
+      "resolution": "2K",
+      "file": "img/bg/openspace.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png"
+      ],
+      "prompt": "Wide establishing shot of a corporate open-space office of Outworld Corp at mid-morning: rows of grey desks with monitors, ergonomic chairs, a whiteboard with a flowchart, a wall map poster with the single word OUTWORLD, potted dead plants, a water cooler. Skulls and bone trophies sit on shelves and desks as ordinary decor; an iron banner with a dragon emblem hangs from the ceiling. Empty of people. Wide-angle, eye level, deep depth of field, clean composition with the lower third free for UI. Exception to the no-text rule: the single word OUTWORLD on the wall poster is required; no other text anywhere."
+    },
+    {
+      "id": "pt_mileena_neutral",
+      "kind": "portrait",
+      "group": "rank0",
+      "character": "mileena",
+      "size": [
+        512,
+        512
+      ],
+      "file": "img/portraits/mileena_neutral.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png"
+      ],
+      "prompt": "Head-and-shoulders portrait, looking directly at camera with a cool evaluating gaze, slight tilt of the head. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional.. Background: blurred HR office with a framed 'Employee of the Month' certificate and a skull on a filing cabinet."
+    },
+    {
+      "id": "pt_mileena_angry",
+      "kind": "portrait",
+      "group": "rank0",
+      "character": "mileena",
+      "size": [
+        512,
+        512
+      ],
+      "file": "img/portraits/mileena_angry.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_mileena_neutral"
+      ],
+      "dependsOn": [
+        "pt_mileena_neutral"
+      ],
+      "prompt": "Same woman, same framing and background as the reference portrait. The violet veil is pulled down to her chin, revealing a wide mouth full of long needle-like teeth in a furious snarl; eyes narrowed. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional.."
+    },
+    {
+      "id": "sp_mileena_idle",
+      "kind": "sprite",
+      "group": "rank0",
+      "character": "mileena",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/mileena_idle.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_mileena_neutral"
+      ],
+      "dependsOn": [
+        "pt_mileena_neutral"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Full body, head to shoes fully visible, MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. standing in a poised interviewer stance, three-quarter view facing LEFT, holding a clipboard in one hand and a pen in the other, weight on one heel. Isolated on a flat uniform solid magenta background (#FF00FF), no floor, no shadow on the background, even studio lighting from the right."
+    },
+    {
+      "id": "sp_mileena_attack",
+      "kind": "sprite",
+      "group": "rank0",
+      "character": "mileena",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/mileena_attack.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_mileena_neutral",
+        "sp_mileena_idle"
+      ],
+      "dependsOn": [
+        "pt_mileena_neutral",
+        "sp_mileena_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Same woman as the reference sprite, still facing LEFT at the same three-quarter angle. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. lunging forward to the LEFT, thrusting the clipboard out like a blade, other hand slashing the air with the pen, veil in place, aggressive. Same magenta background, same framing scale."
+    },
+    {
+      "id": "sp_mileena_hurt",
+      "kind": "sprite",
+      "group": "rank0",
+      "character": "mileena",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/mileena_hurt.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_mileena_neutral",
+        "sp_mileena_idle"
+      ],
+      "dependsOn": [
+        "pt_mileena_neutral",
+        "sp_mileena_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Same woman, still facing LEFT at the same three-quarter angle. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. recoiling backward (her back moves to the RIGHT), clipboard papers flying, one hand raised to her veil, eyes wide in surprise. Same magenta background, same framing scale."
+    },
+    {
+      "id": "sp_mileena_defeated",
+      "kind": "sprite",
+      "group": "rank0",
+      "character": "mileena",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/mileena_defeated.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_mileena_neutral",
+        "sp_mileena_idle"
+      ],
+      "dependsOn": [
+        "pt_mileena_neutral",
+        "sp_mileena_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Same woman, still facing LEFT. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. slumped sideways onto the floor, half-sitting, ponytail undone, clipboard face down beside her, veil still covering her mouth, exhausted but composed. Same magenta background, same framing scale."
     },
     {
       "id": "bg_dev_throne",
@@ -175,88 +315,6 @@
         900
       ],
       "file": "img/bg/dev_throne.webp",
-      "model": "",
-      "prompt": "",
-      "generated": false
-    },
-    {
-      "id": "pt_dev_neutral",
-      "kind": "portrait",
-      "group": "rank0",
-      "size": [
-        512,
-        512
-      ],
-      "file": "img/portraits/dev_neutral.webp",
-      "model": "",
-      "prompt": "",
-      "generated": false
-    },
-    {
-      "id": "pt_dev_angry",
-      "kind": "portrait",
-      "group": "rank0",
-      "size": [
-        512,
-        512
-      ],
-      "file": "img/portraits/dev_angry.webp",
-      "model": "",
-      "prompt": "",
-      "generated": false
-    },
-    {
-      "id": "sp_dev_idle",
-      "kind": "sprite",
-      "group": "rank0",
-      "character": "dev_mileena",
-      "size": [
-        700,
-        900
-      ],
-      "file": "img/sprites/dev_idle.webp",
-      "model": "",
-      "prompt": "",
-      "generated": false
-    },
-    {
-      "id": "sp_dev_attack",
-      "kind": "sprite",
-      "group": "rank0",
-      "character": "dev_mileena",
-      "size": [
-        700,
-        900
-      ],
-      "file": "img/sprites/dev_attack.webp",
-      "model": "",
-      "prompt": "",
-      "generated": false
-    },
-    {
-      "id": "sp_dev_hurt",
-      "kind": "sprite",
-      "group": "rank0",
-      "character": "dev_mileena",
-      "size": [
-        700,
-        900
-      ],
-      "file": "img/sprites/dev_hurt.webp",
-      "model": "",
-      "prompt": "",
-      "generated": false
-    },
-    {
-      "id": "sp_dev_defeated",
-      "kind": "sprite",
-      "group": "rank0",
-      "character": "dev_mileena",
-      "size": [
-        700,
-        900
-      ],
-      "file": "img/sprites/dev_defeated.webp",
       "model": "",
       "prompt": "",
       "generated": false
