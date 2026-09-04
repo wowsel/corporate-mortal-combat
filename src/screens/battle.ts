@@ -77,7 +77,7 @@ export function createBattleScreen(): Screen {
           // подсказка считается той же формулой, что и бой: без множителей босса, их игрок узнаёт по удару
           const expected = Math.round(baseDamage(move, state.stats));
           b.innerHTML = `<span class="move-key">${i + 1}</span><span class="move-name">${move.name}</span><span class="move-stat">${move.stat ? `≈${expected}` : ''}</span>`;
-          b.title = enabled ? move.hint : 'Не при свидетелях.';
+          b.title = enabled ? move.hint : 'Не при свидетелях. Сначала доведите терпение почти до нуля.';
           b.addEventListener('click', () => void onMove(move));
           return b;
         }));
