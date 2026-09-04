@@ -1,5 +1,7 @@
 .env
-assets/raw/
+assets/raw/*
+!assets/raw/.gitkeep
 node_modules/
 dist/
 .playwright-mcp/
+public/assets/**/*.tmp

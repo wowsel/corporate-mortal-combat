@@ -9,10 +9,14 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "gen": "tsx tools/gen-assets.ts",
+    "assets:check": "tsx tools/check-assets.ts",
+    "test:py": "python3 tools/postprocess_test.py"
   },
   "devDependencies": {
     "@types/node": "^26.4.1",
+    "tsx": "^4.23.13",
     "typescript": "^5.6.0",
     "vite": "^6.0.0",
     "vitest": "^3.0.0"
