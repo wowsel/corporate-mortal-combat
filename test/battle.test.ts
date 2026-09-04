@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { availableMoves, baseDamage, bossDamage, createBattle, moveDamage, resolveTurn } from '../src/battle';
+import { EXCHANGE_COUNT, LOOP_TAIL, availableMoves, baseDamage, bossDamage, createBattle, moveDamage, nextExchange, resolveTurn } from '../src/battle';
 import { MOVES, STRIKE_MOVE } from '../src/content/moves';
 import type { Stats } from '../src/types';
 import { makeBoss } from './fixtures';
 
 const stats: Stats = { loyalty: 30, reputation: 20, competence: 30, stress: 10 };
 const move = (id: string) => MOVES.find(m => m.id === id)!;
-const never = () => 0.9;  // спецприёма нет, lineIndex последний
+const never = () => 0.9;  // спецприёма нет, lineIndex special последний
 const always = () => 0.1; // спецприём
 
 describe('moveDamage', () => {
@@ -53,7 +53,7 @@ describe('bossDamage', () => {
 describe('createBattle', () => {
   it('заполняет полоски', () => {
     const b = createBattle(makeBoss({ patience: 120 }));
-    expect(b).toEqual({ confidence: 100, maxConfidence: 100, patience: 120, maxPatience: 120, turn: 0, hitImmune: false, bossSpecialHit: false, finishHim: false });
+    expect(b).toEqual({ confidence: 100, maxConfidence: 100, patience: 120, maxPatience: 120, turn: 0, hitImmune: false, bossSpecialHit: false, finishHim: false, exchange: 0 });
   });
 });
 
@@ -72,14 +72,49 @@ describe('availableMoves', () => {
   });
 });
 
+describe('nextExchange', () => {
+  it('идёт по порядку, потом крутит последние LOOP_TAIL', () => {
+    const seq: number[] = []; let i = 0;
+    for (let k = 0; k < EXCHANGE_COUNT + 4; k++) { seq.push(i); i = nextExchange(EXCHANGE_COUNT, i); }
+    expect(seq).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 5, 6, 7, 5]);
+    expect(LOOP_TAIL).toBe(3);
+  });
+  it('клампит у короткого босса', () => {
+    expect(nextExchange(2, 1)).toBe(0);
+    expect(nextExchange(1, 0)).toBe(0);
+  });
+});
+
 describe('resolveTurn', () => {
-  it('обычный ход: урон обоим, continue, turn+1, lineIndex детерминирован', () => {
+  it('обычный ход: урон обоим, continue, turn+1, без lineIndex у игрока', () => {
     const boss = makeBoss({ patience: 100, attack: 10 });
     const r = resolveTurn(createBattle(boss), move('data'), stats, boss, never);
     expect(r.outcome).toBe('continue');
-    expect(r.player).toEqual({ move: 'data', damage: 15, weakness: false, immune: false, lineIndex: 1 });
-    expect(r.boss).toEqual({ damage: 11, special: false, lineIndex: 1 }); // rng: игрок → спецприём → реплика босса
+    expect(r.player).toEqual({ move: 'data', damage: 15, weakness: false, immune: false });
+    expect(r.boss).toEqual({ damage: 11, special: false, lineIndex: 0 }); // rng: спецприём → реплика special (одна в фикстуре)
     expect(r.battle.patience).toBe(85); expect(r.battle.confidence).toBe(89); expect(r.battle.turn).toBe(1);
+  });
+  it('rng вызывается ровно дважды за обычный ход и ни разу при добивании', () => {
+    let calls = 0; const rng = () => { calls++; return 0.9; };
+    const boss = makeBoss({ patience: 100 });
+    resolveTurn(createBattle(boss), move('data'), stats, boss, rng);
+    expect(calls).toBe(2);
+    calls = 0;
+    const small = makeBoss({ patience: 10 });
+    resolveTurn(createBattle(small), move('data'), stats, small, rng);
+    expect(calls).toBe(0);
+  });
+  it('индекс обмена растёт каждый ход и зацикливается на хвосте', () => {
+    const boss = makeBoss({ patience: 100000, attack: 0 });
+    let b = createBattle(boss);
+    const seen: number[] = [];
+    for (let k = 0; k < 10; k++) { seen.push(b.exchange); b = resolveTurn(b, move('data'), stats, boss, never).battle; }
+    expect(seen).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 5, 6]);
+  });
+  it('strike не двигает обмен', () => {
+    const boss = makeBoss({ final: true });
+    const b = { ...createBattle(boss), finishHim: true, exchange: 3 };
+    expect(resolveTurn(b, STRIKE_MOVE, stats, boss, never).battle.exchange).toBe(3);
   });
   it('добивающий удар: win, босс не отвечает', () => {
     const boss = makeBoss({ patience: 10 });

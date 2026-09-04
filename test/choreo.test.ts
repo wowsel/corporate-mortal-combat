@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { resolveTurn, createBattle } from '../src/battle';
-import { bannerFor, introSteps, outcomeSteps, turnSteps } from '../src/choreo';
+import { bannerFor, exchangeAt, introSteps, outcomeSteps, turnSteps } from '../src/choreo';
 import { MOVES, STRIKE_MOVE } from '../src/content/moves';
 import type { Step, Stats } from '../src/types';
 import { makeBoss } from './fixtures';
@@ -14,7 +14,16 @@ describe('introSteps', () => {
   it('ROUND 1, реплика босса, FIGHT!', () => {
     const s = introSteps(makeBoss());
     expect(s.filter(x => x.t === 'banner').map(x => (x as any).text)).toEqual(['ROUND 1', 'FIGHT!']);
-    expect(has(s, x => x.t === 'line' && x.text === 'Ну, начнём.')).toBe(true);
+    expect(has(s, x => x.t === 'line' && x.text === 'Ну, начнём.' && !x.append)).toBe(true);
+  });
+});
+
+describe('exchangeAt', () => {
+  it('клампит индекс в границы списка', () => {
+    const boss = makeBoss();
+    expect(exchangeAt(boss, -1)).toBe(boss.exchanges[0]);
+    expect(exchangeAt(boss, 99)).toBe(boss.exchanges[boss.exchanges.length - 1]);
+    expect(exchangeAt(boss, 3)).toBe(boss.exchanges[3]);
   });
 });
 
@@ -30,14 +39,35 @@ describe('turnSteps: обычный удар', () => {
     expect(has(s, x => x.t === 'particles' && x.at === 'boss')).toBe(true);
     expect(has(s, x => x.t === 'damage' && x.at === 'boss' && x.value === 15 && !x.muted)).toBe(true);
     expect(has(s, x => x.t === 'bar' && x.who === 'boss' && x.to === r.battle.patience)).toBe(true);
-    expect(has(s, x => x.t === 'line' && x.style === 'bubble' && x.text === 'Ай.')).toBe(true);
+    expect(has(s, x => x.t === 'line' && x.style === 'bubble' && x.text === 'Ай.' && !x.append)).toBe(true);
+  });
+  it('реакция — из обмена, на который отвечал игрок; следующая реплика дописывается в пузырь после хода босса', () => {
+    const reactionIdx = s.findIndex(x => x.t === 'line' && x.text === 'Ай.');
+    const heroReturnIdx = s.findIndex(x => x.t === 'move' && x.who === 'hero' && x.dx === 0);
+    const promptIdx = s.findIndex(x => x.t === 'line' && x.append === true);
+    const bossDamageIdx = s.findIndex(x => x.t === 'damage' && x.at === 'hero');
+    expect(reactionIdx).toBeGreaterThanOrEqual(0);
+    expect(heroReturnIdx).toBeGreaterThan(reactionIdx);
+    expect(promptIdx).toBeGreaterThan(bossDamageIdx);
+    const prompt = s[promptIdx] as Extract<Step, { t: 'line' }>;
+    expect(prompt).toEqual({ t: 'line', text: 'Вопрос 1.', style: 'bubble', append: true });
+    expect(r.battle.exchange).toBe(1);
+    // после реакции — пауза на чтение перед выпадом босса
+    expect(s[reactionIdx + 1]).toEqual({ t: 'wait', ms: 900 });
+  });
+  it('второй ход берёт реакцию из обмена 1 и реплику обмена 2', () => {
+    const r2 = resolveTurn(r.battle, move('agree'), stats, boss, () => 0.9);
+    const s2 = turnSteps(r2, boss, r.battle);
+    expect(has(s2, x => x.t === 'line' && x.text === 'Ох 1.' && !x.append)).toBe(true);
+    expect(has(s2, x => x.t === 'line' && x.text === 'Вопрос 2.' && x.append === true)).toBe(true);
   });
   it('босс отвечает и все возвращаются в idle', () => {
     expect(has(s, x => x.t === 'pose' && x.who === 'boss' && x.pose === 'attack')).toBe(true);
     expect(has(s, x => x.t === 'damage' && x.at === 'hero' && x.value === 11)).toBe(true);
     expect(has(s, x => x.t === 'bar' && x.who === 'hero' && x.to === r.battle.confidence)).toBe(true);
-    // хвост при continue: pose boss idle, move boss 0, camera 1, pose hero idle
-    const tail = s.slice(-4);
+    // хвост при continue: pose boss idle, move boss 0, camera 1, pose hero idle, затем реплика следующего обмена
+    expect(s[s.length - 1]!.t).toBe('line');
+    const tail = s.slice(-5, -1);
     expect(types(tail)).toEqual(['pose', 'move', 'camera', 'pose']);
     expect(has(tail, x => x.t === 'camera' && x.zoom === 1)).toBe(true);
     expect(has(tail, x => x.t === 'move' && x.dx === 0)).toBe(true);
@@ -127,12 +157,14 @@ describe('turnSteps: FINISH HIM', () => {
     const r2 = resolveTurn(b1, move('data'), stats, boss, () => 0.9);
     expect(has(turnSteps(r2, boss, b1), x => x.t === 'banner' && x.text === 'FINISH HIM')).toBe(false);
   });
-  it('порядок: FINISH HIM появляется после контратаки босса', () => {
+  it('порядок: FINISH HIM появляется после контратаки босса и после дописанной реплики', () => {
     const s0 = turnSteps(r, boss, b0);
     const bossDamageIdx = s0.findIndex(x => x.t === 'damage' && x.at === 'hero');
+    const promptIdx = s0.findIndex(x => x.t === 'line' && x.append === true);
     const finishBannerIdx = s0.findIndex(x => x.t === 'banner' && x.text === 'FINISH HIM');
     expect(bossDamageIdx).toBeGreaterThanOrEqual(0);
-    expect(finishBannerIdx).toBeGreaterThan(bossDamageIdx);
+    expect(promptIdx).toBeGreaterThan(bossDamageIdx);
+    expect(finishBannerIdx).toBeGreaterThan(promptIdx);
   });
 });
 
@@ -161,6 +193,14 @@ describe('bannerFor / outcomeSteps', () => {
       { t: 'particles', at: 'screen', kind: 'confetti' },
       { t: 'wait', ms: 1500 },
     ]);
+  });
+  it('поражение: реакция на ответ есть, следующей реплики (append) нет', () => {
+    const big = makeBoss({ patience: 1000, attack: 200 });
+    const b0 = createBattle(big);
+    const r = resolveTurn(b0, move('data'), stats, big, () => 0.9);
+    const ts = turnSteps(r, big, b0);
+    expect(has(ts, x => x.t === 'line' && x.text === 'Ай.')).toBe(true);
+    expect(has(ts, x => x.t === 'line' && x.append === true)).toBe(false);
   });
   it('поражение: точная последовательность шагов', () => {
     const big = makeBoss({ patience: 1000, attack: 200 });

@@ -5,7 +5,10 @@
 // запускаются и не ожидаются — они намеренно накладываются на следующий шаг:
 // вспышка светит поверх отлёта босса, тряска идёт под цифру урона, полоска утекает под реплику.
 // Реплика-`bubble` не гаснет сама: висит до следующего пузыря или до хода игрока (clearSpeech в контроллере).
-import type { BannerText, BattleState, Boss, Step, TurnResult } from './types';
+// Тексты боя живут в обменах босса (Boss.exchanges): реакция на ответ героя берётся из обмена, на который
+// он отвечал (prev.exchange), следующая реплика — из обмена, к которому перешёл бой (r.battle.exchange),
+// и дописывается в тот же пузырь (`append`), чтобы игрок читал «реакция + вопрос» без таймера.
+import type { BannerText, BattleState, Boss, Exchange, Step, Tactic, TurnResult } from './types';
 
 const WHITE = '#ffffff';
 const RED = '#c81e1e';
@@ -16,10 +19,18 @@ export function bannerFor(r: TurnResult): BannerText {
   return r.battle.hitImmune || r.battle.bossSpecialHit ? 'PROMOTION!!!' : 'FLAWLESS PRESENTATION';
 }
 
+/** Обмен по индексу с клампом: под noUncheckedIndexedAccess и на случай короткого босса в тестах. */
+export function exchangeAt(boss: Boss, i: number): Exchange {
+  const list = boss.exchanges;
+  const ex = list[Math.max(0, Math.min(i, list.length - 1))];
+  if (!ex) throw new Error(`boss ${boss.id} has no exchanges`);
+  return ex;
+}
+
 export function introSteps(boss: Boss): Step[] {
   return [
     { t: 'banner', text: 'ROUND 1' }, { t: 'voice', id: 'vo_round1' }, { t: 'sound', name: 'banner' }, { t: 'wait', ms: 900 },
-    { t: 'line', text: boss.intro, style: 'bubble' }, { t: 'wait', ms: 1400 },
+    { t: 'line', text: exchangeAt(boss, 0).prompt, style: 'bubble' }, { t: 'wait', ms: 1400 },
     { t: 'banner', text: 'FIGHT!' }, { t: 'voice', id: 'vo_fight' }, { t: 'sound', name: 'banner' }, { t: 'wait', ms: 700 },
   ];
 }
@@ -28,9 +39,10 @@ function returnSteps(who: 'hero' | 'boss'): Step[] {
   return [{ t: 'pose', who, pose: 'idle' } as Step, { t: 'move', who, dx: 0, ms: 150 }, { t: 'camera', zoom: 1, ms: 150 }];
 }
 
-function playerAttack(r: TurnResult, boss: Boss): Step[] {
+function playerAttack(r: TurnResult, boss: Boss, prev: BattleState): Step[] {
   const p = r.player;
-  const line = p.immune ? boss.lines.immune[p.lineIndex] : boss.lines.hit[p.lineIndex];
+  // strike сюда не попадает: fatality возвращает пустой список раньше
+  const line = p.move === 'strike' ? undefined : exchangeAt(boss, prev.exchange).replies[p.move as Tactic].reaction;
   const steps: Step[] = [
     { t: 'pose', who: 'hero', pose: 'attack' },
     { t: 'sound', name: 'whoosh' },
@@ -58,7 +70,7 @@ function playerAttack(r: TurnResult, boss: Boss): Step[] {
     );
   }
   if (line) steps.push({ t: 'line', text: line, style: 'bubble' });
-  steps.push({ t: 'wait', ms: 500 });
+  steps.push({ t: 'wait', ms: 900 }); // реакцию надо успеть прочитать до выпада босса
   return steps;
 }
 
@@ -98,10 +110,14 @@ function bossAttack(r: TurnResult, boss: Boss): Step[] {
 
 export function turnSteps(r: TurnResult, boss: Boss, prev: BattleState): Step[] {
   if (r.outcome === 'fatality') return [];
-  const steps: Step[] = [...playerAttack(r, boss)];
+  const steps: Step[] = [...playerAttack(r, boss, prev)];
   if (r.outcome === 'continue' || r.outcome === 'lose') {
     steps.push(...returnSteps('hero'), ...bossAttack(r, boss));
-    if (r.outcome === 'continue') steps.push(...returnSteps('boss'), { t: 'pose', who: 'hero', pose: 'idle' });
+    if (r.outcome === 'continue') {
+      steps.push(...returnSteps('boss'), { t: 'pose', who: 'hero', pose: 'idle' });
+      // следующая реплика босса дописывается к реакции и висит до хода игрока; при lose её нет
+      steps.push({ t: 'line', text: exchangeAt(boss, r.battle.exchange).prompt, style: 'bubble', append: true });
+    }
   }
   if (!prev.finishHim && r.battle.finishHim && r.outcome === 'continue') {
     steps.push({ t: 'banner', text: 'FINISH HIM' }, { t: 'voice', id: 'vo_finish_him' }, { t: 'sound', name: 'banner' }, { t: 'wait', ms: 900 });

@@ -2,6 +2,12 @@ export type StatKey = 'loyalty' | 'reputation' | 'competence' | 'stress';
 export type Stats = Record<StatKey, number>;
 
 export type MoveId = 'agree' | 'data' | 'blame' | 'joke' | 'strike';
+/** Четыре разговорные тактики — ключи ответов в обмене; strike не реплика, а действие. */
+export type Tactic = Exclude<MoveId, 'strike'>;
+/** Ответ героя и реакция босса именно на этот ответ. */
+export interface Reply { text: string; reaction: string }
+/** Обмен: реплика босса и четыре ответа героя. Один обмен — один ход боя. */
+export interface Exchange { prompt: string; replies: Record<Tactic, Reply> }
 export interface Move {
   id: MoveId;
   name: string;
@@ -40,8 +46,9 @@ export interface Boss {
   final: boolean;
   sprites: Record<BossPose, string>;
   portraits: { neutral: string; angry: string };
-  intro: string;
-  lines: { hit: string[]; immune: string[]; special: string[]; defeated: string[] };
+  exchanges: Exchange[];       // ровно EXCHANGE_COUNT (battle.ts); exchanges[0] — открывающая реплика
+  strikeText?: string;         // текст пятой карточки «Ударить» (≤ 60); обязателен у final, запрещён у остальных
+  lines: { special: string[]; defeated: string[] };
 }
 
 export interface Rank {
@@ -88,12 +95,14 @@ export interface BattleState {
   hitImmune: boolean;
   bossSpecialHit: boolean;
   finishHim: boolean;
+  exchange: number;          // обмен, чья реплика на экране и чьи ответы на карточках; после хода — уже следующий
 }
 
+/** Без текстов: правила боя не зависят от копирайта, реплики достаёт choreo.ts по индексам. */
 export interface TurnResult {
   battle: BattleState;
   outcome: 'continue' | BattleOutcome;
-  player: { move: MoveId; damage: number; weakness: boolean; immune: boolean; lineIndex: number };
+  player: { move: MoveId; damage: number; weakness: boolean; immune: boolean };
   boss: { damage: number; special: boolean; lineIndex: number } | null;
 }
 
@@ -114,7 +123,7 @@ export type Step =
   | { t: 'particles'; at: 'hero' | 'boss' | 'screen'; kind: 'paper' | 'sparks' | 'confetti' }
   | { t: 'damage'; at: 'hero' | 'boss'; value: number; muted: boolean }
   | { t: 'bar'; who: 'hero' | 'boss'; to: number; ms: number }
-  | { t: 'line'; text: string; style: 'bubble' | 'center' }
+  | { t: 'line'; text: string; style: 'bubble' | 'center'; append?: boolean } // append: дописать абзацем в висящий пузырь
   | { t: 'banner'; text: BannerText }
   | { t: 'sound'; name: SoundName; gain?: number }
   | { t: 'voice'; id: string }

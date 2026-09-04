@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { validateContent } from '../src/content/schema';
 import type { Manifest } from '../src/types';
-import { makeBoss, makeEvent, makeRank, makeRanks } from './fixtures';
+import { makeBoss, makeEvent, makeExchanges, makeRank, makeRanks } from './fixtures';
 import { CONTENT } from '../src/content';
+import { EXCHANGE_COUNT } from '../src/battle';
 import manifestJson from '../assets/manifest.json';
-import type { Ending, EndingId } from '../src/types';
+import type { Boss, Ending, EndingId } from '../src/types';
 
 const ids = ['bg_test', 'sp_d_idle', 'sp_d_attack', 'sp_d_hurt', 'sp_d_defeated', 'pt_d_neutral', 'pt_d_angry'];
 const manifest: Manifest = {
@@ -69,8 +70,45 @@ describe('validateContent', () => {
     expect(validateContent(ranks, manifest).join()).toMatch(/same/);
   });
   it('пустые lines у босса', () => {
-    const ranks = makeRanks(); ranks[0] = makeRank({ boss: makeBoss({ lines: { hit: [], immune: ['x'], special: ['y'], defeated: ['z'] } }) });
+    const ranks = makeRanks(); ranks[0] = makeRank({ boss: makeBoss({ lines: { special: [], defeated: ['z'] } }) });
     expect(validateContent(ranks, manifest).join()).toMatch(/lines/);
+  });
+
+  describe('обмены', () => {
+    const withExchanges = (mut: (ex: ReturnType<typeof makeExchanges>) => void, over: Partial<Boss> = {}) => {
+      const ex = makeExchanges(); mut(ex);
+      const ranks = makeRanks(); ranks[0] = makeRank({ boss: makeBoss({ exchanges: ex, ...over }) });
+      return validateContent(ranks, manifest).join('\n');
+    };
+    it('ровно EXCHANGE_COUNT обменов', () => {
+      expect(withExchanges(ex => { ex.pop(); })).toMatch(new RegExp(`expected ${EXCHANGE_COUNT} exchanges, got 7`));
+    });
+    it('лишний или отсутствующий ключ ответа', () => {
+      expect(withExchanges(ex => { (ex[1]!.replies as Record<string, unknown>)['strike'] = { text: 'x', reaction: 'y' }; })).toMatch(/replies must have exactly/);
+      expect(withExchanges(ex => { delete (ex[1]!.replies as Partial<Record<string, unknown>>)['joke']; })).toMatch(/replies must have exactly/);
+    });
+    it('лимиты длины: реплика 110, ответ 80, реакция 75', () => {
+      expect(withExchanges(ex => { ex[2]!.prompt = 'п'.repeat(111); })).toMatch(/exchange\[2\] prompt: 111 chars > 110/);
+      expect(withExchanges(ex => { ex[2]!.prompt = 'п'.repeat(110); })).not.toMatch(/prompt: 110/);
+      expect(withExchanges(ex => { ex[3]!.replies.data.text = 'о'.repeat(81); })).toMatch(/data\.text: 81 chars > 80/);
+      expect(withExchanges(ex => { ex[3]!.replies.joke.reaction = 'р'.repeat(76); })).toMatch(/joke\.reaction: 76 chars > 75/);
+    });
+    it('пустая реплика', () => {
+      expect(withExchanges(ex => { ex[4]!.replies.blame.reaction = '  '; })).toMatch(/blame\.reaction: empty text/);
+    });
+    it('одна реплика у двух боссов — ошибка', () => {
+      const ranks = makeRanks();
+      ranks[1]!.boss.exchanges[5]!.prompt = ranks[0]!.boss.exchanges[2]!.prompt;
+      expect(validateContent(ranks, manifest).join()).toMatch(/duplicate text/);
+    });
+    it('strikeText: обязателен у финального, запрещён у остальных, не длиннее 60', () => {
+      const ranks = makeRanks(); ranks[0] = makeRank({ boss: makeBoss({ strikeText: 'x' }) });
+      expect(validateContent(ranks, manifest).join()).toMatch(/strikeText only for the final boss/);
+      const ranks2 = makeRanks(); ranks2[1] = { ...ranks2[1]!, boss: makeBoss({ id: 'final', final: true, strikeText: '' }) };
+      expect(validateContent(ranks2, manifest).join()).toMatch(/final boss needs strikeText/);
+      const ranks3 = makeRanks(); ranks3[1] = { ...ranks3[1]!, boss: makeBoss({ id: 'final', final: true, strikeText: 'у'.repeat(61) }) };
+      expect(validateContent(ranks3, manifest).join()).toMatch(/strikeText 61 chars > 60/);
+    });
   });
 
   it('эпилог с несуществующим портретом — ошибка', () => {

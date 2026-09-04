@@ -9,11 +9,11 @@ const HINT_WORDS: Record<string, RegExp> = {
 describe('content hints', () => {
   it('текст перед боем намекает на слабость и иммунитет босса', () => {
     for (const r of CONTENT.ranks) {
-      // у ступени без событий (финал) намёк даёт вступительная реплика босса
+      // у ступени без событий (финал) намёк даёт открывающая реплика босса (exchanges[0].prompt)
       const last = r.events[r.events.length - 1];
       const blob = last
         ? `${last.text} ${last.repeatText ?? ''}`
-        : r.boss.intro;
+        : r.boss.exchanges[0]!.prompt;
       expect(blob, `${r.id} weakness ${r.boss.weakness}`).toMatch(HINT_WORDS[r.boss.weakness]!);
       expect(blob, `${r.id} immunity ${r.boss.immunity}`).toMatch(HINT_WORDS[r.boss.immunity]!);
     }

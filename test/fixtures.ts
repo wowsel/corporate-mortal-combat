@@ -1,13 +1,34 @@
-import type { Boss, GameEvent, Rank } from '../src/types';
+import { EXCHANGE_COUNT } from '../src/battle';
+import type { Boss, Exchange, GameEvent, Rank } from '../src/types';
+
+/**
+ * Восемь обменов тестового босса. Нулевой — со «историческими» текстами, на которые ссылаются тесты
+ * («Ну, начнём.», «Ай.», «Не смешно.»); остальные нумерованы. `tag` делает тексты уникальными между боссами:
+ * валидатор запрещает одну реплику у двух боссов.
+ */
+export function makeExchanges(tag = ''): Exchange[] {
+  return Array.from({ length: EXCHANGE_COUNT }, (_, i): Exchange => ({
+    prompt: i === 0 ? `Ну, начнём.${tag}` : `Вопрос ${i}.${tag}`,
+    replies: {
+      agree: { text: `Да ${i}.${tag}`, reaction: `Ох ${i}.${tag}` },
+      data: { text: `Цифры ${i}.${tag}`, reaction: i === 0 ? `Ай.${tag}` : `Ай ${i}.${tag}` },
+      blame: { text: `Не я ${i}.${tag}`, reaction: `Ну-ну ${i}.${tag}` },
+      joke: { text: `Шутка ${i}.${tag}`, reaction: i === 0 ? `Не смешно.${tag}` : `Не смешно ${i}.${tag}` },
+    },
+  }));
+}
 
 export function makeBoss(over: Partial<Boss> = {}): Boss {
+  const id = over.id ?? 'dummy';
+  const final = over.final ?? false;
   return {
-    id: 'dummy', name: 'Тестовый босс', title: 'Менеджер', patience: 100, attack: 10,
-    weakness: 'agree', immunity: 'joke', final: false,
+    id, name: 'Тестовый босс', title: 'Менеджер', patience: 100, attack: 10,
+    weakness: 'agree', immunity: 'joke', final,
     sprites: { idle: 'sp_d_idle', attack: 'sp_d_attack', hurt: 'sp_d_hurt', defeated: 'sp_d_defeated' },
     portraits: { neutral: 'pt_d_neutral', angry: 'pt_d_angry' },
-    intro: 'Ну, начнём.',
-    lines: { hit: ['Ох.', 'Ай.'], immune: ['Не смешно.'], special: ['Вот тебе!'], defeated: ['Ладно…'] },
+    exchanges: makeExchanges(id === 'dummy' ? '' : ` [${id}]`),
+    ...(final ? { strikeText: 'Ударить.' } : {}),
+    lines: { special: ['Вот тебе!'], defeated: ['Ладно…'] },
     ...over,
   };
 }
