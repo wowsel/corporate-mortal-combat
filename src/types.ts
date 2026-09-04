@@ -123,7 +123,7 @@ export interface AssetEntry {
   id: string;
   kind: AssetKind;
   group: AssetGroup;
-  file: string;
+  file: string; // путь относительно public/assets/
   model: string;
   prompt: string;
   generated: boolean;
@@ -136,6 +136,8 @@ export interface AssetEntry {
   flip?: boolean;
   duration?: number;
   seed?: number;
+  voice?: string;        // для kind voice: голос TTS
+  resolution?: '1K' | '2K';
 }
 
 export interface Manifest {
