@@ -16,7 +16,7 @@ import './styles/battle.css';
 
 const root = document.getElementById('app')!;
 const manifest = manifestJson as Manifest;
-const errors = validateContent(CONTENT.ranks, manifest);
+const errors = validateContent(CONTENT.ranks, manifest, CONTENT.endings);
 if (errors.length) {
   const pre = document.createElement('pre');
   pre.style.padding = '24px';

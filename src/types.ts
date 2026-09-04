@@ -53,11 +53,17 @@ export interface Rank {
 }
 
 export type EndingId = 'promotion' | 'burnout' | 'fatality';
+/** Карточка под текстом концовки: кто и что сказал напоследок. */
+export interface Epilogue { name: string; portrait: string; text: string }
+/** Вариант концовки по флагу: перекрывает поля базовой концовки, первый подходящий выигрывает. */
+export interface EndingVariant { requiresFlag: string; title?: string; text?: string; epilogue?: Epilogue }
 export interface Ending {
   id: EndingId;
   title: string;
   text: string;
   illustration: string;
+  epilogue?: Epilogue;
+  variants?: EndingVariant[];
 }
 
 export type BattleOutcome = 'win' | 'lose' | 'fatality';

@@ -4,6 +4,7 @@ import type { Manifest } from '../src/types';
 import { makeBoss, makeEvent, makeRank, makeRanks } from './fixtures';
 import { CONTENT } from '../src/content';
 import manifestJson from '../assets/manifest.json';
+import type { Ending, EndingId } from '../src/types';
 
 const ids = ['bg_test', 'sp_d_idle', 'sp_d_attack', 'sp_d_hurt', 'sp_d_defeated', 'pt_d_neutral', 'pt_d_angry'];
 const manifest: Manifest = {
@@ -72,7 +73,23 @@ describe('validateContent', () => {
     expect(validateContent(ranks, manifest).join()).toMatch(/lines/);
   });
 
+  it('эпилог с несуществующим портретом — ошибка', () => {
+    const endings = { ...CONTENT.endings, fatality: { ...CONTENT.endings.fatality, epilogue: { name: 'x', portrait: 'pt_ghost', text: 'y' } } };
+    expect(validateContent(CONTENT.ranks, manifestJson as Manifest, endings).join()).toMatch(/pt_ghost/);
+  });
+
+  it('вариант с requiresFlag, который нигде не ставится — ошибка', () => {
+    const ranks = makeRanks();
+    const ending: Ending = { id: 'promotion', title: 't', text: 't', illustration: 'bg_test', variants: [{ requiresFlag: 'ghost_flag' }] };
+    const endings = { promotion: ending } as unknown as Record<EndingId, Ending>;
+    expect(validateContent(ranks, manifest, endings).join()).toMatch(/ghost_flag/);
+  });
+
   it('реальный контент проходит валидацию', () => {
     expect(validateContent(CONTENT.ranks, manifestJson as Manifest)).toEqual([]);
+  });
+
+  it('реальный контент с endings проходит валидацию', () => {
+    expect(validateContent(CONTENT.ranks, manifestJson as Manifest, CONTENT.endings)).toEqual([]);
   });
 });

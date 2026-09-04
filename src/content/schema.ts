@@ -1,6 +1,6 @@
-import type { Manifest, Rank } from '../types';
+import type { Ending, EndingId, Manifest, Rank } from '../types';
 
-export function validateContent(ranks: Rank[], manifest: Manifest): string[] {
+export function validateContent(ranks: Rank[], manifest: Manifest, endings?: Record<EndingId, Ending>): string[] {
   const errors: string[] = [];
   const assetIds = new Set(manifest.entries.map(e => e.id));
   const setFlags = new Set<string>();
@@ -51,6 +51,21 @@ export function validateContent(ranks: Rank[], manifest: Manifest): string[] {
     for (const p of Object.values(b.portraits)) asset(p, bw);
     for (const [k, arr] of Object.entries(b.lines)) if (arr.length === 0) errors.push(`${bw}: lines.${k} is empty`);
   });
+
+  if (endings) {
+    Object.values(endings).forEach(e => {
+      const ew = `ending ${e.id}`;
+      asset(e.illustration, ew);
+      if (e.epilogue) asset(e.epilogue.portrait, ew);
+      e.variants?.forEach((v, i) => {
+        const vw = `${ew} variant[${i}]`;
+        if (v.epilogue) asset(v.epilogue.portrait, vw);
+        if (!setFlags.has(v.requiresFlag)) {
+          errors.push(`${vw}: requiresFlag "${v.requiresFlag}" is never set`);
+        }
+      });
+    });
+  }
 
   return errors;
 }

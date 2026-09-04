@@ -14,7 +14,11 @@ function collectContentAssetIds(): string[] {
     for (const ev of r.events) { ids.push(ev.speaker.portrait); for (const c of ev.choices) if (c.reaction) ids.push(c.reaction.portrait); }
     ids.push(...Object.values(r.boss.sprites), ...Object.values(r.boss.portraits));
   }
-  for (const e of Object.values(CONTENT.endings)) ids.push(e.illustration);
+  for (const e of Object.values(CONTENT.endings)) {
+    ids.push(e.illustration);
+    if (e.epilogue) ids.push(e.epilogue.portrait);
+    for (const v of e.variants ?? []) if (v.epilogue) ids.push(v.epilogue.portrait);
+  }
   ids.push('sp_hero_idle', 'sp_hero_attack', 'sp_hero_hurt', 'sp_hero_win', 'pt_hero_neutral', 'pt_hero_worried', 'il_title');
   return ids;
 }

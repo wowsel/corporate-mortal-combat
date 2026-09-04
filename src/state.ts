@@ -1,4 +1,4 @@
-import type { Boss, BattleOutcome, Choice, EndingId, GameEvent, GameState, Rank, StatKey, Stats } from './types';
+import type { Boss, BattleOutcome, Choice, Ending, EndingId, Epilogue, GameEvent, GameState, Rank, StatKey, Stats } from './types';
 
 export const STAT_KEYS: StatKey[] = ['loyalty', 'reputation', 'competence', 'stress'];
 
@@ -54,6 +54,21 @@ export function afterBattle(state: GameState, boss: Boss, outcome: BattleOutcome
     stats.stress = clampStat(stats.stress + 25);
   }
   return { ...state, stats, rank, step: 0, week: state.week + 1, lastBattle: { bossId: boss.id, outcome } };
+}
+
+export interface ResolvedEnding { id: EndingId; title: string; text: string; illustration: string; epilogue?: Epilogue }
+
+/** Первый вариант, чей requiresFlag установлен, перекрывает title/text/epilogue базовой концовки
+ * (только те поля, что он сам определяет); при отсутствии подходящего варианта — база как есть. */
+export function resolveEnding(ending: Ending, flags: Set<string>): ResolvedEnding {
+  const variant = ending.variants?.find(v => flags.has(v.requiresFlag));
+  return {
+    id: ending.id,
+    title: variant?.title ?? ending.title,
+    text: variant?.text ?? ending.text,
+    illustration: ending.illustration,
+    epilogue: variant?.epilogue ?? ending.epilogue,
+  };
 }
 
 export function checkEnding(state: GameState, ranks: Rank[]): EndingId | null {

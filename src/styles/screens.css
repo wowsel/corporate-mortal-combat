@@ -30,3 +30,8 @@
 .ending-panel h1 { font-family: var(--font-display); color: var(--gold); font-size: 40px; margin: 0; }
 .ending-panel p { font-size: 18px; line-height: 1.5; }
 .ending-meta { color: var(--muted); font-size: 14px; }
+
+.epilogue { display: flex; gap: 14px; align-items: flex-start; margin-top: 12px; padding: 12px; border: 1px solid rgba(201,163,74,0.35); background: rgba(255,255,255,0.03); }
+.epilogue-portrait { width: 84px; height: 84px; flex: none; background-size: cover; background-position: center top; border: 1px solid rgba(201,163,74,0.5); }
+.epilogue-name { font-family: var(--font-display); color: var(--gold); letter-spacing: 1px; margin-bottom: 4px; }
+.epilogue-text { font-style: italic; }

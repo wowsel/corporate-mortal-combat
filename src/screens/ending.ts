@@ -1,12 +1,13 @@
 import type { Ctx, Screen } from '../engine';
-import { checkEnding, createInitialState } from '../state';
+import { checkEnding, createInitialState, resolveEnding } from '../state';
 import { placeholderBg } from './event';
 
 export function createEndingScreen(): Screen {
   return {
     async mount(root, ctx: Ctx) {
+      await ctx.assets.loadGroup('endings');
       const id = checkEnding(ctx.getState(), ctx.content.ranks) ?? 'burnout';
-      const ending = ctx.content.endings[id];
+      const ending = resolveEnding(ctx.content.endings[id], ctx.getState().flags);
       ctx.audio.playMusic('mu_ending');
       const el = document.createElement('div');
       el.className = `screen ending ending-${id}`;
@@ -19,6 +20,29 @@ export function createEndingScreen(): Screen {
           <p class="ending-meta">Недель в Outworld: ${ctx.getState().week}</p>
           <button class="btn-primary">Начать карьеру заново</button>
         </div>`;
+      const panel = el.querySelector('.ending-panel')!;
+      if (ending.epilogue) {
+        const { name, portrait, text } = ending.epilogue;
+        const card = document.createElement('div');
+        card.className = 'epilogue';
+        const portraitEl = document.createElement('div');
+        portraitEl.className = 'epilogue-portrait';
+        const url = ctx.assets.getImageUrl(portrait);
+        portraitEl.style.background = url ? `url('${url}') center top/cover no-repeat` : placeholderBg(portrait);
+        portraitEl.dataset.id = portrait;
+        const body = document.createElement('div');
+        const nameEl = document.createElement('div');
+        nameEl.className = 'epilogue-name';
+        nameEl.textContent = name;
+        const textEl = document.createElement('div');
+        textEl.className = 'epilogue-text';
+        textEl.textContent = text;
+        body.appendChild(nameEl);
+        body.appendChild(textEl);
+        card.appendChild(portraitEl);
+        card.appendChild(body);
+        panel.insertBefore(card, panel.querySelector('.ending-meta'));
+      }
       root.appendChild(el);
       el.querySelector('button')!.addEventListener('click', () => {
         ctx.setState(createInitialState());

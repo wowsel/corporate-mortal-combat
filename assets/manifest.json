@@ -936,99 +936,174 @@
       "prompt": "Same man, still facing LEFT. SHANG_TSUNG on one knee, hunched, propping himself up with one hand on the floor, the tablet lying dark and cracked beside him, hair falling over his face, the faint green glow in his eyes dying out, exhausted sneer. Same magenta background, same framing scale. SHANG_TSUNG: a sinister sorcerer reimagined as Director of Transformation of Outworld Corp, a man in his 50s. Long straight black hair slicked back, thin moustache and a pointed goatee, pale gaunt face with sharp cheekbones, eyes glowing a faint toxic green. Black silk mandarin-collar business suit with subtle gold dragon embroidery on the chest and cuffs, many heavy gold rings on both hands, a corporate lanyard with a badge. Holds a black tablet whose screen glows an eerie green like a soul-stealing artifact. Calm, theatrical, predatory. NO pink, NO magenta anywhere in the outfit or lighting. The green energy wisps and tablet glow are rendered as solid opaque shapes, no translucent or semi-transparent elements."
     },
     {
-      "id": "bg_dev_throne",
+      "id": "bg_throne_office",
       "kind": "background",
       "group": "rank5",
       "size": [
         1600,
         900
       ],
-      "file": "img/bg/dev_throne.webp",
-      "model": "",
-      "prompt": "",
-      "generated": false
+      "resolution": "2K",
+      "file": "img/bg/throne_office.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png"
+      ],
+      "prompt": "Wide establishing shot of a CEO's office that is half throne room: a black stone throne behind a huge dark wooden executive desk with three monitors and a blank nameplate; tall arched windows with red drapes overlooking a stormy city at dusk; a wall of trophies — skulls, a shattered globe of Earthrealm, framed charts with unreadable curves; iron braziers burning next to an office printer; a large wall map poster of a dark realm with no legible text. Empty of people. Lighting: dramatic warm side light from the braziers mixed with cold storm light from the windows, no pink or magenta light. Wide-angle, eye level, deep depth of field (override the shallow depth of field of the style prefix for this establishing shot), clean composition with the lower third free for UI. No readable text, no labels, no signage, no logos anywhere in the image."
     },
     {
-      "id": "pt_dev2_neutral",
+      "id": "pt_shao_neutral",
       "kind": "portrait",
       "group": "rank5",
+      "character": "shao_kahn",
       "size": [
         512,
         512
       ],
-      "file": "img/portraits/dev2_neutral.webp",
-      "model": "",
-      "prompt": "",
-      "generated": false
+      "file": "img/portraits/shao_neutral.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png"
+      ],
+      "prompt": "Head-and-shoulders portrait, looking down at camera with imperial contempt, chin raised, helmet on, red eyes glowing softly, jaw set. SHAO_KAHN: a towering, massively muscular warlord reimagined as CEO of Outworld Corp, 2.3 m tall. Bare chest with a black leather harness bearing a silver skull medallion, spiked pauldrons, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a horned skull-faced war helmet with a golden crest; glowing red eyes. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the warlord in the reference image. NO pink, NO magenta anywhere in the outfit or lighting. Background: blurred throne office, a stone throne and red drapes, warm brazier light from the side."
     },
     {
-      "id": "pt_dev2_angry",
+      "id": "pt_shao_angry",
       "kind": "portrait",
       "group": "rank5",
+      "character": "shao_kahn",
       "size": [
         512,
         512
       ],
-      "file": "img/portraits/dev2_angry.webp",
-      "model": "",
-      "prompt": "",
-      "generated": false
+      "file": "img/portraits/shao_angry.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_shao_neutral"
+      ],
+      "dependsOn": [
+        "pt_shao_neutral"
+      ],
+      "prompt": "Same figure, same framing and background as the reference portrait. He roars, mouth open showing teeth, eyes blazing bright red, cape flaring behind the shoulders, one gauntleted fist raised into the bottom of the frame. SHAO_KAHN: a towering, massively muscular warlord reimagined as CEO of Outworld Corp, 2.3 m tall. Bare chest with a black leather harness bearing a silver skull medallion, spiked pauldrons, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a horned skull-faced war helmet with a golden crest; glowing red eyes. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the warlord in the reference image. NO pink, NO magenta anywhere in the outfit or lighting."
     },
     {
-      "id": "sp_dev2_idle",
+      "id": "sp_shao_idle",
       "kind": "sprite",
       "group": "rank5",
-      "character": "dev_shao",
+      "character": "shao_kahn",
       "size": [
         700,
         900
       ],
-      "file": "img/sprites/dev2_idle.webp",
-      "model": "",
-      "prompt": "",
-      "generated": false
+      "file": "img/sprites/shao_idle.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_shao_neutral"
+      ],
+      "dependsOn": [
+        "pt_shao_neutral"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Full body, head to boots fully visible, SHAO_KAHN standing wide-legged with arms crossed over the chest, three-quarter view facing LEFT, a small laser pointer in one huge fist, the cape kept close to the body and hanging behind him, the whole silhouette including helmet horns and cape entirely inside the frame with a margin, nothing cropped at the canvas edge. Isolated on a flat uniform solid magenta background (#FF00FF), no floor, no shadow on the background, even studio lighting from the right. SHAO_KAHN: a towering, massively muscular warlord reimagined as CEO of Outworld Corp, 2.3 m tall. Bare chest with a black leather harness bearing a silver skull medallion, spiked pauldrons, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a horned skull-faced war helmet with a golden crest; glowing red eyes. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the warlord in the reference image. NO pink, NO magenta anywhere in the outfit or lighting. The red eye glow is rendered as solid opaque shapes, no translucent or semi-transparent elements."
     },
     {
-      "id": "sp_dev2_attack",
+      "id": "sp_shao_attack",
       "kind": "sprite",
       "group": "rank5",
-      "character": "dev_shao",
+      "character": "shao_kahn",
       "size": [
         700,
         900
       ],
-      "file": "img/sprites/dev2_attack.webp",
-      "model": "",
-      "prompt": "",
-      "generated": false
+      "file": "img/sprites/shao_attack.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_shao_neutral",
+        "sp_shao_idle"
+      ],
+      "dependsOn": [
+        "pt_shao_neutral",
+        "sp_shao_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Same figure as the reference sprite, still facing LEFT at the same three-quarter angle. SHAO_KAHN lunging to the LEFT and slamming a giant fist down onto an invisible desk, sheets of paper bursting upward around the fist, mouth open in a roar, the cape swinging but fully inside the frame with a margin on all sides. Same magenta background, same framing scale. SHAO_KAHN: a towering, massively muscular warlord reimagined as CEO of Outworld Corp, 2.3 m tall. Bare chest with a black leather harness bearing a silver skull medallion, spiked pauldrons, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a horned skull-faced war helmet with a golden crest; glowing red eyes. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the warlord in the reference image. NO pink, NO magenta anywhere in the outfit or lighting. The red eye glow and the papers are rendered as solid opaque shapes, no translucent or semi-transparent elements."
     },
     {
-      "id": "sp_dev2_hurt",
+      "id": "sp_shao_hurt",
       "kind": "sprite",
       "group": "rank5",
-      "character": "dev_shao",
+      "character": "shao_kahn",
       "size": [
         700,
         900
       ],
-      "file": "img/sprites/dev2_hurt.webp",
-      "model": "",
-      "prompt": "",
-      "generated": false
+      "file": "img/sprites/shao_hurt.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_shao_neutral",
+        "sp_shao_idle"
+      ],
+      "dependsOn": [
+        "pt_shao_neutral",
+        "sp_shao_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Same figure as the reference sprite, still facing LEFT at the same three-quarter angle. SHAO_KAHN staggering back to the RIGHT, one hand pressed to the helmet, the other arm flung out for balance, cape swinging but fully inside the frame with a margin on all sides, expression of surprised anger. Same magenta background, same framing scale. SHAO_KAHN: a towering, massively muscular warlord reimagined as CEO of Outworld Corp, 2.3 m tall. Bare chest with a black leather harness bearing a silver skull medallion, spiked pauldrons, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a horned skull-faced war helmet with a golden crest; glowing red eyes. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the warlord in the reference image. NO pink, NO magenta anywhere in the outfit or lighting. The red eye glow is rendered as solid opaque shapes, no translucent or semi-transparent elements."
     },
     {
-      "id": "sp_dev2_defeated",
+      "id": "sp_shao_defeated",
       "kind": "sprite",
       "group": "rank5",
-      "character": "dev_shao",
+      "character": "shao_kahn",
       "size": [
         700,
         900
       ],
-      "file": "img/sprites/dev2_defeated.webp",
-      "model": "",
-      "prompt": "",
-      "generated": false
+      "file": "img/sprites/shao_defeated.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_shao_neutral",
+        "sp_shao_idle"
+      ],
+      "dependsOn": [
+        "pt_shao_neutral",
+        "sp_shao_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Same figure as the reference sprite, still facing LEFT at the same three-quarter angle. SHAO_KAHN down on one knee, head bowed, one hand on the floor, the other hand holding out a signed paper contract toward the LEFT, helmet slightly tilted, cape pooled close to the body and fully inside the frame with a margin. Same magenta background, same framing scale. SHAO_KAHN: a towering, massively muscular warlord reimagined as CEO of Outworld Corp, 2.3 m tall. Bare chest with a black leather harness bearing a silver skull medallion, spiked pauldrons, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a horned skull-faced war helmet with a golden crest; glowing red eyes. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the warlord in the reference image. NO pink, NO magenta anywhere in the outfit or lighting. The red eye glow is rendered as solid opaque shapes, no translucent or semi-transparent elements."
+    },
+    {
+      "id": "pt_jax_neutral",
+      "kind": "portrait",
+      "group": "endings",
+      "character": "jax",
+      "size": [
+        512,
+        512
+      ],
+      "file": "img/portraits/jax_neutral.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png"
+      ],
+      "prompt": "Head-and-shoulders portrait, looking at camera with a tired, unimpressed expression, one chrome cybernetic hand raised into the frame in a \"come with me\" gesture. JAX: head of corporate security of Outworld Corp — a very tall broad Black man with a shaved head, calm authoritative face, black security uniform shirt with a radio on the shoulder, dark tie, an earpiece, and two massive chrome cybernetic arms. NO pink, NO magenta anywhere. Background: dim office corridor lit by a red emergency light, blurred."
     },
     {
       "id": "il_title",

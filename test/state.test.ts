@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { afterBattle, applyChoice, checkEnding, clampStat, createInitialState, currentEvent, visibleChoices } from '../src/state';
+import { afterBattle, applyChoice, checkEnding, clampStat, createInitialState, currentEvent, resolveEnding, visibleChoices } from '../src/state';
+import type { Ending } from '../src/types';
 import { makeBoss, makeEvent, makeRanks } from './fixtures';
+
+function makeEnding(over: Partial<Ending> = {}): Ending {
+  return {
+    id: 'promotion', title: 'База', text: 'Базовый текст', illustration: 'il_test',
+    epilogue: { name: 'Базовый', portrait: 'pt_d_neutral', text: 'база' },
+    ...over,
+  };
+}
 
 describe('createInitialState', () => {
   it('стартовые статы и пустые множества', () => {
@@ -89,6 +98,42 @@ describe('afterBattle', () => {
   it('fatality: статы не меняются', () => {
     const s1 = afterBattle(createInitialState(), boss, 'fatality');
     expect(s1.stats.stress).toBe(10); expect(s1.lastBattle?.outcome).toBe('fatality');
+  });
+});
+
+describe('resolveEnding', () => {
+  it('без подходящих флагов возвращает базовые поля', () => {
+    const ending = makeEnding();
+    const r = resolveEnding(ending, new Set());
+    expect(r).toEqual({ id: 'promotion', title: 'База', text: 'Базовый текст', illustration: 'il_test', epilogue: ending.epilogue });
+  });
+
+  it('вариант с установленным флагом перекрывает title/text/epilogue', () => {
+    const ending = makeEnding({
+      variants: [{ requiresFlag: 'flag_a', title: 'Вариант', text: 'Текст варианта', epilogue: { name: 'Другой', portrait: 'pt_d_angry', text: 'вариант' } }],
+    });
+    const r = resolveEnding(ending, new Set(['flag_a']));
+    expect(r.title).toBe('Вариант');
+    expect(r.text).toBe('Текст варианта');
+    expect(r.epilogue).toEqual({ name: 'Другой', portrait: 'pt_d_angry', text: 'вариант' });
+  });
+
+  it('вариант без text сохраняет базовый текст', () => {
+    const ending = makeEnding({ variants: [{ requiresFlag: 'flag_a', title: 'Вариант' }] });
+    const r = resolveEnding(ending, new Set(['flag_a']));
+    expect(r.title).toBe('Вариант');
+    expect(r.text).toBe('Базовый текст');
+  });
+
+  it('выигрывает первый подходящий вариант', () => {
+    const ending = makeEnding({
+      variants: [
+        { requiresFlag: 'flag_a', title: 'Первый' },
+        { requiresFlag: 'flag_b', title: 'Второй' },
+      ],
+    });
+    const r = resolveEnding(ending, new Set(['flag_a', 'flag_b']));
+    expect(r.title).toBe('Первый');
   });
 });
 

@@ -20,10 +20,11 @@ describe('content hints', () => {
     expect(MOVES.map(m => m.id).every(id => id in HINT_WORDS)).toBe(true);
   });
 
-  it('ступень 4 ставит флаг shang_secret для финала', () => {
+  it('ступень 4 ставит флаг shang_secret, и у него есть потребитель — вариант концовки promotion', () => {
     const director = CONTENT.ranks.find(r => r.id === 'director')!;
     const flags = director.events.flatMap(e => e.choices.map(c => c.setFlag)).filter(Boolean);
     expect(flags).toContain('shang_secret');
     expect(director.events[1]!.choices[0]!.requiresFlag).toBeUndefined();
+    expect(CONTENT.endings.promotion.variants?.some(v => v.requiresFlag === 'shang_secret')).toBe(true);
   });
 });
