@@ -3,7 +3,7 @@ import { availableMoves, baseDamage, createBattle, resolveTurn } from '../battle
 import { introSteps, outcomeSteps, turnSteps } from '../choreo';
 import type { Ctx, Screen } from '../engine';
 import { createHud } from '../hud';
-import { banner, damageNumber, dim, flash, grayscale, particles, shake, speechLine, wait } from '../render/effects';
+import { banner, clearSpeech, damageNumber, dim, flash, grayscale, particles, shake, speechLine, wait } from '../render/effects';
 import { getScene, type Scene } from '../render/scene';
 import { afterBattle, checkEnding, currentRank } from '../state';
 import type { AssetGroup, BattleState, Boss, Move, Step } from '../types';
@@ -136,6 +136,7 @@ export function createBattleScreen(): Screen {
         if (phase !== 'awaitInput') return;
         phase = 'playerAnim';
         renderMoves();
+        if (scene) clearSpeech(scene); // пузырь босса висел, пока игрок думал; ход сделан — убрать
         const prev = battle;
         const result = resolveTurn(prev, move, ctx.getState().stats, boss);
         battle = result.battle;

@@ -103,6 +103,24 @@ export async function banner(scene: Scene, text: string): Promise<void> {
   drop();
 }
 
+const SPEECH = 'speech';
+
+/**
+ * Гасит закреплённый пузырь босса (если есть). Вызывается контроллером боя в момент выбора приёма
+ * и самим speechLine перед показом следующего пузыря — на экране всегда не больше одного.
+ */
+export function clearSpeech(scene: Scene): void {
+  const old = scene.layers.banners.getChildByLabel(SPEECH);
+  if (!old) return;
+  old.label = ''; // следующий пузырь не должен найти уходящий по метке
+  gsap.to(old, { alpha: 0, duration: 0.25, onComplete: () => { if (!old.destroyed) old.destroy({ children: true }); } });
+}
+
+/**
+ * Реплика босса. `bubble` — белое облачко у головы босса, висит до следующей реплики или до хода игрока
+ * (`clearSpeech`): раньше оно гасло через 1.6 с, и игрок не успевал прочитать. `center` — крик спецприёма
+ * поверх затемнения, гаснет сам вместе с затемнением.
+ */
 export function speechLine(scene: Scene, text: string, style: 'bubble' | 'center'): void {
   const layer = scene.layers.banners;
   const c = new Container();
@@ -110,6 +128,8 @@ export function speechLine(scene: Scene, text: string, style: 'bubble' | 'center
   const t = new Text({ text, style: new TextStyle({ fontFamily: isCenter ? 'Impact, Arial Black, sans-serif' : 'sans-serif', fontSize: isCenter ? 44 : 20, fill: isCenter ? 0xff6b6b : 0x1a1a1a, wordWrap: true, wordWrapWidth: isCenter ? 900 : 360, align: 'center' }) });
   t.anchor.set(0.5);
   if (!isCenter) {
+    clearSpeech(scene);
+    c.label = SPEECH;
     const pad = 14;
     const box = new Graphics().roundRect(-t.width / 2 - pad, -t.height / 2 - pad, t.width + pad * 2, t.height + pad * 2, 10).fill({ color: 0xf5efe0 }).stroke({ color: 0x3a2a10, width: 2 });
     c.addChild(box);
@@ -120,7 +140,7 @@ export function speechLine(scene: Scene, text: string, style: 'bubble' | 'center
   c.alpha = 0;
   layer.addChild(c);
   gsap.to(c, { alpha: 1, y: c.y - 10, duration: 0.2 });
-  gsap.to(c, { alpha: 0, duration: 0.3, delay: isCenter ? 1.2 : 1.6, onComplete: () => { if (!c.destroyed) c.destroy({ children: true }); } });
+  if (isCenter) gsap.to(c, { alpha: 0, duration: 0.3, delay: 1.2, onComplete: () => { if (!c.destroyed) c.destroy({ children: true }); } });
 }
 
 export function dim(scene: Scene, to: number, ms: number): Promise<void> {

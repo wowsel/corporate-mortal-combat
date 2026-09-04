@@ -4,6 +4,7 @@
 // `flash`, `shake`, `bar`, а также `pose`, `particles`, `damage`, `line`, `sound`, `voice`, `timeScale`
 // запускаются и не ожидаются — они намеренно накладываются на следующий шаг:
 // вспышка светит поверх отлёта босса, тряска идёт под цифру урона, полоска утекает под реплику.
+// Реплика-`bubble` не гаснет сама: висит до следующего пузыря или до хода игрока (clearSpeech в контроллере).
 import type { BannerText, BattleState, Boss, Step, TurnResult } from './types';
 
 const WHITE = '#ffffff';
