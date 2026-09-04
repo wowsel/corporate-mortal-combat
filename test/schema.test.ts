@@ -77,6 +77,10 @@ describe('validateContent', () => {
     const endings = { ...CONTENT.endings, fatality: { ...CONTENT.endings.fatality, epilogue: { name: 'x', portrait: 'pt_ghost', text: 'y' } } };
     expect(validateContent(CONTENT.ranks, manifestJson as Manifest, endings).join()).toMatch(/pt_ghost/);
   });
+  it('концовка под чужим ключом — ошибка', () => {
+    const endings = { ...CONTENT.endings, burnout: { ...CONTENT.endings.burnout, id: 'promotion' as const } };
+    expect(validateContent(CONTENT.ranks, manifestJson as Manifest, endings).join()).toMatch(/ending burnout: id is "promotion"/);
+  });
 
   it('вариант с requiresFlag, который нигде не ставится — ошибка', () => {
     const ranks = makeRanks();

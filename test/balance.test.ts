@@ -4,11 +4,19 @@ import { summarize } from '../tools/simulate';
 
 describe('balance', () => {
   const n = CONTENT.ranks.length;
-  it('правильная стратегия: каждый босс ≥ 60% с первого раза, два последних ≤ 95%, промоушен ≥ 50%', () => {
+  it('правильная стратегия: каждый босс ≥ 60% с первого раза, два последних снимают 60–90 уверенности, промоушен ≥ 50%', () => {
     const s = summarize(CONTENT.ranks, 'best', 'weakness', 300);
     s.bosses.forEach((b, k) => {
       expect(b.firstTryWin, b.boss).toBeGreaterThanOrEqual(0.6);
-      if (k >= n - 2) expect(b.firstTryWin, b.boss).toBeLessThanOrEqual(0.95); // ранние боссы могут браться в 100% — это дизайн
+      // Ранние боссы могут браться в 100% — это дизайн. Для двух последних угроза измеряется не долей
+      // поражений (при стрессе 0 босс с атакой ≤ 16 физически не снимает 100 за T − 1 ответов), а ожидаемым
+      // поглощённым уроном по формуле спеки: (T − 1) × 1.125 × (attack + stress × 0.05) в окне 60–90.
+      if (k >= n - 2) {
+        const boss = CONTENT.ranks[k]!.boss;
+        const absorbed = (b.avgTurns - 1) * 1.125 * (boss.attack + b.avgStress * 0.05);
+        expect(absorbed, `${b.boss} absorbed`).toBeGreaterThanOrEqual(60);
+        expect(absorbed, `${b.boss} absorbed`).toBeLessThanOrEqual(90);
+      }
     });
     expect(s.promotionRate).toBeGreaterThanOrEqual(0.5);
   });

@@ -53,8 +53,9 @@ export function validateContent(ranks: Rank[], manifest: Manifest, endings?: Rec
   });
 
   if (endings) {
-    Object.values(endings).forEach(e => {
-      const ew = `ending ${e.id}`;
+    Object.entries(endings).forEach(([key, e]) => {
+      const ew = `ending ${key}`;
+      if (key !== e.id) errors.push(`${ew}: id is "${e.id}"`);
       asset(e.illustration, ew);
       if (e.epilogue) asset(e.epilogue.portrait, ew);
       e.variants?.forEach((v, i) => {

@@ -26,7 +26,7 @@
 
 .ending { flex-direction: row; }
 .ending-art { flex: 1.3; background-size: cover; background-position: center; }
-.ending-panel { flex: 1; padding: 48px; display: flex; flex-direction: column; justify-content: center; gap: 16px; background: var(--panel); }
+.ending-panel { flex: 1; padding: 48px; display: flex; flex-direction: column; justify-content: center; gap: 16px; background: var(--panel); overflow-y: auto; }
 .ending-panel h1 { font-family: var(--font-display); color: var(--gold); font-size: 40px; margin: 0; }
 .ending-panel p { font-size: 18px; line-height: 1.5; }
 .ending-meta { color: var(--muted); font-size: 14px; }
