@@ -307,6 +307,159 @@
       "prompt": "Same woman, still facing LEFT. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. She is slumped sideways onto the floor, half-sitting, ponytail undone, clipboard face down beside her, veil still covering her mouth, exhausted but composed. Same magenta background, same framing scale."
     },
     {
+      "id": "bg_meeting_room",
+      "kind": "background",
+      "group": "rank1",
+      "size": [
+        1600,
+        900
+      ],
+      "resolution": "2K",
+      "file": "img/bg/meeting_room.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png"
+      ],
+      "prompt": "Wide establishing shot of a corporate meeting room of Outworld Corp, the room the staff call the Blood Well: a long dark conference table with black office chairs, a big wall screen showing a red bar chart, a whiteboard covered with sticky notes and a flowchart, a wall poster with the single word OUTWORLD. In the centre of the floor sits a round dark stone well like a pit, lit from within by a deep red glow, with a small blank laminated sign standing on its rim — the room's brainstorm well. Skull trophies on a sideboard, a horned skull mounted above the screen, an iron dragon emblem on the wall. Empty of people. Wide-angle, eye level, deep depth of field (override the shallow depth of field of the style prefix for this establishing shot), clean composition with the lower third free for UI. Exception to the no-text rule: the single word OUTWORLD on the wall poster is required; no other text anywhere."
+    },
+    {
+      "id": "pt_baraka_neutral",
+      "kind": "portrait",
+      "group": "rank1",
+      "character": "baraka",
+      "size": [
+        512,
+        512
+      ],
+      "file": "img/portraits/baraka_neutral.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png"
+      ],
+      "prompt": "Head-and-shoulders portrait, looking directly at camera with an impatient evaluating stare, tiny eyes narrowed, mouth slightly open showing rows of fangs, one steel ruler-blade visible at the edge of the frame. BARAKA: a huge hulking Tarkatan man, Team Lead at Outworld Corp. Grey-brown leathery skin, bald head with bony ridges running back over the skull, tiny fierce deep-set eyes, and an enormous mouth full of rows of long curved fangs that never fully closes. Grey business shirt with the sleeves rolled up over massive forearms, a loosened dark charcoal tie, a corporate lanyard with a badge, dark olive cargo trousers with many pockets and black work boots. Instead of arm blades he wears two long steel ruler-like blades strapped to his forearms with leather straps, engraved with measurement marks, extending well past his hands. Intimidating, impatient, oddly professional. Palette strictly greys, browns, dark olive and matte, non-reflective brushed steel — absolutely no pink, no magenta, no purple anywhere on the character. Background: blurred meeting room with a whiteboard covered in sticky notes and a horned skull on the wall."
+    },
+    {
+      "id": "pt_baraka_angry",
+      "kind": "portrait",
+      "group": "rank1",
+      "character": "baraka",
+      "size": [
+        512,
+        512
+      ],
+      "file": "img/portraits/baraka_angry.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_baraka_neutral"
+      ],
+      "dependsOn": [
+        "pt_baraka_neutral"
+      ],
+      "prompt": "Same man, same framing and background as the reference portrait. BARAKA roaring with his mouth wide open, every row of long curved fangs fully visible, eyes bulging, brow ridges pulled down, veins standing out on the neck, loosened tie swinging. BARAKA: a huge hulking Tarkatan man, Team Lead at Outworld Corp. Grey-brown leathery skin, bald head with bony ridges running back over the skull, tiny fierce deep-set eyes, and an enormous mouth full of rows of long curved fangs that never fully closes. Grey business shirt with the sleeves rolled up over massive forearms, a loosened dark charcoal tie, a corporate lanyard with a badge, dark olive cargo trousers with many pockets and black work boots. Instead of arm blades he wears two long steel ruler-like blades strapped to his forearms with leather straps, engraved with measurement marks, extending well past his hands. Intimidating, impatient, oddly professional. Palette strictly greys, browns, dark olive and matte, non-reflective brushed steel — absolutely no pink, no magenta, no purple anywhere on the character."
+    },
+    {
+      "id": "sp_baraka_idle",
+      "kind": "sprite",
+      "group": "rank1",
+      "character": "baraka",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/baraka_idle.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_baraka_neutral"
+      ],
+      "dependsOn": [
+        "pt_baraka_neutral"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Full body, head to boots fully visible, BARAKA standing in a wide impatient stance, three-quarter view facing LEFT, holding an open laptop in one hand at chest height with its screen showing a solid red error page, the other arm hanging with the steel ruler-blade pointing down, mouth open showing fangs, both steel ruler-blades fully inside the frame, nothing cropped at the edges. BARAKA: a huge hulking Tarkatan man, Team Lead at Outworld Corp. Grey-brown leathery skin, bald head with bony ridges running back over the skull, tiny fierce deep-set eyes, and an enormous mouth full of rows of long curved fangs that never fully closes. Grey business shirt with the sleeves rolled up over massive forearms, a loosened dark charcoal tie, a corporate lanyard with a badge, dark olive cargo trousers with many pockets and black work boots. Instead of arm blades he wears two long steel ruler-like blades strapped to his forearms with leather straps, engraved with measurement marks, extending well past his hands. Intimidating, impatient, oddly professional. Palette strictly greys, browns, dark olive and matte, non-reflective brushed steel — absolutely no pink, no magenta, no purple anywhere on the character. Isolated on a flat uniform solid magenta background (#FF00FF), no floor, no shadow on the background, even studio lighting from the right."
+    },
+    {
+      "id": "sp_baraka_attack",
+      "kind": "sprite",
+      "group": "rank1",
+      "character": "baraka",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/baraka_attack.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_baraka_neutral",
+        "sp_baraka_idle"
+      ],
+      "dependsOn": [
+        "pt_baraka_neutral",
+        "sp_baraka_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Same man as the reference sprite, still facing LEFT at the same three-quarter angle. BARAKA lunging forward to the LEFT, thrusting the red-screen laptop out with one hand and slashing downward with the ruler-blade on the other arm, jaws wide, roaring, both steel ruler-blades fully inside the frame, nothing cropped at the edges. BARAKA: a huge hulking Tarkatan man, Team Lead at Outworld Corp. Grey-brown leathery skin, bald head with bony ridges running back over the skull, tiny fierce deep-set eyes, and an enormous mouth full of rows of long curved fangs that never fully closes. Grey business shirt with the sleeves rolled up over massive forearms, a loosened dark charcoal tie, a corporate lanyard with a badge, dark olive cargo trousers with many pockets and black work boots. Instead of arm blades he wears two long steel ruler-like blades strapped to his forearms with leather straps, engraved with measurement marks, extending well past his hands. Intimidating, impatient, oddly professional. Palette strictly greys, browns, dark olive and matte, non-reflective brushed steel — absolutely no pink, no magenta, no purple anywhere on the character. Same magenta background, same framing scale."
+    },
+    {
+      "id": "sp_baraka_hurt",
+      "kind": "sprite",
+      "group": "rank1",
+      "character": "baraka",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/baraka_hurt.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_baraka_neutral",
+        "sp_baraka_idle"
+      ],
+      "dependsOn": [
+        "pt_baraka_neutral",
+        "sp_baraka_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Same man, still facing LEFT at the same three-quarter angle. BARAKA recoiling backward (his back moves to the RIGHT), laptop tilting in his hand, the other ruler-blade raised across his face in a blocking gesture, tie flying, fangs bared in surprise. BARAKA: a huge hulking Tarkatan man, Team Lead at Outworld Corp. Grey-brown leathery skin, bald head with bony ridges running back over the skull, tiny fierce deep-set eyes, and an enormous mouth full of rows of long curved fangs that never fully closes. Grey business shirt with the sleeves rolled up over massive forearms, a loosened dark charcoal tie, a corporate lanyard with a badge, dark olive cargo trousers with many pockets and black work boots. Instead of arm blades he wears two long steel ruler-like blades strapped to his forearms with leather straps, engraved with measurement marks, extending well past his hands. Intimidating, impatient, oddly professional. Palette strictly greys, browns, dark olive and matte, non-reflective brushed steel — absolutely no pink, no magenta, no purple anywhere on the character. Same magenta background, same framing scale."
+    },
+    {
+      "id": "sp_baraka_defeated",
+      "kind": "sprite",
+      "group": "rank1",
+      "character": "baraka",
+      "size": [
+        700,
+        900
+      ],
+      "file": "img/sprites/baraka_defeated.webp",
+      "model": "bytedance-seed/seedream-5-0-pro",
+      "generated": false,
+      "references": [
+        "assets/reference/post-hero-and-shao-kahn.png",
+        "pt_baraka_neutral",
+        "sp_baraka_idle"
+      ],
+      "dependsOn": [
+        "pt_baraka_neutral",
+        "sp_baraka_idle"
+      ],
+      "chroma": "#FF00FF",
+      "flip": false,
+      "prompt": "Same man, still facing LEFT at the same three-quarter angle. BARAKA sitting slumped on the floor, legs stretched out, both ruler-blades resting limp on the ground, closed laptop on his knees, head bowed, mouth closed for once, a small green sticky note stuck to his forehead. BARAKA: a huge hulking Tarkatan man, Team Lead at Outworld Corp. Grey-brown leathery skin, bald head with bony ridges running back over the skull, tiny fierce deep-set eyes, and an enormous mouth full of rows of long curved fangs that never fully closes. Grey business shirt with the sleeves rolled up over massive forearms, a loosened dark charcoal tie, a corporate lanyard with a badge, dark olive cargo trousers with many pockets and black work boots. Instead of arm blades he wears two long steel ruler-like blades strapped to his forearms with leather straps, engraved with measurement marks, extending well past his hands. Intimidating, impatient, oddly professional. Palette strictly greys, browns, dark olive and matte, non-reflective brushed steel — absolutely no pink, no magenta, no purple anywhere on the character. Same magenta background, same framing scale."
+    },
+    {
       "id": "bg_dev_throne",
       "kind": "background",
       "group": "rank5",

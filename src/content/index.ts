@@ -3,6 +3,7 @@ import { ENDINGS } from './endings';
 import { MOVES, STRIKE_MOVE } from './moves';
 import { DEV_RANKS } from './ranks/dev';
 import { RANK_INTERN } from './ranks/00-intern';
+import { RANK_JUNIOR } from './ranks/01-junior';
 
 export interface Content {
   ranks: Rank[];
@@ -11,7 +12,7 @@ export interface Content {
   strike: Move;
 }
 
-export const RANKS: Rank[] = [RANK_INTERN, ...DEV_RANKS];
+export const RANKS: Rank[] = [RANK_INTERN, RANK_JUNIOR, ...DEV_RANKS];
 export { ENDINGS, MOVES, STRIKE_MOVE };
 
 export const CONTENT: Content = { ranks: RANKS, endings: ENDINGS, moves: MOVES, strike: STRIKE_MOVE };
