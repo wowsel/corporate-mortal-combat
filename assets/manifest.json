@@ -219,7 +219,7 @@
       ],
       "file": "img/sprites/mileena_idle.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
         "assets/reference/post-hero-and-shao-kahn.png",
         "pt_mileena_neutral"
@@ -229,7 +229,11 @@
       ],
       "chroma": "#00FF00",
       "flip": false,
-      "prompt": "Full body, head to shoes fully visible. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT green — it must contrast with a green chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. She stands in a poised interviewer stance, three-quarter view facing LEFT, holding a clipboard in one hand and a pen in the other, weight on one heel. Isolated on a flat uniform solid green background (#00FF00), no floor, no shadow on the background, even studio lighting from the right. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. The whole figure, including both feet, is fully inside the frame with a clear margin at the bottom edge; nothing is cropped by the canvas edge."
+      "prompt": "Full body, head to shoes fully visible. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT green — it must contrast with a green chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. She stands in a poised interviewer stance, three-quarter view facing LEFT, holding a clipboard in one hand and a pen in the other, weight on one heel. Isolated on a flat uniform solid green background (#00FF00), no floor, no shadow on the background, even studio lighting from the right. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. The whole figure, including both feet, is fully inside the frame with a clear margin at the bottom edge; nothing is cropped by the canvas edge.",
+      "anchor": [
+        350,
+        885
+      ]
     },
     {
       "id": "sp_mileena_attack",
@@ -242,7 +246,7 @@
       ],
       "file": "img/sprites/mileena_attack.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
         "assets/reference/post-hero-and-shao-kahn.png",
         "pt_mileena_neutral",
@@ -254,7 +258,11 @@
       ],
       "chroma": "#00FF00",
       "flip": false,
-      "prompt": "Same woman as the reference sprite, still facing LEFT at the same three-quarter angle. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT green — it must contrast with a green chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. She lunges forward to the LEFT, thrusting the clipboard out like a blade, other hand slashing the air with the pen, veil in place, aggressive. Same green background, same framing scale. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. The whole figure, including both feet, is fully inside the frame with a clear margin at the bottom edge; nothing is cropped by the canvas edge."
+      "prompt": "Same woman as the reference sprite, still facing LEFT at the same three-quarter angle. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT green — it must contrast with a green chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. She lunges forward to the LEFT, thrusting the clipboard out like a blade, other hand slashing the air with the pen, veil in place, aggressive. Same green background, same framing scale. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. The whole figure, including both feet, is fully inside the frame with a clear margin at the bottom edge; nothing is cropped by the canvas edge.",
+      "anchor": [
+        350,
+        885
+      ]
     },
     {
       "id": "sp_mileena_hurt",
@@ -267,7 +275,7 @@
       ],
       "file": "img/sprites/mileena_hurt.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
         "assets/reference/post-hero-and-shao-kahn.png",
         "pt_mileena_neutral",
@@ -279,7 +287,11 @@
       ],
       "chroma": "#00FF00",
       "flip": false,
-      "prompt": "Same woman, still facing LEFT at the same three-quarter angle. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT green — it must contrast with a green chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. She recoils backward (her back moves to the RIGHT), clipboard papers flying, one hand raised to her veil, eyes wide in surprise. Same green background, same framing scale. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. The whole figure, including both feet, is fully inside the frame with a clear margin at the bottom edge; nothing is cropped by the canvas edge."
+      "prompt": "Same woman, still facing LEFT at the same three-quarter angle. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT green — it must contrast with a green chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. She recoils backward (her back moves to the RIGHT), clipboard papers flying, one hand raised to her veil, eyes wide in surprise. Same green background, same framing scale. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. The whole figure, including both feet, is fully inside the frame with a clear margin at the bottom edge; nothing is cropped by the canvas edge.",
+      "anchor": [
+        350,
+        885
+      ]
     },
     {
       "id": "sp_mileena_defeated",
@@ -292,7 +304,7 @@
       ],
       "file": "img/sprites/mileena_defeated.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
         "assets/reference/post-hero-and-shao-kahn.png",
         "pt_mileena_neutral",
@@ -304,7 +316,11 @@
       ],
       "chroma": "#00FF00",
       "flip": false,
-      "prompt": "Same woman, still facing LEFT. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT green — it must contrast with a green chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. She is slumped sideways onto the floor, half-sitting, ponytail undone, clipboard face down beside her, veil still covering her mouth, exhausted but composed. Same green background, same framing scale. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. The whole figure, including both feet, is fully inside the frame with a clear margin at the bottom edge; nothing is cropped by the canvas edge."
+      "prompt": "Same woman, still facing LEFT. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT green — it must contrast with a green chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. She is slumped sideways onto the floor, half-sitting, ponytail undone, clipboard face down beside her, veil still covering her mouth, exhausted but composed. Same green background, same framing scale. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. The whole figure, including both feet, is fully inside the frame with a clear margin at the bottom edge; nothing is cropped by the canvas edge.",
+      "anchor": [
+        350,
+        885
+      ]
     },
     {
       "id": "bg_meeting_room",
