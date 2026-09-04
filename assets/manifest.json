@@ -1026,7 +1026,7 @@
       "resolution": "2K",
       "file": "img/bg/throne_office.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
         "assets/reference/post-hero-and-shao-kahn.png"
       ],
@@ -1043,11 +1043,11 @@
       ],
       "file": "img/portraits/shao_neutral.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
         "assets/reference/post-hero-and-shao-kahn.png"
       ],
-      "prompt": "Head-and-shoulders portrait, looking down at camera with imperial contempt, chin raised, helmet on, red eyes glowing softly, jaw set. SHAO_KAHN: a towering, massively muscular warlord reimagined as CEO of Outworld Corp, 2.3 m tall. Bare chest with a black leather harness bearing a silver skull medallion, spiked pauldrons, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a horned skull-faced war helmet with a golden crest; glowing red eyes. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the warlord in the reference image. NO green anywhere in the outfit or lighting. Background: blurred throne office, a stone throne and red drapes, warm brazier light from the side."
+      "prompt": "Head-and-shoulders portrait, looking down at camera with imperial contempt, chin raised, helmet on, eyes glinting red, jaw set. SHAO_KAHN: a towering, massively muscular armored emperor-executive, CEO of Outworld Corp, 2.3 m tall. A tight black sleeveless undershirt with broad black leather shoulder straps and a large silver dragon medallion, heavy bronze shoulder plates, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a ceremonial horned helmet shaped like a stylized bone mask with a golden crest; eyes glinting red. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the armored emperor in the reference image. NO green anywhere in the outfit or lighting. Background: blurred throne office, a stone throne and red drapes, warm brazier light from the side."
     },
     {
       "id": "pt_shao_angry",
@@ -1060,15 +1060,14 @@
       ],
       "file": "img/portraits/shao_angry.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
-        "assets/reference/post-hero-and-shao-kahn.png",
-        "pt_shao_neutral"
+        "assets/reference/post-hero-and-shao-kahn.png"
       ],
       "dependsOn": [
         "pt_shao_neutral"
       ],
-      "prompt": "Same figure, same framing and background as the reference portrait. He roars, mouth open showing teeth, eyes blazing bright red, cape flaring behind the shoulders, one gauntleted fist raised into the bottom of the frame. SHAO_KAHN: a towering, massively muscular warlord reimagined as CEO of Outworld Corp, 2.3 m tall. Bare chest with a black leather harness bearing a silver skull medallion, spiked pauldrons, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a horned skull-faced war helmet with a golden crest; glowing red eyes. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the warlord in the reference image. NO green anywhere in the outfit or lighting."
+      "prompt": "Same figure as the neutral portrait: same helmet, cape, straps, medallion and badge; same framing and background. He shouts, jaw open wide, eyes bright red, cape flaring behind the shoulders, one gauntleted hand raised into the bottom of the frame. SHAO_KAHN: a towering, massively muscular armored emperor-executive, CEO of Outworld Corp, 2.3 m tall. A tight black sleeveless undershirt with broad black leather shoulder straps and a large silver dragon medallion, heavy bronze shoulder plates, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a ceremonial horned helmet shaped like a stylized bone mask with a golden crest; eyes glinting red. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the armored emperor in the reference image. NO green anywhere in the outfit or lighting."
     },
     {
       "id": "sp_shao_idle",
@@ -1081,17 +1080,18 @@
       ],
       "file": "img/sprites/shao_idle.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
-      "references": [
-        "assets/reference/post-hero-and-shao-kahn.png",
-        "pt_shao_neutral"
-      ],
+      "generated": true,
+      "references": [],
       "dependsOn": [
         "pt_shao_neutral"
       ],
       "chroma": "#00FF00",
       "flip": false,
-      "prompt": "FULL-LENGTH FULL-BODY SHOT from the top of the head to the soles of the shoes, both shoes completely visible with empty background beneath them; never a waist-up, three-quarter-length or knee-length crop. Full body, head to boots fully visible, SHAO_KAHN standing wide-legged with arms crossed over the chest, three-quarter view facing LEFT, a small laser pointer in one huge fist, the cape kept close to the body and hanging behind him, the whole silhouette including helmet horns and cape entirely inside the frame with a margin, nothing cropped at the canvas edge. Isolated on a flat uniform solid green background (#00FF00), no floor, no shadow on the background, even studio lighting from the right. SHAO_KAHN: a towering, massively muscular warlord reimagined as CEO of Outworld Corp, 2.3 m tall. Bare chest with a black leather harness bearing a silver skull medallion, spiked pauldrons, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a horned skull-faced war helmet with a golden crest; glowing red eyes. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the warlord in the reference image. NO green anywhere in the outfit or lighting. The red eye glow is rendered as solid opaque shapes, no translucent or semi-transparent elements. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. Leave a clear empty margin of plain background below the feet and above the head: the figure fills at most 85% of the frame height and is centered horizontally."
+      "prompt": "FULL-LENGTH FULL-BODY SHOT from the top of the head to the soles of the shoes, both shoes completely visible with empty background beneath them; never a waist-up, three-quarter-length or knee-length crop. Full body, head to boots fully visible, SHAO_KAHN standing tall with feet planted shoulder-width apart and arms crossed over the chest, three-quarter view facing LEFT, a rolled-up quarterly report tucked under one arm, the cape kept close to the body and hanging behind him, the whole silhouette including helmet horns and cape entirely inside the frame with a margin, nothing cropped at the canvas edge. Isolated on a flat uniform solid green background (#00FF00), no floor, no shadow on the background, even studio lighting from the right. SHAO_KAHN: a towering, broad-shouldered heavyset armored emperor-executive, CEO of Outworld Corp, 2.3 m tall. A black long-sleeved dress shirt with broad black leather shoulder straps over it and a large silver dragon medallion, heavy bronze shoulder plates, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a ceremonial horned helmet shaped like a stylized bone mask with a golden crest; eyes glinting red. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the armored emperor in the reference image. NO green anywhere in the outfit or lighting. The red eye glow is rendered as solid opaque shapes, no translucent or semi-transparent elements. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. Leave a clear empty margin of plain background below the feet and above the head: the figure fills at most 85% of the frame height and is centered horizontally.",
+      "anchor": [
+        350,
+        888
+      ]
     },
     {
       "id": "sp_shao_attack",
@@ -1104,10 +1104,8 @@
       ],
       "file": "img/sprites/shao_attack.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
-        "assets/reference/post-hero-and-shao-kahn.png",
-        "pt_shao_neutral",
         "sp_shao_idle"
       ],
       "dependsOn": [
@@ -1116,7 +1114,11 @@
       ],
       "chroma": "#00FF00",
       "flip": false,
-      "prompt": "FULL-LENGTH FULL-BODY SHOT from the top of the head to the soles of the shoes, both shoes completely visible with empty background beneath them; never a waist-up, three-quarter-length or knee-length crop. Same figure as the reference sprite, still facing LEFT at the same three-quarter angle. SHAO_KAHN lunging to the LEFT and slamming a giant fist down onto an invisible desk, sheets of paper bursting upward around the fist, mouth open in a roar, the cape swinging but fully inside the frame with a margin on all sides. Same green background, same framing scale. SHAO_KAHN: a towering, massively muscular warlord reimagined as CEO of Outworld Corp, 2.3 m tall. Bare chest with a black leather harness bearing a silver skull medallion, spiked pauldrons, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a horned skull-faced war helmet with a golden crest; glowing red eyes. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the warlord in the reference image. NO green anywhere in the outfit or lighting. The red eye glow and the papers are rendered as solid opaque shapes, no translucent or semi-transparent elements. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. Leave a clear empty margin of plain background below the feet and above the head: the figure fills at most 85% of the frame height and is centered horizontally."
+      "prompt": "FULL-LENGTH FULL-BODY SHOT from the top of the head to the soles of the shoes, both shoes completely visible with empty background beneath them; never a waist-up, three-quarter-length or knee-length crop. Same figure as the reference sprite, still facing LEFT at the same three-quarter angle. SHAO_KAHN lunging to the LEFT and planting a giant hand down onto an invisible desk, sheets of paper bursting upward around the hand, mouth open in a roar, the cape swinging but fully inside the frame with a margin on all sides. Same green background, same framing scale. SHAO_KAHN: a towering, broad-shouldered heavyset armored emperor-executive, CEO of Outworld Corp, 2.3 m tall. A black long-sleeved dress shirt with broad black leather shoulder straps over it and a large silver dragon medallion, heavy bronze shoulder plates, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a ceremonial horned helmet shaped like a stylized bone mask with a golden crest; eyes glinting red. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the armored emperor in the reference image. NO green anywhere in the outfit or lighting. The red eye glow and the papers are rendered as solid opaque shapes, no translucent or semi-transparent elements. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. Leave a clear empty margin of plain background below the feet and above the head: the figure fills at most 85% of the frame height and is centered horizontally.",
+      "anchor": [
+        350,
+        888
+      ]
     },
     {
       "id": "sp_shao_hurt",
@@ -1129,10 +1131,8 @@
       ],
       "file": "img/sprites/shao_hurt.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
-        "assets/reference/post-hero-and-shao-kahn.png",
-        "pt_shao_neutral",
         "sp_shao_idle"
       ],
       "dependsOn": [
@@ -1141,7 +1141,11 @@
       ],
       "chroma": "#00FF00",
       "flip": false,
-      "prompt": "FULL-LENGTH FULL-BODY SHOT from the top of the head to the soles of the shoes, both shoes completely visible with empty background beneath them; never a waist-up, three-quarter-length or knee-length crop. Same figure as the reference sprite, still facing LEFT at the same three-quarter angle. SHAO_KAHN staggering back to the RIGHT, one hand pressed to the helmet, the other arm flung out for balance, cape swinging but fully inside the frame with a margin on all sides, expression of surprised anger. Same green background, same framing scale. SHAO_KAHN: a towering, massively muscular warlord reimagined as CEO of Outworld Corp, 2.3 m tall. Bare chest with a black leather harness bearing a silver skull medallion, spiked pauldrons, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a horned skull-faced war helmet with a golden crest; glowing red eyes. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the warlord in the reference image. NO green anywhere in the outfit or lighting. The red eye glow is rendered as solid opaque shapes, no translucent or semi-transparent elements. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. Leave a clear empty margin of plain background below the feet and above the head: the figure fills at most 85% of the frame height and is centered horizontally."
+      "prompt": "FULL-LENGTH FULL-BODY SHOT from the top of the head to the soles of the shoes, both shoes completely visible with empty background beneath them; never a waist-up, three-quarter-length or knee-length crop. Same figure as the reference sprite, still facing LEFT at the same three-quarter angle. SHAO_KAHN staggering back to the RIGHT, one hand pressed to the helmet, the other arm flung out for balance, cape swinging but fully inside the frame with a margin on all sides, expression of surprised anger. Same green background, same framing scale. SHAO_KAHN: a towering, broad-shouldered heavyset armored emperor-executive, CEO of Outworld Corp, 2.3 m tall. A black long-sleeved dress shirt with broad black leather shoulder straps over it and a large silver dragon medallion, heavy bronze shoulder plates, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a ceremonial horned helmet shaped like a stylized bone mask with a golden crest; eyes glinting red. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the armored emperor in the reference image. NO green anywhere in the outfit or lighting. The red eye glow is rendered as solid opaque shapes, no translucent or semi-transparent elements. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. Leave a clear empty margin of plain background below the feet and above the head: the figure fills at most 85% of the frame height and is centered horizontally.",
+      "anchor": [
+        350,
+        888
+      ]
     },
     {
       "id": "sp_shao_defeated",
@@ -1154,10 +1158,8 @@
       ],
       "file": "img/sprites/shao_defeated.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
-        "assets/reference/post-hero-and-shao-kahn.png",
-        "pt_shao_neutral",
         "sp_shao_idle"
       ],
       "dependsOn": [
@@ -1166,7 +1168,11 @@
       ],
       "chroma": "#00FF00",
       "flip": false,
-      "prompt": "FULL-LENGTH FULL-BODY SHOT from the top of the head to the soles of the shoes, both shoes completely visible with empty background beneath them; never a waist-up, three-quarter-length or knee-length crop. Same figure as the reference sprite, still facing LEFT at the same three-quarter angle. SHAO_KAHN down on one knee, head bowed, one hand on the floor, the other hand holding out a signed paper contract toward the LEFT, helmet slightly tilted, cape pooled close to the body and fully inside the frame with a margin. Same green background, same framing scale. SHAO_KAHN: a towering, massively muscular warlord reimagined as CEO of Outworld Corp, 2.3 m tall. Bare chest with a black leather harness bearing a silver skull medallion, spiked pauldrons, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a horned skull-faced war helmet with a golden crest; glowing red eyes. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the warlord in the reference image. NO green anywhere in the outfit or lighting. The red eye glow is rendered as solid opaque shapes, no translucent or semi-transparent elements. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. Leave a clear empty margin of plain background below the feet and above the head: the figure fills at most 85% of the frame height and is centered horizontally."
+      "prompt": "FULL-LENGTH FULL-BODY SHOT from the top of the head to the soles of the shoes, both shoes completely visible with empty background beneath them; never a waist-up, three-quarter-length or knee-length crop. Same figure as the reference sprite, still facing LEFT at the same three-quarter angle. SHAO_KAHN down on one knee, head bowed, one hand on the floor, the other hand holding out a signed paper contract toward the LEFT, helmet slightly tilted, cape pooled close to the body and fully inside the frame with a margin. Same green background, same framing scale. SHAO_KAHN: a towering, broad-shouldered heavyset armored emperor-executive, CEO of Outworld Corp, 2.3 m tall. A black long-sleeved dress shirt with broad black leather shoulder straps over it and a large silver dragon medallion, heavy bronze shoulder plates, a deep crimson red cape (red, not pink), bronze gauntlets; on his head a ceremonial horned helmet shaped like a stylized bone mask with a golden crest; eyes glinting red. Over the harness, an unbuttoned dark charcoal suit jacket that is far too small for him, and a corporate lanyard with a CEO badge. Same design as the armored emperor in the reference image. NO green anywhere in the outfit or lighting. The red eye glow is rendered as solid opaque shapes, no translucent or semi-transparent elements. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. Leave a clear empty margin of plain background below the feet and above the head: the figure fills at most 85% of the frame height and is centered horizontally.",
+      "anchor": [
+        350,
+        888
+      ]
     },
     {
       "id": "pt_jax_neutral",
@@ -1317,7 +1323,7 @@
       "model": "google/lyria-3-clip-preview",
       "prompt": "Instrumental, loopable 30s. Final boss theme: heavy war drums, male choir chanting, dissonant brass, 120 BPM, relentless. No vocals with words.",
       "duration": 30,
-      "generated": false
+      "generated": true
     },
     {
       "id": "mu_ending",
