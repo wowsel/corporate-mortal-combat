@@ -61,6 +61,46 @@ def main():
         iv = Image.open(os.path.join(outv, 'z_idle.webp')).convert('RGBA')
         assert iv.getpixel((5, 5))[3] == 0, iv.getpixel((5, 5))
         assert iv.getpixel((350, 850))[3] > 200, iv.getpixel((350, 850))
+        # явные --near/--far: адаптив не используется, результат всё равно валиден
+        outn = os.path.join(d, 'outn')
+        subprocess.run([sys.executable, 'tools/postprocess.py', 'character', '--out-dir', outn, '--size', '700x900',
+                        '--chroma', 'FF00FF', '--near', '10', '--far', '20', f'n_idle={a}'],
+                       capture_output=True, text=True, check=True)
+        inn = Image.open(os.path.join(outn, 'n_idle.webp')).convert('RGBA')
+        assert inn.size == (700, 900)
+        assert inn.getpixel((5, 5))[3] == 0, inn.getpixel((5, 5))
+        assert inn.getpixel((350, 850))[3] > 200, inn.getpixel((350, 850))
+        # --far <= --near отвергается парсером (а не молча делит на ноль)
+        bad = subprocess.run([sys.executable, 'tools/postprocess.py', 'character', '--out-dir', os.path.join(d, 'outbad'),
+                              '--size', '700x900', '--near', '30', '--far', '30', f'q_idle={a}'], capture_output=True, text=True)
+        assert bad.returncode != 0, bad
+        assert '--far must be greater than --near' in bad.stderr, bad.stderr
+        # sanity-подсказка: фон далёк от мадженты → аварийный выход, а не «откат к подсказке»
+        g = os.path.join(d, 'g.png')
+        gim = Image.new('RGB', (400, 600), (60, 120, 180))
+        gpx = gim.load()
+        for x in range(150, 250):
+            for y in range(200, 560):
+                gpx[x, y] = (200, 40, 40)
+        gim.save(g)
+        far = subprocess.run([sys.executable, 'tools/postprocess.py', 'character', '--out-dir', os.path.join(d, 'outg'),
+                              '--size', '700x900', '--chroma', 'FF00FF', f'g_idle={g}'], capture_output=True, text=True)
+        assert far.returncode != 0, far
+        assert 'not a chroma key' in far.stderr, far.stderr
+        # фигура упирается в край кадра: общий кроп срезал бы её → аварийный выход.
+        # на адаптивных порогах такая рамка сначала задирает near (p99 рамки — это уже фигура),
+        # поэтому кадр выкашивается целиком и срабатывает проверка на вырожденный кей;
+        # с явными порогами видно именно проверку рамки. Оба пути обязаны выйти ненулём.
+        e = os.path.join(d, 'e.png'); make_sprite(e, (100, 200, 300, 600), (200, 40, 40))
+        edge = subprocess.run([sys.executable, 'tools/postprocess.py', 'character', '--out-dir', os.path.join(d, 'oute'),
+                               '--size', '700x900', '--chroma', 'FF00FF', f'e_idle={e}'], capture_output=True, text=True)
+        assert edge.returncode != 0, edge
+        assert 'degenerate chroma key' in edge.stderr, edge.stderr
+        edge2 = subprocess.run([sys.executable, 'tools/postprocess.py', 'character', '--out-dir', os.path.join(d, 'oute2'),
+                                '--size', '700x900', '--chroma', 'FF00FF', '--near', '10', '--far', '20',
+                                f'e_idle={e}'], capture_output=True, text=True)
+        assert edge2.returncode != 0, edge2
+        assert 'touches the frame border' in edge2.stderr, edge2.stderr
         # plain
         big = os.path.join(d, 'bg.png'); Image.new('RGB', (2048, 1536), (10, 20, 30)).save(big)
         outbg = os.path.join(d, 'bg.webp')

@@ -46,7 +46,8 @@ def estimate_key(arr, hint_rgb, frac=0.03):
     Модель почти никогда не рисует ровный #FF00FF: получается приглушённая маджента
     с виньеткой. Поэтому ключ берём из самой картинки, а --chroma используем только
     как sanity-подсказку: если оценка ушла дальше 90 единиц CbCr от подсказки,
-    значит фон не хромакейный — предупреждаем и работаем по подсказке.
+    значит рамка кадра не хромакейная — прерываем работу (SystemExit), чтобы оператор
+    посмотрел на сырьё, а не молча получил испорченный спрайт.
     """
     m = border_frame_mask(arr.shape, frac)
     est = np.median(arr[m], axis=0)
@@ -55,10 +56,10 @@ def estimate_key(arr, hint_rgb, frac=0.03):
     hcb, hcr = rgb_to_ycbcr(hint.reshape(1, 1, 3))[1:]
     d = float(np.sqrt((ecb - hcb) ** 2 + (ecr - hcr) ** 2).reshape(-1)[0])
     if d > 90.0:
-        sys.stderr.write(
-            f'warning: estimated background {tuple(int(v) for v in est)} is {d:.0f} CbCr units '
-            f'from the hinted chroma {tuple(int(v) for v in hint)}; falling back to the hint\n')
-        return hint, m
+        raise SystemExit(
+            f'error: estimated background {tuple(int(v) for v in est)} is {d:.0f} CbCr units '
+            f'from the hinted chroma {tuple(int(v) for v in hint)}: the border of the frame is not '
+            f'a chroma key. Look at the raw image (or pass the right --chroma).')
     return est.astype(np.float32), m
 
 
@@ -109,6 +110,29 @@ def alpha_bbox(rgba, thresh=24):
     return (int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1)
 
 
+def assert_keyed(rgba, aid, thresh=24, frac=0.03):
+    """Проверяет, что кей не выродился, и возвращает (доля непрозрачного, доля рамки).
+
+    Без этой проверки полностью провалившийся кей (весь кадр непрозрачный или, наоборот,
+    выкошенная фигура) молча уезжает дальше: alpha_bbox отдаёт весь кадр, общий кроп
+    ломается, а на выходе получается «правильный» по размеру, но мусорный спрайт.
+    """
+    a = np.asarray(rgba.split()[3])
+    solid = a > thresh
+    opaque = float(solid.mean())
+    border = border_frame_mask(a.shape, frac)
+    border_opaque = float(solid[border].mean())
+    if not 0.02 <= opaque <= 0.70:
+        raise SystemExit(
+            f'error: {aid}: degenerate chroma key — {opaque * 100:.1f}% of the frame is opaque '
+            f'(expected 2%-70%). Look at the raw image, then fix --chroma/--near/--far.')
+    if border_opaque > 0.05:
+        raise SystemExit(
+            f'error: {aid}: subject touches the frame border — {border_opaque * 100:.1f}% of the '
+            f'border is opaque (expected <5%). The shared crop would cut the figure off.')
+    return opaque, border_opaque
+
+
 def do_character(args):
     w, h = map(int, args.size.lower().split('x'))
     key = hex_rgb(args.chroma)
@@ -116,6 +140,8 @@ def do_character(args):
     for spec in args.items:
         aid, path = spec.split('=', 1)
         rgba = chroma_key(Image.open(path), key, args.near, args.far)
+        opaque, border_opaque = assert_keyed(rgba, aid)
+        sys.stderr.write(f'{aid}: opaque {opaque * 100:.1f}% of frame, {border_opaque * 100:.2f}% of border\n')
         if args.flip:
             rgba = rgba.transpose(Image.FLIP_LEFT_RIGHT)
         items.append((aid, rgba, alpha_bbox(rgba)))
@@ -182,7 +208,17 @@ def main():
     q.add_argument('--out', required=True); q.add_argument('--size', required=True)
     q.add_argument('--quality', type=int, default=72); q.add_argument('src')
     q.set_defaults(fn=do_plain)
-    args = p.parse_args(); args.fn(args)
+    args = p.parse_args()
+    if args.cmd == 'character':
+        if (args.near is None) != (args.far is None):
+            c.error('--near and --far must be given together (or neither)')
+        if args.near is not None and args.near < 0:
+            c.error('--near must be >= 0')
+        if args.far is not None and args.far < 0:
+            c.error('--far must be >= 0')
+        if args.near is not None and args.far is not None and args.far <= args.near:
+            c.error('--far must be greater than --near')
+    args.fn(args)
 
 
 if __name__ == '__main__':
