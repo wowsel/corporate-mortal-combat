@@ -671,7 +671,7 @@
       "resolution": "2K",
       "file": "img/bg/council.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
         "assets/reference/post-hero-and-shao-kahn.png"
       ],
@@ -688,7 +688,7 @@
       ],
       "file": "img/portraits/sindel_neutral.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
         "assets/reference/post-hero-and-shao-kahn.png"
       ],
@@ -705,7 +705,7 @@
       ],
       "file": "img/portraits/sindel_angry.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
         "assets/reference/post-hero-and-shao-kahn.png",
         "pt_sindel_neutral"
@@ -726,7 +726,7 @@
       ],
       "file": "img/sprites/sindel_idle.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
         "assets/reference/post-hero-and-shao-kahn.png",
         "pt_sindel_neutral"
@@ -736,7 +736,11 @@
       ],
       "chroma": "#00FF00",
       "flip": false,
-      "prompt": "FULL-LENGTH FULL-BODY SHOT from the top of the head to the soles of the shoes, both shoes completely visible with empty background beneath them; never a waist-up, three-quarter-length or knee-length crop. Full body, head to shoes fully visible, SINDEL standing tall in an imperious CFO stance, three-quarter view facing LEFT, the closed budget ledger held against her hip in one hand, the red pen raised in the other as if about to strike out a line. SINDEL: a tall regal woman in her fifties, Chief Financial Officer of Outworld Corp, with the bearing of a queen. Very long flowing white hair with a single black streak, pale skin, dramatic dark smoky eye makeup, thin dark lips. Her hair is rendered as solid opaque strands with a clean silhouette — no wispy fly-away strands, no translucent or semi-transparent elements anywhere in the costume. Black and silver high-collared executive gown cut like a long tailored blazer, silver embroidery on the collar, a wide dark leather belt with a silver buckle; the lining and accents are deep indigo / dark violet (NOT green, NOT teal — they must contrast with a green chroma background). A golden crown-like headband holds her hair back. She holds a thick leather-bound budget ledger and a red pen. Imperious, cold, composed. Hair kept compact, gathered behind the shoulders, falling straight down her back, not blowing across the background. Isolated on a flat uniform solid green background (#00FF00), no floor, no shadow on the background, even studio lighting from the right. The entire figure, including all of her hair and the hem of the gown, is fully inside the frame, nothing cropped at the edges. Palette strictly black, silver, white, gold and deep indigo — absolutely no green anywhere on the character or her hair. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. Leave a clear empty margin of plain background below the feet and above the head: the figure fills at most 85% of the frame height and is centered horizontally."
+      "prompt": "FULL-LENGTH FULL-BODY SHOT from the top of the head to the soles of the shoes, both shoes completely visible with empty background beneath them; never a waist-up, three-quarter-length or knee-length crop. Full body, head to shoes fully visible, SINDEL standing tall in an imperious CFO stance, three-quarter view facing LEFT, the closed budget ledger held against her hip in one hand, the red pen raised in the other as if about to strike out a line. SINDEL: a tall regal woman in her fifties, Chief Financial Officer of Outworld Corp, with the bearing of a queen. Very long flowing white hair with a single black streak, pale skin, dramatic dark smoky eye makeup, thin dark lips. Her hair is rendered as solid opaque strands with a clean silhouette — no wispy fly-away strands, no translucent or semi-transparent elements anywhere in the costume. Black and silver high-collared executive gown cut like a long tailored blazer, silver embroidery on the collar, a wide dark leather belt with a silver buckle; the lining and accents are deep indigo / dark violet (NOT green, NOT teal — they must contrast with a green chroma background). A golden crown-like headband holds her hair back. She holds a thick leather-bound budget ledger and a red pen. Imperious, cold, composed. Hair kept compact, gathered behind the shoulders, falling straight down her back, not blowing across the background. Isolated on a flat uniform solid green background (#00FF00), no floor, no shadow on the background, even studio lighting from the right. The entire figure, including all of her hair and the hem of the gown, is fully inside the frame, nothing cropped at the edges. Palette strictly black, silver, white, gold and deep indigo — absolutely no green anywhere on the character or her hair. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. Leave a clear empty margin of plain background below the feet and above the head: the figure fills at most 85% of the frame height and is centered horizontally.",
+      "anchor": [
+        350,
+        877
+      ]
     },
     {
       "id": "sp_sindel_attack",
@@ -749,7 +753,7 @@
       ],
       "file": "img/sprites/sindel_attack.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
         "assets/reference/post-hero-and-shao-kahn.png",
         "pt_sindel_neutral",
@@ -761,7 +765,11 @@
       ],
       "chroma": "#00FF00",
       "flip": false,
-      "prompt": "FULL-LENGTH FULL-BODY SHOT from the top of the head to the soles of the shoes, both shoes completely visible with empty background beneath them; never a waist-up, three-quarter-length or knee-length crop. Same woman as the reference sprite, still facing LEFT at the same three-quarter angle. SINDEL leaning forward to the LEFT, mouth wide open in a sonic scream, hair blown violently back to the RIGHT, the ledger flung open with pages rippling, red pen stabbing forward like a blade. SINDEL: a tall regal woman in her fifties, Chief Financial Officer of Outworld Corp, with the bearing of a queen. Very long flowing white hair with a single black streak, pale skin, dramatic dark smoky eye makeup, thin dark lips. Her hair is rendered as solid opaque strands with a clean silhouette — no wispy fly-away strands, no translucent or semi-transparent elements anywhere in the costume. Black and silver high-collared executive gown cut like a long tailored blazer, silver embroidery on the collar, a wide dark leather belt with a silver buckle; the lining and accents are deep indigo / dark violet (NOT green, NOT teal — they must contrast with a green chroma background). A golden crown-like headband holds her hair back. She holds a thick leather-bound budget ledger and a red pen. Imperious, cold, composed. Same green background, same framing scale. The entire figure, including all of her hair and the hem of the gown, is fully inside the frame, nothing cropped at the edges. Palette strictly black, silver, white, gold and deep indigo — absolutely no green anywhere on the character or her hair. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. Leave a clear empty margin of plain background below the feet and above the head: the figure fills at most 85% of the frame height and is centered horizontally."
+      "prompt": "FULL-LENGTH FULL-BODY SHOT from the top of the head to the soles of the shoes, both shoes completely visible with empty background beneath them; never a waist-up, three-quarter-length or knee-length crop. Same woman as the reference sprite, still facing LEFT at the same three-quarter angle. SINDEL standing upright with both boots planted on the same ground line, leaning only her head and shoulders forward to the LEFT, mouth wide open in a sonic scream, hair blown back to the RIGHT but compact and kept well inside the frame, the ledger flung open with pages rippling, red pen stabbing forward like a blade; the whole figure from the top of the head to the soles of the boots is small enough to fit with clear margin above and below. SINDEL: a tall regal woman in her fifties, Chief Financial Officer of Outworld Corp, with the bearing of a queen. Very long flowing white hair with a single black streak, pale skin, dramatic dark smoky eye makeup, thin dark lips. Her hair is rendered as solid opaque strands with a clean silhouette — no wispy fly-away strands, no translucent or semi-transparent elements anywhere in the costume. Black and silver high-collared executive gown cut like a long tailored blazer, silver embroidery on the collar, a wide dark leather belt with a silver buckle; the lining and accents are deep indigo / dark violet (NOT green, NOT teal — they must contrast with a green chroma background). A golden crown-like headband holds her hair back. She holds a thick leather-bound budget ledger and a red pen. Imperious, cold, composed. Same green background, same framing scale. The entire figure, including all of her hair and the hem of the gown, is fully inside the frame, nothing cropped at the edges. Palette strictly black, silver, white, gold and deep indigo — absolutely no green anywhere on the character or her hair. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. Leave a clear empty margin of plain background below the feet and above the head: the figure fills at most 85% of the frame height and is centered horizontally.",
+      "anchor": [
+        350,
+        877
+      ]
     },
     {
       "id": "sp_sindel_hurt",
@@ -774,7 +782,7 @@
       ],
       "file": "img/sprites/sindel_hurt.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
         "assets/reference/post-hero-and-shao-kahn.png",
         "pt_sindel_neutral",
@@ -786,7 +794,11 @@
       ],
       "chroma": "#00FF00",
       "flip": false,
-      "prompt": "FULL-LENGTH FULL-BODY SHOT from the top of the head to the soles of the shoes, both shoes completely visible with empty background beneath them; never a waist-up, three-quarter-length or knee-length crop. Same woman, still facing LEFT at the same three-quarter angle. SINDEL recoiling backward (her back moves to the RIGHT), one hand clutching the golden headband as it slips, the ledger loose with sheets flying out, hair whipped upward, eyes wide in outrage. SINDEL: a tall regal woman in her fifties, Chief Financial Officer of Outworld Corp, with the bearing of a queen. Very long flowing white hair with a single black streak, pale skin, dramatic dark smoky eye makeup, thin dark lips. Her hair is rendered as solid opaque strands with a clean silhouette — no wispy fly-away strands, no translucent or semi-transparent elements anywhere in the costume. Black and silver high-collared executive gown cut like a long tailored blazer, silver embroidery on the collar, a wide dark leather belt with a silver buckle; the lining and accents are deep indigo / dark violet (NOT green, NOT teal — they must contrast with a green chroma background). A golden crown-like headband holds her hair back. She holds a thick leather-bound budget ledger and a red pen. Imperious, cold, composed. Same green background, same framing scale. The entire figure, including all of her hair and the hem of the gown, is fully inside the frame, nothing cropped at the edges. Palette strictly black, silver, white, gold and deep indigo — absolutely no green anywhere on the character or her hair. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. Leave a clear empty margin of plain background below the feet and above the head: the figure fills at most 85% of the frame height and is centered horizontally."
+      "prompt": "FULL-LENGTH FULL-BODY SHOT from the top of the head to the soles of the shoes, both shoes completely visible with empty background beneath them; never a waist-up, three-quarter-length or knee-length crop. Same woman, still facing LEFT at the same three-quarter angle. SINDEL recoiling backward (her back moves to the RIGHT), one hand clutching the golden headband as it slips, the ledger loose with sheets flying out, hair whipped upward, eyes wide in outrage. SINDEL: a tall regal woman in her fifties, Chief Financial Officer of Outworld Corp, with the bearing of a queen. Very long flowing white hair with a single black streak, pale skin, dramatic dark smoky eye makeup, thin dark lips. Her hair is rendered as solid opaque strands with a clean silhouette — no wispy fly-away strands, no translucent or semi-transparent elements anywhere in the costume. Black and silver high-collared executive gown cut like a long tailored blazer, silver embroidery on the collar, a wide dark leather belt with a silver buckle; the lining and accents are deep indigo / dark violet (NOT green, NOT teal — they must contrast with a green chroma background). A golden crown-like headband holds her hair back. She holds a thick leather-bound budget ledger and a red pen. Imperious, cold, composed. Same green background, same framing scale. The entire figure, including all of her hair and the hem of the gown, is fully inside the frame, nothing cropped at the edges. Palette strictly black, silver, white, gold and deep indigo — absolutely no green anywhere on the character or her hair. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. Leave a clear empty margin of plain background below the feet and above the head: the figure fills at most 85% of the frame height and is centered horizontally.",
+      "anchor": [
+        350,
+        877
+      ]
     },
     {
       "id": "sp_sindel_defeated",
@@ -799,7 +811,7 @@
       ],
       "file": "img/sprites/sindel_defeated.webp",
       "model": "bytedance-seed/seedream-5-0-pro",
-      "generated": false,
+      "generated": true,
       "references": [
         "assets/reference/post-hero-and-shao-kahn.png",
         "pt_sindel_neutral",
@@ -811,7 +823,11 @@
       ],
       "chroma": "#00FF00",
       "flip": false,
-      "prompt": "FULL-LENGTH FULL-BODY SHOT from the top of the head to the soles of the shoes, both shoes completely visible with empty background beneath them; never a waist-up, three-quarter-length or knee-length crop. Same woman, still facing LEFT. SINDEL sunk onto one knee, propping herself on the closed ledger, golden headband tilted, hair pooled over her shoulders, red pen dropped beside her, signing an approval page with visible reluctance and dignity. SINDEL: a tall regal woman in her fifties, Chief Financial Officer of Outworld Corp, with the bearing of a queen. Very long flowing white hair with a single black streak, pale skin, dramatic dark smoky eye makeup, thin dark lips. Her hair is rendered as solid opaque strands with a clean silhouette — no wispy fly-away strands, no translucent or semi-transparent elements anywhere in the costume. Black and silver high-collared executive gown cut like a long tailored blazer, silver embroidery on the collar, a wide dark leather belt with a silver buckle; the lining and accents are deep indigo / dark violet (NOT green, NOT teal — they must contrast with a green chroma background). A golden crown-like headband holds her hair back. She holds a thick leather-bound budget ledger and a red pen. Imperious, cold, composed. Same green background, same framing scale. The entire figure, including all of her hair and the hem of the gown, is fully inside the frame, nothing cropped at the edges. Palette strictly black, silver, white, gold and deep indigo — absolutely no green anywhere on the character or her hair. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. Leave a clear empty margin of plain background below the feet and above the head: the figure fills at most 85% of the frame height and is centered horizontally."
+      "prompt": "FULL-LENGTH FULL-BODY SHOT from the top of the head to the soles of the shoes, both shoes completely visible with empty background beneath them; never a waist-up, three-quarter-length or knee-length crop. Same woman, still facing LEFT. SINDEL sunk onto one knee, propping herself on the closed ledger, golden headband tilted, hair pooled over her shoulders, red pen dropped beside her, signing an approval page with visible reluctance and dignity. SINDEL: a tall regal woman in her fifties, Chief Financial Officer of Outworld Corp, with the bearing of a queen. Very long flowing white hair with a single black streak, pale skin, dramatic dark smoky eye makeup, thin dark lips. Her hair is rendered as solid opaque strands with a clean silhouette — no wispy fly-away strands, no translucent or semi-transparent elements anywhere in the costume. Black and silver high-collared executive gown cut like a long tailored blazer, silver embroidery on the collar, a wide dark leather belt with a silver buckle; the lining and accents are deep indigo / dark violet (NOT green, NOT teal — they must contrast with a green chroma background). A golden crown-like headband holds her hair back. She holds a thick leather-bound budget ledger and a red pen. Imperious, cold, composed. Same green background, same framing scale. The entire figure, including all of her hair and the hem of the gown, is fully inside the frame, nothing cropped at the edges. Palette strictly black, silver, white, gold and deep indigo — absolutely no green anywhere on the character or her hair. The entire background is one flat, perfectly uniform, fully saturated pure green (#00FF00) chroma-key screen, edge to edge: no vignette, no gradient, no shadows, no color grading on the background. The character is in sharp focus, evenly lit. Leave a clear empty margin of plain background below the feet and above the head: the figure fills at most 85% of the frame height and is centered horizontally.",
+      "anchor": [
+        350,
+        877
+      ]
     },
     {
       "id": "bg_server_dungeon",
@@ -1265,7 +1281,7 @@
       "model": "google/lyria-3-clip-preview",
       "prompt": "Instrumental, loopable 30s. Dark corporate ambient: slow synth pads, distant gong, ticking clock, occasional low choir. Tense, boardroom before a decision. No vocals.",
       "duration": 30,
-      "generated": false
+      "generated": true
     },
     {
       "id": "mu_battle",
