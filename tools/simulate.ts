@@ -4,7 +4,7 @@ import { afterBattle, applyChoice, checkEnding, createInitialState, currentEvent
 import { pathToFileURL } from 'node:url';
 import type { Boss, EndingId, GameState, Rank, Stats } from '../src/types';
 
-export type EventStrategy = 'first' | 'random' | 'best';
+export type EventStrategy = 'first' | 'random' | 'best' | 'worst';
 // fatality: слабость везде, а у финального босса — подвести терпение в окно FINISH HIM и ударить
 export type FightStrategy = 'weakness' | 'random' | 'neutral' | 'fatality';
 
@@ -16,6 +16,8 @@ function mulberry32(seed: number) {
 function pickChoice(state: GameState, choices: ReturnType<typeof visibleChoices>, strat: EventStrategy, rng: () => number) {
   if (strat === 'first') return choices[0]!;
   if (strat === 'random') return choices[Math.floor(rng() * choices.length)]!;
+  // worst: минимизируем ту же оценку — игрок, который везде выбирает стресс и минус к статам
+  if (strat === 'worst') return [...choices].sort((a, b) => score(a.effects) - score(b.effects))[0]!;
   // best: максимизируем сумму позитивных статов минус стресс
   return [...choices].sort((a, b) => score(b.effects) - score(a.effects))[0]!;
   function score(e?: Partial<Stats>) { if (!e) return 0; return (e.loyalty ?? 0) + (e.reputation ?? 0) + (e.competence ?? 0) - 2 * (e.stress ?? 0); }
@@ -95,7 +97,7 @@ export function summarize(ranks: Rank[], ev: EventStrategy, fs: FightStrategy, r
 
 if (pathToFileURL(process.argv[1] ?? '').href === import.meta.url) {
   const runs = Number(process.argv[2] ?? 500);
-  for (const [ev, fs] of [['best', 'weakness'], ['random', 'random'], ['first', 'neutral']] as const) {
+  for (const [ev, fs] of [['best', 'weakness'], ['random', 'weakness'], ['first', 'weakness'], ['worst', 'weakness'], ['random', 'random'], ['first', 'neutral']] as const) {
     const s = summarize(CONTENT.ranks, ev, fs, runs);
     console.log(`\n=== events=${ev} fight=${fs}: promotion ${(s.promotionRate * 100).toFixed(0)}%`);
     console.table(s.bosses.map(b => ({ ...b, firstTryWin: `${(b.firstTryWin * 100).toFixed(0)}%`, avgTurns: b.avgTurns.toFixed(1), avgStress: b.avgStress.toFixed(0) })));
