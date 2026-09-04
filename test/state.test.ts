@@ -44,8 +44,10 @@ describe('currentEvent', () => {
     expect(currentEvent({ ...s, step: 2 }, ranks)).toBeNull();
   });
   it('ступень без событий сразу бой', () => {
+    // в контенте таких ступеней больше нет (финал получил события 2026-09-04), но движок путь сохраняет
+    const ranks = makeRanks(); ranks[1] = { ...ranks[1]!, events: [] };
     const s = { ...createInitialState(), rank: 1 };
-    expect(currentEvent(s, makeRanks())).toBeNull();
+    expect(currentEvent(s, ranks)).toBeNull();
   });
 });
 

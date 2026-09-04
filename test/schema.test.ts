@@ -20,7 +20,7 @@ describe('validateContent', () => {
     const ranks = makeRanks(); ranks[0] = makeRank({ events: [makeEvent()] });
     expect(validateContent(ranks, manifest).join()).toMatch(/events/);
   });
-  it('последняя ступень с событиями — ошибка', () => {
+  it('последняя ступень без 2 событий — ошибка', () => {
     const ranks = makeRanks(); ranks[1] = { ...ranks[1]!, events: [makeEvent()] };
     expect(validateContent(ranks, manifest).join()).toMatch(/events/);
   });

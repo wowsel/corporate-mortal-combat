@@ -68,6 +68,7 @@ export function makeRank(over: Partial<Rank> = {}): Rank {
 export function makeRanks(): Rank[] {
   return [
     makeRank({ id: 'r0' }),
-    makeRank({ id: 'r1', title: 'Финал', events: [], boss: makeBoss({ id: 'final', final: true, patience: 200 }) }),
+    // у финала тоже два события (с 2026-09-04); flag_a для f_ev2 ставит ev1 первой ступени — флаги копятся по всей игре
+    makeRank({ id: 'r1', title: 'Финал', events: makeRank().events.map(e => ({ ...e, id: `f_${e.id}` })), boss: makeBoss({ id: 'final', final: true, patience: 200 }) }),
   ];
 }

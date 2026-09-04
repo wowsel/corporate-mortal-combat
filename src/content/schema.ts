@@ -37,8 +37,7 @@ export function validateContent(ranks: Rank[], manifest: Manifest, endings?: Rec
     unique(rank.id, where);
     if (!rank.background) errors.push(`${where}: background is empty`);
     else asset(rank.background, where);
-    if (last && rank.events.length !== 0) errors.push(`${where}: last rank must have 0 events`);
-    if (!last && rank.events.length !== 2) errors.push(`${where}: expected 2 events, got ${rank.events.length}`);
+    if (rank.events.length !== 2) errors.push(`${where}: expected 2 events, got ${rank.events.length}`);
 
     rank.events.forEach((ev, j) => {
       const ew = `${where} event[${j}] ${ev.id}`;

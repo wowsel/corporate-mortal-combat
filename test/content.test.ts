@@ -9,7 +9,7 @@ const HINT_WORDS: Record<string, RegExp> = {
 describe('content hints', () => {
   it('текст перед боем намекает на слабость и иммунитет босса', () => {
     for (const r of CONTENT.ranks) {
-      // у ступени без событий (финал) намёк даёт открывающая реплика босса (exchanges[0].prompt)
+      // запасной путь для ступени без событий: намёк даёт открывающая реплика босса (exchanges[0].prompt)
       const last = r.events[r.events.length - 1];
       const blob = last
         ? `${last.text} ${last.repeatText ?? ''}`
