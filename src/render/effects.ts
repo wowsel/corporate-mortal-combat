@@ -104,13 +104,16 @@ export async function banner(scene: Scene, text: string): Promise<void> {
 }
 
 const SPEECH = 'speech';
-// Геометрия пузыря (координаты сцены 1280×720): стоит между бойцами слева от босса, растёт вверх.
-// Левее ~460 px голова героя, выше ~90 px HUD — отсюда ширина переноса и лимиты текстов в валидаторе
-// (реплика 110, реакция 75): худший случай — 6 строк ≈ 172 px, верх на 128 px.
-const BUBBLE_RIGHT_GAP = 60;
-const BUBBLE_BOTTOM = 300;
-const BUBBLE_WRAP = 380;
-const BUBBLE_TOP_MIN = 100;
+// Геометрия пузыря (координаты сцены 1280×720): стоит в просвете между бойцами, растёт вниз от HUD.
+// Замер по idle-спрайтам (все позы 700×900 → высота 520): герой в idle занимает x ≤ 450, босс — x ≥ 775
+// (Шан Цзун — самый широкий, голова от 787), головы на y 128–275, HUD заканчивается на ~75.
+// Отсюда центр просвета 612, коробка не шире 318 (перенос 290 + 2×14) и верх на 100: пузырь стоит
+// рядом с лицом босса, не закрывая ни его, ни героя. Худший случай текста (реакция 75 + реплика 110)
+// при ~30 знаках в строке — 8 строк ≈ 220 px; страховка — шрифт 17 px, если коробка длиннее допустимого.
+const BUBBLE_CENTER_X = 612;
+const BUBBLE_TOP = 100;
+const BUBBLE_MAX_BOTTOM = 600;
+const BUBBLE_WRAP = 290;
 const BUBBLE_FONT = 20;
 const BUBBLE_FONT_SMALL = 17;
 const BUBBLE_PAD = 14;
@@ -133,22 +136,22 @@ function drawBubbleBox(box: Graphics, t: Text): { w: number; h: number } {
   const h = t.height + BUBBLE_PAD * 2;
   box.clear();
   box.roundRect(-w / 2, -h / 2, w, h, 10).fill({ color: BUBBLE_FILL }).stroke({ color: BUBBLE_STROKE, width: 2 });
-  // хвостик вправо, к боссу: заливка поверх рамки, затем обводка только двух внешних рёбер
-  const x0 = w / 2 - 1, yTop = h / 2 - 44, yTip = h / 2 - 28, yBot = h / 2 - 16;
+  // хвостик вправо, к лицу босса (y ≈ 180 на сцене, то есть ~80 px ниже верха коробки; у короткой коробки — по центру):
+  // заливка поверх рамки, затем обводка только двух внешних рёбер
+  const x0 = w / 2 - 1, yTip = -h / 2 + Math.min(80, h - 30), yTop = yTip - 16, yBot = yTip + 12;
   box.poly([x0, yTop, x0 + 24, yTip, x0, yBot]).fill({ color: BUBBLE_FILL });
   box.moveTo(x0, yTop).lineTo(x0 + 24, yTip).lineTo(x0, yBot).stroke({ color: BUBBLE_STROKE, width: 2 });
   return { w, h };
 }
 
 /** Перерисовать коробку под текст и поставить пузырь правым нижним углом к точке привязки; если не влезает по высоте — шрифт меньше. */
-function layoutBubble(scene: Scene, c: Container): void {
+function layoutBubble(c: Container): void {
   const t = c.getChildByLabel('text') as Text;
   const box = c.getChildByLabel('box') as Graphics;
   t.style.fontSize = BUBBLE_FONT;
   let size = drawBubbleBox(box, t);
-  if (size.h > BUBBLE_BOTTOM - BUBBLE_TOP_MIN) { t.style.fontSize = BUBBLE_FONT_SMALL; size = drawBubbleBox(box, t); }
-  const right = scene.fighterPoint('boss').x - BUBBLE_RIGHT_GAP;
-  c.position.set(right - size.w / 2, BUBBLE_BOTTOM - size.h / 2);
+  if (size.h > BUBBLE_MAX_BOTTOM - BUBBLE_TOP) { t.style.fontSize = BUBBLE_FONT_SMALL; size = drawBubbleBox(box, t); }
+  c.position.set(BUBBLE_CENTER_X, BUBBLE_TOP + size.h / 2);
 }
 
 /**
@@ -175,7 +178,7 @@ export function speechLine(scene: Scene, text: string, style: 'bubble' | 'center
   if (append && existing) {
     const t = existing.getChildByLabel('text') as Text;
     t.text = `${t.text}\n\n${text}`;
-    layoutBubble(scene, existing);
+    layoutBubble(existing);
     return;
   }
   if (existing) { gsap.killTweensOf(existing); existing.destroy({ children: true }); }
@@ -187,7 +190,7 @@ export function speechLine(scene: Scene, text: string, style: 'bubble' | 'center
   t.label = 'text';
   t.anchor.set(0.5);
   c.addChild(box, t);
-  layoutBubble(scene, c);
+  layoutBubble(c);
   c.alpha = 0;
   layer.addChild(c);
   scene.track(gsap.to(c, { alpha: 1, duration: 0.2 }));
