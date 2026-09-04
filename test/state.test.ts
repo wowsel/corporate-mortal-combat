@@ -35,6 +35,30 @@ describe('visibleChoices', () => {
   });
 });
 
+describe('visibleChoices requiresFlags', () => {
+  const ev = makeEvent({ choices: [
+    { text: 'обычный' },
+    { text: 'две из трёх', requiresFlags: { flags: ['a', 'b', 'c'], min: 2 }, ending: 'partnership' },
+  ] });
+  it('скрыт при одном флаге, виден при двух', () => {
+    const one = { ...createInitialState(), flags: new Set(['a']) };
+    expect(visibleChoices(ev, one).map(c => c.text)).toEqual(['обычный']);
+    const two = { ...createInitialState(), flags: new Set(['a', 'c']) };
+    expect(visibleChoices(ev, two).map(c => c.text)).toEqual(['обычный', 'две из трёх']);
+  });
+  it('выбор с ending назначает концовку, и checkEnding отдаёт её раньше боя', () => {
+    const s = applyChoice({ ...createInitialState(), flags: new Set(['a', 'b']) }, ev, ev.choices[1]!);
+    expect(s.ending).toBe('partnership');
+    expect(checkEnding(s, makeRanks())).toBe('partnership');
+    // обычный выбор концовку не назначает
+    expect(applyChoice(createInitialState(), ev, ev.choices[0]!).ending).toBeNull();
+  });
+  it('сид партии задаётся и сохраняется', () => {
+    expect(createInitialState(7).seed).toBe(7);
+    expect(createInitialState().ending).toBeNull();
+  });
+});
+
 describe('currentEvent', () => {
   it('возвращает событие по step и null когда пора в бой', () => {
     const ranks = makeRanks();

@@ -43,7 +43,7 @@ export function validateContent(ranks: Rank[], manifest: Manifest, endings?: Rec
       const ew = `${where} event[${j}] ${ev.id}`;
       unique(ev.id, ew);
       asset(ev.speaker.portrait, ew);
-      if (ev.choices.length < 2 || ev.choices.length > 4) errors.push(`${ew}: choices must be 2..4`);
+      if (ev.choices.length < 2 || ev.choices.length > 5) errors.push(`${ew}: choices must be 2..5`);
       if (ev.choices[0]?.requiresFlag) errors.push(`${ew}: first choice must not have requiresFlag`);
       // Check requiresFlag against flags set by *previous* events only — a flag set by a
       // choice in this same event is not yet in effect when the choice is being made.
@@ -51,6 +51,12 @@ export function validateContent(ranks: Rank[], manifest: Manifest, endings?: Rec
         if (c.requiresFlag && !setFlags.has(c.requiresFlag)) {
           errors.push(`${ew} choice[${k}]: requiresFlag "${c.requiresFlag}" is never set before this event`);
         }
+        if (c.requiresFlags) {
+          const { flags, min } = c.requiresFlags;
+          if (flags.length === 0 || min < 1 || min > flags.length) errors.push(`${ew} choice[${k}]: requiresFlags min ${min} of ${flags.length}`);
+          for (const f of flags) if (!setFlags.has(f)) errors.push(`${ew} choice[${k}]: requiresFlags "${f}" is never set before this event`);
+        }
+        if (c.ending && endings && !(c.ending in endings)) errors.push(`${ew} choice[${k}]: unknown ending "${c.ending}"`);
         if (c.reaction) asset(c.reaction.portrait, `${ew} choice[${k}] reaction`);
       });
       ev.choices.forEach(c => { if (c.setFlag) setFlags.add(c.setFlag); });
@@ -89,6 +95,7 @@ export function validateContent(ranks: Rank[], manifest: Manifest, endings?: Rec
       const ew = `ending ${key}`;
       if (key !== e.id) errors.push(`${ew}: id is "${e.id}"`);
       asset(e.illustration, ew);
+      if (e.music) asset(e.music, `${ew} music`);
       if (e.epilogue) asset(e.epilogue.portrait, ew);
       e.variants?.forEach((v, i) => {
         const vw = `${ew} variant[${i}]`;

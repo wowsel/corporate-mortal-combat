@@ -84,6 +84,7 @@ export const RANK_SPECIALIST: Rank = {
     weakness: 'data',
     immunity: 'agree',
     final: false,
+    fixedExchanges: 5, // пункты договора нумерованы: первый…пятый идут по порядку, тасуется только хвост
     sprites: {
       idle: 'sp_kitana_idle', attack: 'sp_kitana_attack', hurt: 'sp_kitana_hurt', defeated: 'sp_kitana_defeated',
     },

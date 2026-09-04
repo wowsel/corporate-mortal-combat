@@ -37,6 +37,12 @@ describe('balance', () => {
     for (const b of s.bosses) expect(b.firstTryWin, b.boss).toBeGreaterThanOrEqual(0.8);
     expect(s.promotionRate).toBeGreaterThanOrEqual(0.85);
   });
+  it('рекомендации боссов: стратегия allies уходит в «Партнёрство» без боя ≥ 90%', () => {
+    const s = summarize(CONTENT.ranks, 'allies', 'weakness', 300);
+    expect(s.partnershipRate).toBeGreaterThanOrEqual(0.9);
+    // best по очкам рекомендаций не собирает: развилка — награда за выбор союзников, а не за максимум статов
+    expect(best.partnershipRate).toBe(0);
+  });
   it('Fatality достижима намеренно ослабленными ходами у финального босса', () => {
     const s = summarize(CONTENT.ranks, 'best', 'fatality', 300);
     expect(s.fatalityRate).toBeGreaterThanOrEqual(0.9);

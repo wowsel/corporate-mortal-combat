@@ -20,6 +20,10 @@ export interface Choice {
   effects?: Partial<Stats>;
   setFlag?: string;
   requiresFlag?: string;
+  /** Виден, если установлено хотя бы `min` флагов из `flags` (рекомендации боссов перед финалом). */
+  requiresFlags?: { flags: string[]; min: number };
+  /** Выбор завершает игру этой концовкой вместо продолжения ступени (партнёрство без боя). */
+  ending?: EndingId;
   reaction?: { portrait: string; text: string };
 }
 
@@ -44,6 +48,8 @@ export interface Boss {
   weakness: MoveId;
   immunity: MoveId;
   final: boolean;
+  /** Сколько первых обменов не тасуются (по умолчанию 1 — открывающая реплика с намёком). Китана: нумерованные пункты. */
+  fixedExchanges?: number;
   sprites: Record<BossPose, string>;
   portraits: { neutral: string; angry: string };
   exchanges: Exchange[];       // ровно EXCHANGE_COUNT (battle.ts); exchanges[0] — открывающая реплика
@@ -59,7 +65,7 @@ export interface Rank {
   boss: Boss;
 }
 
-export type EndingId = 'promotion' | 'burnout' | 'fatality';
+export type EndingId = 'promotion' | 'burnout' | 'fatality' | 'partnership';
 /** Карточка под текстом концовки: кто и что сказал напоследок. */
 export interface Epilogue { name: string; portrait: string; text: string }
 /** Вариант концовки по флагу: перекрывает поля базовой концовки, первый подходящий выигрывает.
@@ -72,6 +78,8 @@ export interface Ending {
   illustration: string;
   epilogue?: Epilogue;
   variants?: EndingVariant[];
+  /** Музыка экрана концовки; по умолчанию mu_ending. */
+  music?: string;
 }
 
 export type BattleOutcome = 'win' | 'lose' | 'fatality';
@@ -84,6 +92,10 @@ export interface GameState {
   flags: Set<string>;
   seenEvents: Set<string>;
   lastBattle: { bossId: string; outcome: BattleOutcome } | null;
+  /** Концовка, назначенная выбором в событии (Choice.ending); checkEnding отдаёт её первой. */
+  ending: EndingId | null;
+  /** Сид партии: порядок обменов в боях (exchanges.ts). Фиксируется на старте, реванш идёт в том же порядке. */
+  seed: number;
 }
 
 export interface BattleState {

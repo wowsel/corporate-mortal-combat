@@ -24,6 +24,25 @@ describe('validateContent', () => {
     const ranks = makeRanks(); ranks[1] = { ...ranks[1]!, events: [makeEvent()] };
     expect(validateContent(ranks, manifest).join()).toMatch(/events/);
   });
+  it('requiresFlags: флаг не поставлен раньше или min вне диапазона — ошибка; пять вариантов допустимы, шесть — нет', () => {
+    const ranks = makeRanks();
+    const ev2 = ranks[0]!.events[1]!;
+    ranks[0]!.events[1] = { ...ev2, choices: [...ev2.choices, { text: 'Г', requiresFlags: { flags: ['flag_a', 'nope'], min: 1 } }, { text: 'Д', requiresFlags: { flags: ['flag_a'], min: 2 } }] };
+    const errs = validateContent(ranks, manifest).join('\n');
+    expect(errs).toMatch(/requiresFlags "nope"/);
+    expect(errs).toMatch(/requiresFlags min 2 of 1/);
+    expect(errs).not.toMatch(/choices must be/);
+    ranks[0]!.events[1] = { ...ev2, choices: [...ev2.choices, { text: 'Г' }, { text: 'Д' }, { text: 'Е' }] };
+    expect(validateContent(ranks, manifest).join()).toMatch(/choices must be 2..5/);
+  });
+  it('неизвестная концовка у выбора — ошибка при переданных endings', () => {
+    const ranks = makeRanks();
+    const ev2 = ranks[0]!.events[1]!;
+    ranks[0]!.events[1] = { ...ev2, choices: [...ev2.choices, { text: 'Г', ending: 'nowhere' as never }] };
+    expect(validateContent(ranks, manifest, CONTENT.endings).join()).toMatch(/unknown ending "nowhere"/);
+    ranks[0]!.events[1] = { ...ev2, choices: [...ev2.choices, { text: 'Г', ending: 'partnership' }] };
+    expect(validateContent(ranks, manifest, CONTENT.endings).join()).not.toMatch(/unknown ending/);
+  });
   it('нет background', () => {
     const ranks = makeRanks(); ranks[0] = makeRank({ background: '' });
     expect(validateContent(ranks, manifest).join()).toMatch(/background/);

@@ -1337,6 +1337,16 @@
       "generated": true
     },
     {
+      "id": "mu_partnership",
+      "kind": "music",
+      "group": "endings",
+      "file": "audio/mu_partnership.mp3",
+      "model": "google/lyria-3-clip-preview",
+      "prompt": "Instrumental 30s. Epic triumphant orchestral finale: massive brass fanfare, thunderous war drums, soaring strings, male choir swelling to a grand resolution, 100 BPM, cinematic, majestic. No vocals with words.",
+      "duration": 30,
+      "generated": true
+    },
+    {
       "id": "vo_round1",
       "kind": "voice",
       "group": "core",

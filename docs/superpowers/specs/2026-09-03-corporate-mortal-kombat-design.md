@@ -150,7 +150,13 @@ interface GameState {
   `stress −10`, если босс не финальный `rank += 1`, `step = 0`; поражение —
   `stress +25`, `step = 0`, ранг не меняется; fatality — статы и ранг не
   меняются. `week += 1` во всех случаях.
-- `checkEnding(state, ranks)` возвращает `'burnout'`, если `stress >= 100`;
+- `checkEnding(state, ranks)` сначала возвращает `state.ending`, если выбор в событии
+  назначил концовку (`Choice.ending`; 2026-09-04 — «Партнёрство»: в «Приёмной» с двумя
+  из трёх рекомендаций `baraka_respect`/`kitana_owes_you`/`sindel_budget_ally`,
+  `Choice.requiresFlags: { flags, min }`, иллюстрация `il_title`, музыка `mu_partnership`);
+  порядок обменов боя тасуется по `state.seed` (`exchanges.ts`, первый обмен и
+  `Boss.fixedExchanges` на месте, хвост остаётся хвостом);
+- иначе `'burnout'`, если `stress >= 100`;
   `'fatality'`, если `lastBattle?.outcome === 'fatality'`; `'promotion'`, если
   `lastBattle?.outcome === 'win'` и босс с `lastBattle.bossId` финальный;
   иначе `null`. Вызывается экраном события после выбора и экраном боя после

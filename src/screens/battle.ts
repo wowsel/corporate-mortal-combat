@@ -5,6 +5,7 @@ import type { Ctx, Screen } from '../engine';
 import { createHud } from '../hud';
 import { banner, clearSpeech, damageNumber, dim, flash, grayscale, particles, shake, speechLine, wait } from '../render/effects';
 import { getScene, type Scene } from '../render/scene';
+import { orderExchanges } from '../exchanges';
 import { afterBattle, checkEnding, currentRank } from '../state';
 import type { AssetGroup, BattleState, Boss, Move, Step, Tactic } from '../types';
 
@@ -24,7 +25,8 @@ export function createBattleScreen(): Screen {
       alive = true;
       const state = ctx.getState();
       const rank = currentRank(state, ctx.content.ranks);
-      const boss: Boss = rank.boss;
+      // порядок обменов зависит от сида партии: реванш с тем же боссом идёт в том же порядке (exchanges.ts)
+      const boss: Boss = { ...rank.boss, exchanges: orderExchanges(rank.boss, state.seed) };
       let battle: BattleState = createBattle(boss);
       let phase: Phase = 'intro';
 

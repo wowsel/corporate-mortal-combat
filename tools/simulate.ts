@@ -4,7 +4,7 @@ import { afterBattle, applyChoice, checkEnding, createInitialState, currentEvent
 import { pathToFileURL } from 'node:url';
 import type { Boss, EndingId, GameState, Rank, Stats } from '../src/types';
 
-export type EventStrategy = 'first' | 'random' | 'best' | 'worst';
+export type EventStrategy = 'first' | 'random' | 'best' | 'worst' | 'allies';
 // fatality: слабость везде, а у финального босса — подвести терпение в окно FINISH HIM и ударить
 export type FightStrategy = 'weakness' | 'random' | 'neutral' | 'fatality';
 
@@ -15,6 +15,11 @@ function mulberry32(seed: number) {
 
 function pickChoice(state: GameState, choices: ReturnType<typeof visibleChoices>, strat: EventStrategy, rng: () => number) {
   if (strat === 'first') return choices[0]!;
+  // allies: собираем рекомендации боссов (флаги) и берём развилку без боя, когда она открылась; иначе как best
+  if (strat === 'allies') {
+    const ending = choices.find(c => c.ending); if (ending) return ending;
+    const flag = choices.find(c => c.setFlag); if (flag) return flag;
+  }
   if (strat === 'random') return choices[Math.floor(rng() * choices.length)]!;
   // worst: минимизируем ту же оценку — игрок, который везде выбирает стресс и минус к статам
   if (strat === 'worst') return [...choices].sort((a, b) => score(a.effects) - score(b.effects))[0]!;
@@ -76,11 +81,12 @@ export function simulateRun(ranks: Rank[], ev: EventStrategy, fs: FightStrategy,
 export function summarize(ranks: Rank[], ev: EventStrategy, fs: FightStrategy, runs: number) {
   const rng = mulberry32(42);
   const wins = ranks.map(() => 0), tries = ranks.map(() => 0), turnSum = ranks.map(() => 0), stressSum = ranks.map(() => 0);
-  let promotions = 0, fatalities = 0;
+  let promotions = 0, fatalities = 0, partnerships = 0;
   for (let i = 0; i < runs; i++) {
     const r = simulateRun(ranks, ev, fs, rng);
     if (r.ending === 'promotion') promotions++;
     if (r.ending === 'fatality') fatalities++;
+    if (r.ending === 'partnership') partnerships++;
     r.firstTry.forEach((w, k) => {
       const t = r.turns[k], st = r.stressAtBoss[k];
       if (t === undefined || st === undefined) throw new Error(`bookkeeping mismatch at rank ${k}`);
@@ -91,15 +97,16 @@ export function summarize(ranks: Rank[], ev: EventStrategy, fs: FightStrategy, r
   return {
     promotionRate: promotions / runs,
     fatalityRate: fatalities / runs,
+    partnershipRate: partnerships / runs,
     bosses: ranks.map((r, k) => ({ boss: r.boss.name, firstTryWin: tries[k] ? wins[k]! / tries[k]! : 0, avgTurns: tries[k] ? turnSum[k]! / tries[k]! : 0, avgStress: tries[k] ? stressSum[k]! / tries[k]! : 0 })),
   };
 }
 
 if (pathToFileURL(process.argv[1] ?? '').href === import.meta.url) {
   const runs = Number(process.argv[2] ?? 500);
-  for (const [ev, fs] of [['best', 'weakness'], ['random', 'weakness'], ['first', 'weakness'], ['worst', 'weakness'], ['random', 'random'], ['first', 'neutral']] as const) {
+  for (const [ev, fs] of [['best', 'weakness'], ['allies', 'weakness'], ['random', 'weakness'], ['first', 'weakness'], ['worst', 'weakness'], ['random', 'random'], ['first', 'neutral']] as const) {
     const s = summarize(CONTENT.ranks, ev, fs, runs);
-    console.log(`\n=== events=${ev} fight=${fs}: promotion ${(s.promotionRate * 100).toFixed(0)}%`);
+    console.log(`\n=== events=${ev} fight=${fs}: promotion ${(s.promotionRate * 100).toFixed(0)}%, partnership ${(s.partnershipRate * 100).toFixed(0)}%`);
     console.table(s.bosses.map(b => ({ ...b, firstTryWin: `${(b.firstTryWin * 100).toFixed(0)}%`, avgTurns: b.avgTurns.toFixed(1), avgStress: b.avgStress.toFixed(0) })));
   }
 }

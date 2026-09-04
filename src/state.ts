@@ -2,11 +2,11 @@ import type { Boss, BattleOutcome, Choice, Ending, EndingId, Epilogue, GameEvent
 
 export const STAT_KEYS: StatKey[] = ['loyalty', 'reputation', 'competence', 'stress'];
 
-export function createInitialState(): GameState {
+export function createInitialState(seed = Math.floor(Math.random() * 0x7fffffff)): GameState {
   return {
     rank: 0, step: 0, week: 1,
     stats: { loyalty: 30, reputation: 20, competence: 30, stress: 10 },
-    flags: new Set(), seenEvents: new Set(), lastBattle: null,
+    flags: new Set(), seenEvents: new Set(), lastBattle: null, ending: null, seed,
   };
 }
 
@@ -25,7 +25,14 @@ export function currentEvent(state: GameState, ranks: Rank[]): GameEvent | null 
 }
 
 export function visibleChoices(event: GameEvent, state: GameState): Choice[] {
-  return event.choices.filter(c => !c.requiresFlag || state.flags.has(c.requiresFlag));
+  return event.choices.filter(c => {
+    if (c.requiresFlag && !state.flags.has(c.requiresFlag)) return false;
+    if (c.requiresFlags) {
+      const have = c.requiresFlags.flags.filter(f => state.flags.has(f)).length;
+      if (have < c.requiresFlags.min) return false;
+    }
+    return true;
+  });
 }
 
 export function applyChoice(state: GameState, event: GameEvent, choice: Choice): GameState {
@@ -41,7 +48,7 @@ export function applyChoice(state: GameState, event: GameEvent, choice: Choice):
   if (choice.setFlag) flags.add(choice.setFlag);
   const seenEvents = new Set(state.seenEvents);
   seenEvents.add(event.id);
-  return { ...state, stats, flags, seenEvents, step: state.step + 1, week: state.week + 1, lastBattle: null };
+  return { ...state, stats, flags, seenEvents, step: state.step + 1, week: state.week + 1, lastBattle: null, ending: choice.ending ?? null };
 }
 
 export function afterBattle(state: GameState, boss: Boss, outcome: BattleOutcome): GameState {
@@ -72,6 +79,7 @@ export function resolveEnding(ending: Ending, flags: Set<string>): ResolvedEndin
 }
 
 export function checkEnding(state: GameState, ranks: Rank[]): EndingId | null {
+  if (state.ending) return state.ending;
   if (state.stats.stress >= 100) return 'burnout';
   const lb = state.lastBattle;
   if (!lb) return null;

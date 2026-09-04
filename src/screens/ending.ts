@@ -5,11 +5,12 @@ import { placeholderBg } from './event';
 export function createEndingScreen(): Screen {
   return {
     async mount(root, ctx: Ctx) {
-      await ctx.assets.loadGroup('endings');
+      // core — ради il_title у концовки «Партнёрство» (титульный арт: рукопожатие); группа уже в кэше с титула
+      await Promise.all([ctx.assets.loadGroup('endings'), ctx.assets.loadGroup('core')]);
       const state = ctx.getState();
       const id = checkEnding(state, ctx.content.ranks) ?? 'burnout';
       const ending = resolveEnding(ctx.content.endings[id], state.flags);
-      ctx.audio.playMusic('mu_ending');
+      ctx.audio.playMusic(ctx.content.endings[id].music ?? 'mu_ending');
       const el = document.createElement('div');
       el.className = `screen ending ending-${id}`;
       const art = ctx.assets.getImageUrl(ending.illustration);
