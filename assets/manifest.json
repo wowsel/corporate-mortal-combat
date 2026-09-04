@@ -168,7 +168,7 @@
       "references": [
         "assets/reference/post-hero-and-shao-kahn.png"
       ],
-      "prompt": "Wide establishing shot of a corporate open-space office of Outworld Corp at mid-morning: rows of grey desks with monitors, ergonomic chairs, a whiteboard with a flowchart, a wall map poster with the single word OUTWORLD, potted dead plants, a water cooler. Skulls and bone trophies sit on shelves and desks as ordinary decor; an iron banner with a dragon emblem hangs from the ceiling. Empty of people. Wide-angle, eye level, deep depth of field, clean composition with the lower third free for UI. Exception to the no-text rule: the single word OUTWORLD on the wall poster is required; no other text anywhere."
+      "prompt": "Wide establishing shot of a corporate open-space office of Outworld Corp at mid-morning: rows of grey desks with monitors, ergonomic chairs, a whiteboard with a flowchart, a wall map poster with the single word OUTWORLD, potted dead plants, a water cooler. Skulls and bone trophies sit on shelves and desks as ordinary decor; an iron banner with a dragon emblem hangs from the ceiling. Empty of people. Wide-angle, eye level, deep depth of field (override the shallow depth of field of the style prefix for this establishing shot), clean composition with the lower third free for UI. Exception to the no-text rule: the single word OUTWORLD on the wall poster is required; no other text anywhere."
     },
     {
       "id": "pt_mileena_neutral",
@@ -185,7 +185,7 @@
       "references": [
         "assets/reference/post-hero-and-shao-kahn.png"
       ],
-      "prompt": "Head-and-shoulders portrait, looking directly at camera with a cool evaluating gaze, slight tilt of the head. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional.. Background: blurred HR office with a framed 'Employee of the Month' certificate and a skull on a filing cabinet."
+      "prompt": "Head-and-shoulders portrait, looking directly at camera with a cool evaluating gaze, slight tilt of the head. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. Background: blurred HR office with a framed 'Employee of the Month' certificate and a skull on a filing cabinet."
     },
     {
       "id": "pt_mileena_angry",
@@ -206,7 +206,7 @@
       "dependsOn": [
         "pt_mileena_neutral"
       ],
-      "prompt": "Same woman, same framing and background as the reference portrait. The violet veil is pulled down to her chin, revealing a wide mouth full of long needle-like teeth in a furious snarl; eyes narrowed. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional.."
+      "prompt": "Same woman, same framing and background as the reference portrait. The violet veil is pulled down to her chin, revealing a wide mouth full of long needle-like teeth in a furious snarl; eyes narrowed. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional."
     },
     {
       "id": "sp_mileena_idle",
@@ -229,7 +229,7 @@
       ],
       "chroma": "#FF00FF",
       "flip": false,
-      "prompt": "Full body, head to shoes fully visible, MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. standing in a poised interviewer stance, three-quarter view facing LEFT, holding a clipboard in one hand and a pen in the other, weight on one heel. Isolated on a flat uniform solid magenta background (#FF00FF), no floor, no shadow on the background, even studio lighting from the right."
+      "prompt": "Full body, head to shoes fully visible. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. She stands in a poised interviewer stance, three-quarter view facing LEFT, holding a clipboard in one hand and a pen in the other, weight on one heel. Isolated on a flat uniform solid magenta background (#FF00FF), no floor, no shadow on the background, even studio lighting from the right."
     },
     {
       "id": "sp_mileena_attack",
@@ -254,7 +254,7 @@
       ],
       "chroma": "#FF00FF",
       "flip": false,
-      "prompt": "Same woman as the reference sprite, still facing LEFT at the same three-quarter angle. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. lunging forward to the LEFT, thrusting the clipboard out like a blade, other hand slashing the air with the pen, veil in place, aggressive. Same magenta background, same framing scale."
+      "prompt": "Same woman as the reference sprite, still facing LEFT at the same three-quarter angle. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. She lunges forward to the LEFT, thrusting the clipboard out like a blade, other hand slashing the air with the pen, veil in place, aggressive. Same magenta background, same framing scale."
     },
     {
       "id": "sp_mileena_hurt",
@@ -279,7 +279,7 @@
       ],
       "chroma": "#FF00FF",
       "flip": false,
-      "prompt": "Same woman, still facing LEFT at the same three-quarter angle. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. recoiling backward (her back moves to the RIGHT), clipboard papers flying, one hand raised to her veil, eyes wide in surprise. Same magenta background, same framing scale."
+      "prompt": "Same woman, still facing LEFT at the same three-quarter angle. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. She recoils backward (her back moves to the RIGHT), clipboard papers flying, one hand raised to her veil, eyes wide in surprise. Same magenta background, same framing scale."
     },
     {
       "id": "sp_mileena_defeated",
@@ -304,7 +304,7 @@
       ],
       "chroma": "#FF00FF",
       "flip": false,
-      "prompt": "Same woman, still facing LEFT. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. slumped sideways onto the floor, half-sitting, ponytail undone, clipboard face down beside her, veil still covering her mouth, exhausted but composed. Same magenta background, same framing scale."
+      "prompt": "Same woman, still facing LEFT. MILEENA: a tall athletic woman, Head of HR of Outworld Corp. Sharp tailored dark burgundy business suit with a pencil skirt, black blouse, a corporate lanyard with a badge. Long straight black hair in a severe high ponytail, striking yellow-amber eyes with heavy dark makeup. An opaque matte dark indigo-violet veil (NOT sheer, NOT translucent, NOT see-through; NOT pink, NOT magenta — it must contrast with a magenta chroma background) covers her nose and mouth like a mask, fastened with a small gold clip. Poised, predatory, professional. She is slumped sideways onto the floor, half-sitting, ponytail undone, clipboard face down beside her, veil still covering her mouth, exhausted but composed. Same magenta background, same framing scale."
     },
     {
       "id": "bg_dev_throne",

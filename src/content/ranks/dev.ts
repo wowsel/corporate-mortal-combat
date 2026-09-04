@@ -8,7 +8,7 @@ export const DEV_RANKS: Rank[] = [
       weakness: 'agree', immunity: 'data', final: true,
       sprites: { idle: 'sp_dev2_idle', attack: 'sp_dev2_attack', hurt: 'sp_dev2_hurt', defeated: 'sp_dev2_defeated' },
       portraits: { neutral: 'pt_dev2_neutral', angry: 'pt_dev2_angry' },
-      intro: 'У тебя пять минут. Слайды — на стену. Императора не интересуют цифры. Императора интересует, кто с ним согласен.',
+      intro: 'Пять минут. Меня не интересуют цифры. Меня интересует, кто со мной согласен.',
       lines: {
         hit: ['Хм.', 'Дальше.'],
         immune: ['Цифры? Я император, а не бухгалтер.'],

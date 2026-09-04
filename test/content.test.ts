@@ -12,7 +12,7 @@ describe('content hints', () => {
       // у ступени без событий (финал) намёк даёт вступительная реплика босса
       const last = r.events[r.events.length - 1];
       const blob = last
-        ? `${last.text} ${last.repeatText ?? ''} ${last.choices.map(c => c.text + (c.reaction?.text ?? '')).join(' ')}`
+        ? `${last.text} ${last.repeatText ?? ''}`
         : r.boss.intro;
       expect(blob, `${r.id} weakness ${r.boss.weakness}`).toMatch(HINT_WORDS[r.boss.weakness]!);
       expect(blob, `${r.id} immunity ${r.boss.immunity}`).toMatch(HINT_WORDS[r.boss.immunity]!);
