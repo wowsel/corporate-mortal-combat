@@ -67,7 +67,7 @@ def chroma_key(img, key_rgb, near=None, far=None):
     """Возвращает RGBA: маска по расстоянию в CbCr до ключа, мягкая кромка, despill.
 
     Ключ оценивается по самой картинке (медиана рамки), пороги — адаптивные:
-    near = p99(расстояний пикселей рамки до ключа) + 8, far = near + 45.
+    near = min(p99(расстояний пикселей рамки до ключа) + 8, 30), far = near + 45.
     near/far можно задать явно (CLI --near/--far) — тогда адаптив не используется.
     """
     arr = np.asarray(img.convert('RGB')).astype(np.float32)
@@ -76,7 +76,10 @@ def chroma_key(img, key_rgb, near=None, far=None):
     kcb, kcr = rgb_to_ycbcr(key.reshape(1, 1, 3))[1:]
     dist = np.sqrt((cb - kcb) ** 2 + (cr - kcr) ** 2)
     if near is None:
-        near = float(np.percentile(dist[border], 99)) + 8.0
+        # cap: если фигура касается рамки (планшет за краем, ноги у нижней кромки), p99 рамки —
+        # это уже цвет самой фигуры, и порог уезжает так, что персонаж становится прозрачным;
+        # 30 единиц CbCr достаточно для любого «дышащего» ровного задника
+        near = min(float(np.percentile(dist[border], 99)) + 8.0, 30.0)
     if far is None:
         far = near + 45.0
     alpha = np.clip((dist - near) / (far - near), 0.0, 1.0)

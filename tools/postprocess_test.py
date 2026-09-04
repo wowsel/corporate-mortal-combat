@@ -88,14 +88,15 @@ def main():
         assert far.returncode != 0, far
         assert 'not a chroma key' in far.stderr, far.stderr
         # фигура упирается в край кадра: общий кроп срезал бы её → аварийный выход.
-        # на адаптивных порогах такая рамка сначала задирает near (p99 рамки — это уже фигура),
-        # поэтому кадр выкашивается целиком и срабатывает проверка на вырожденный кей;
-        # с явными порогами видно именно проверку рамки. Оба пути обязаны выйти ненулём.
+        # адаптивный near ограничен сверху (30): p99 рамки здесь — это уже цвет фигуры,
+        # без ограничения порог уезжал и кадр выкашивался целиком (вырожденный кей вместо
+        # понятной ошибки о рамке). Оба пути — адаптивный и с явными порогами — обязаны
+        # выйти ненулём именно проверкой рамки.
         e = os.path.join(d, 'e.png'); make_sprite(e, (100, 200, 300, 600), (200, 40, 40))
         edge = subprocess.run([sys.executable, 'tools/postprocess.py', 'character', '--out-dir', os.path.join(d, 'oute'),
                                '--size', '700x900', '--chroma', 'FF00FF', f'e_idle={e}'], capture_output=True, text=True)
         assert edge.returncode != 0, edge
-        assert 'degenerate chroma key' in edge.stderr, edge.stderr
+        assert 'touches the frame border' in edge.stderr, edge.stderr
         edge2 = subprocess.run([sys.executable, 'tools/postprocess.py', 'character', '--out-dir', os.path.join(d, 'oute2'),
                                 '--size', '700x900', '--chroma', 'FF00FF', '--near', '10', '--far', '20',
                                 f'e_idle={e}'], capture_output=True, text=True)
