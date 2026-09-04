@@ -137,6 +137,7 @@ build`) и публикует его на GitHub Pages. Локально под�
 
 ![Титул](docs/screenshots/art-title.png)
 ![Событие: Милина в опенспейсе](docs/screenshots/art-event-mileena.png)
+![Событие: приёмная Шао Кана, Джакс](docs/screenshots/art-event-jax.png)
 ![Бой с Милиной](docs/screenshots/art-battle-mileena.png)
 ![Бой как диалог: реакция и следующий вопрос в одном облачке](docs/screenshots/art-battle-dialogue.png)
 ![Финал: пять карточек-ответов](docs/screenshots/art-battle-shao-kahn.png)
