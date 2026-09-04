@@ -127,7 +127,9 @@ export function getScene(): Scene {
     tracked.add(t);
   };
   const hero = new Fighter(HERO_X, false, track);
-  const boss = new Fighter(BOSS_X, true, track);
+  // босс не зеркалится движком: по спеке боссы рисуются уже влево (герой — вправо), а разворот неудачной
+  // генерации делает `flip` в манифесте на этапе постобработки
+  const boss = new Fighter(BOSS_X, false, track);
   const heroBar = new Bar(40, 500, false, track);
   const bossBar = new Bar(W - 40 - 500, 500, true, track);
   const heroPortrait = new Sprite(Texture.EMPTY);
