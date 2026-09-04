@@ -5,13 +5,16 @@
 .battle-overlay > * { pointer-events: auto; }
 .battle-mute { position: absolute; top: 1.5%; right: 1.5%; }
 .moves { position: absolute; left: 3%; right: 3%; bottom: 2.5%; display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 1%; }
-.move-card { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 1.2% 1.4%; background: linear-gradient(180deg, rgba(30,24,20,0.95), rgba(12,10,10,0.95)); border: 1px solid rgba(201,163,74,0.5); color: var(--text); font-size: clamp(11px, 1.3vw, 16px); text-align: left; transition: transform 120ms, border-color 120ms; }
+.moves[hidden] { display: none; }
+/* карточка — ответ героя: до трёх строк по 80 знаков при пяти колонках на 1280 px; фиксированная высота текста,
+   чтобы карточки не прыгали между ходами; переполнение обрезается, а не ломает сетку */
+.move-card { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 1.2% 1.4%; background: linear-gradient(180deg, rgba(30,24,20,0.95), rgba(12,10,10,0.95)); border: 1px solid rgba(201,163,74,0.5); color: var(--text); font-size: clamp(11px, 1.15vw, 15px); text-align: left; transition: transform 120ms, border-color 120ms; }
 .move-card:hover:not(:disabled) { transform: translateY(-3px); border-color: var(--gold); }
 .move-card:disabled { opacity: 0.45; cursor: default; }
 .move-card.strike { border-color: var(--blood); background: linear-gradient(180deg, rgba(60,10,10,0.95), rgba(20,4,4,0.95)); }
 .move-key { font-family: var(--font-display); color: var(--gold); }
-.move-name { font-weight: 600; }
-.move-stat { color: var(--muted); font-size: 0.85em; }
+.move-text { font-weight: 600; line-height: 1.3; min-height: 3.9em; overflow: hidden; overflow-wrap: anywhere; }
+.move-meta { color: var(--muted); font-size: 0.8em; }
 .result-panel { position: absolute; left: 50%; top: 58%; transform: translateX(-50%); width: 60%; background: var(--panel); border: 1px solid rgba(201,163,74,0.5); padding: 20px 28px; display: flex; flex-direction: column; gap: 12px; align-items: center; }
 .result-title { font-family: var(--font-display); color: var(--gold); margin: 0; letter-spacing: 2px; }
 /* панель узкая (~60% кадра): HUD внутри неё складывается в колонку — заголовок сверху, статы переносятся */

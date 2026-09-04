@@ -1,12 +1,12 @@
 import { gsap } from 'gsap';
 import { availableMoves, baseDamage, createBattle, resolveTurn } from '../battle';
-import { introSteps, outcomeSteps, turnSteps } from '../choreo';
+import { exchangeAt, introSteps, outcomeSteps, turnSteps } from '../choreo';
 import type { Ctx, Screen } from '../engine';
 import { createHud } from '../hud';
 import { banner, clearSpeech, damageNumber, dim, flash, grayscale, particles, shake, speechLine, wait } from '../render/effects';
 import { getScene, type Scene } from '../render/scene';
 import { afterBattle, checkEnding, currentRank } from '../state';
-import type { AssetGroup, BattleState, Boss, Move, Step } from '../types';
+import type { AssetGroup, BattleState, Boss, Move, Step, Tactic } from '../types';
 
 // bossAnim не выделен: turnSteps отдаёт ход одним списком шагов, разрезать его по границе
 // ответа босса нельзя без изменения хореографии — вся анимация хода живёт в playerAnim
@@ -68,15 +68,24 @@ export function createBattleScreen(): Screen {
       void scene.setBar('boss', battle.maxPatience, battle.maxPatience, 0);
 
       const movesEl = el.querySelector<HTMLElement>('.moves')!;
+      movesEl.hidden = true; // ответы появляются только после вопроса: во время интро карточек нет
+      // Карточки — это ответы героя из текущего обмена (по одному на тактику, порядок фиксирован = клавиши 1–5);
+      // название тактики и ожидаемый урон уходят в мелкую подпись. Только textContent: тексты контентные.
       const renderMoves = () => {
         const list = availableMoves(boss, battle);
+        const ex = exchangeAt(boss, battle.exchange);
         movesEl.replaceChildren(...list.map(({ move, enabled }, i) => {
           const b = document.createElement('button');
           b.className = `move-card ${move.id === 'strike' ? 'strike' : ''}`;
           b.disabled = !enabled || phase !== 'awaitInput';
           // подсказка считается той же формулой, что и бой: без множителей босса, их игрок узнаёт по удару
           const expected = Math.round(baseDamage(move, state.stats));
-          b.innerHTML = `<span class="move-key">${i + 1}</span><span class="move-name">${move.name}</span><span class="move-stat">${move.stat ? `≈${expected}` : ''}</span>`;
+          const key = document.createElement('span'); key.className = 'move-key'; key.textContent = String(i + 1);
+          const text = document.createElement('span'); text.className = 'move-text';
+          text.textContent = move.id === 'strike' ? (boss.strikeText ?? move.name) : ex.replies[move.id as Tactic].text;
+          const meta = document.createElement('span'); meta.className = 'move-meta';
+          meta.textContent = move.stat ? `${move.name} · ≈${expected}` : move.name;
+          b.append(key, text, meta);
           b.title = enabled ? move.hint : 'Не при свидетелях. Сначала доведите терпение почти до нуля.';
           b.addEventListener('click', () => void onMove(move));
           return b;
@@ -96,7 +105,7 @@ export function createBattleScreen(): Screen {
             case 'particles': particles(scene, s.at, s.kind); break;
             case 'damage': damageNumber(scene, s.at, s.value, s.muted); break;
             case 'bar': void scene.setBar(s.who, s.to, s.who === 'hero' ? battle.maxConfidence : battle.maxPatience, s.ms); break;
-            case 'line': speechLine(scene, s.text, s.style); break;
+            case 'line': speechLine(scene, s.text, s.style, s.append ?? false); break;
             case 'banner': await banner(scene, s.text); break;
             case 'sound': ctx.audio.play(s.name, s.gain); break;
             case 'voice': ctx.audio.playVoice(s.id); break;
@@ -136,13 +145,13 @@ export function createBattleScreen(): Screen {
         if (phase !== 'awaitInput') return;
         phase = 'playerAnim';
         renderMoves();
-        if (scene) clearSpeech(scene); // пузырь босса висел, пока игрок думал; ход сделан — убрать
+        if (scene) { clearSpeech(scene); scene.resumeTimer(); } // пузырь висел и таймер стоял, пока игрок думал
         const prev = battle;
         const result = resolveTurn(prev, move, ctx.getState().stats, boss);
         battle = result.battle;
         await run(turnSteps(result, boss, prev));
         if (!alive) return;
-        if (result.outcome === 'continue') { phase = 'awaitInput'; renderMoves(); return; }
+        if (result.outcome === 'continue') { phase = 'awaitInput'; scene?.pauseTimer(); renderMoves(); return; }
         await run(outcomeSteps(result, boss));
         if (!alive) return;
         await finish(result.outcome);
@@ -157,11 +166,12 @@ export function createBattleScreen(): Screen {
         if (item?.enabled) void onMove(item.move);
       });
 
-      renderMoves();
       await run(introSteps(boss));
       if (!alive || !scene) return;
       scene.startTimer();
+      scene.pauseTimer(); // счётчик идёт только во время анимаций: игрок читает без таймера
       phase = 'awaitInput';
+      movesEl.hidden = false;
       renderMoves();
     },
     unmount() {

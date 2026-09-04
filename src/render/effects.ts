@@ -104,10 +104,22 @@ export async function banner(scene: Scene, text: string): Promise<void> {
 }
 
 const SPEECH = 'speech';
+// Геометрия пузыря (координаты сцены 1280×720): стоит между бойцами слева от босса, растёт вверх.
+// Левее ~460 px голова героя, выше ~90 px HUD — отсюда ширина переноса и лимиты текстов в валидаторе
+// (реплика 110, реакция 75): худший случай — 6 строк ≈ 172 px, верх на 128 px.
+const BUBBLE_RIGHT_GAP = 60;
+const BUBBLE_BOTTOM = 300;
+const BUBBLE_WRAP = 380;
+const BUBBLE_TOP_MIN = 100;
+const BUBBLE_FONT = 20;
+const BUBBLE_FONT_SMALL = 17;
+const BUBBLE_PAD = 14;
+const BUBBLE_FILL = 0xf5efe0;
+const BUBBLE_STROKE = 0x3a2a10;
 
 /**
- * Гасит закреплённый пузырь босса (если есть). Вызывается контроллером боя в момент выбора приёма
- * и самим speechLine перед показом следующего пузыря — на экране всегда не больше одного.
+ * Гасит закреплённый пузырь босса (если есть). Вызывается контроллером боя в момент выбора приёма:
+ * пузырь висел, пока игрок читал и думал, ход сделан — убрать.
  */
 export function clearSpeech(scene: Scene): void {
   const old = scene.layers.banners.getChildByLabel(SPEECH);
@@ -116,31 +128,69 @@ export function clearSpeech(scene: Scene): void {
   gsap.to(old, { alpha: 0, duration: 0.25, onComplete: () => { if (!old.destroyed) old.destroy({ children: true }); } });
 }
 
+function drawBubbleBox(box: Graphics, t: Text): { w: number; h: number } {
+  const w = t.width + BUBBLE_PAD * 2;
+  const h = t.height + BUBBLE_PAD * 2;
+  box.clear();
+  box.roundRect(-w / 2, -h / 2, w, h, 10).fill({ color: BUBBLE_FILL }).stroke({ color: BUBBLE_STROKE, width: 2 });
+  // хвостик вправо, к боссу: заливка поверх рамки, затем обводка только двух внешних рёбер
+  const x0 = w / 2 - 1, yTop = h / 2 - 44, yTip = h / 2 - 28, yBot = h / 2 - 16;
+  box.poly([x0, yTop, x0 + 24, yTip, x0, yBot]).fill({ color: BUBBLE_FILL });
+  box.moveTo(x0, yTop).lineTo(x0 + 24, yTip).lineTo(x0, yBot).stroke({ color: BUBBLE_STROKE, width: 2 });
+  return { w, h };
+}
+
+/** Перерисовать коробку под текст и поставить пузырь правым нижним углом к точке привязки; если не влезает по высоте — шрифт меньше. */
+function layoutBubble(scene: Scene, c: Container): void {
+  const t = c.getChildByLabel('text') as Text;
+  const box = c.getChildByLabel('box') as Graphics;
+  t.style.fontSize = BUBBLE_FONT;
+  let size = drawBubbleBox(box, t);
+  if (size.h > BUBBLE_BOTTOM - BUBBLE_TOP_MIN) { t.style.fontSize = BUBBLE_FONT_SMALL; size = drawBubbleBox(box, t); }
+  const right = scene.fighterPoint('boss').x - BUBBLE_RIGHT_GAP;
+  c.position.set(right - size.w / 2, BUBBLE_BOTTOM - size.h / 2);
+}
+
 /**
- * Реплика босса. `bubble` — белое облачко у головы босса, висит до следующей реплики или до хода игрока
- * (`clearSpeech`): раньше оно гасло через 1.6 с, и игрок не успевал прочитать. `center` — крик спецприёма
- * поверх затемнения, гаснет сам вместе с затемнением.
+ * Реплика босса.
+ * `bubble` — облачко между бойцами; не гаснет само: висит до следующего пузыря, до хода игрока (`clearSpeech`)
+ * или до unmount сцены (слой banners чистится там). `append` дописывает текст абзацем в висящий пузырь
+ * (реакция на ответ героя + следующая реплика читаются вместе); без пузыря ведёт себя как обычный `bubble`.
+ * Новый пузырь без `append` уничтожает предыдущий мгновенно — иначе две коробки лежат друг на друге.
+ * `center` — крик спецприёма поверх затемнения, гаснет сам вместе с затемнением.
  */
-export function speechLine(scene: Scene, text: string, style: 'bubble' | 'center'): void {
+export function speechLine(scene: Scene, text: string, style: 'bubble' | 'center', append = false): void {
   const layer = scene.layers.banners;
-  const c = new Container();
-  const isCenter = style === 'center';
-  const t = new Text({ text, style: new TextStyle({ fontFamily: isCenter ? 'Impact, Arial Black, sans-serif' : 'sans-serif', fontSize: isCenter ? 44 : 20, fill: isCenter ? 0xff6b6b : 0x1a1a1a, wordWrap: true, wordWrapWidth: isCenter ? 900 : 360, align: 'center' }) });
-  t.anchor.set(0.5);
-  if (!isCenter) {
-    clearSpeech(scene);
-    c.label = SPEECH;
-    const pad = 14;
-    const box = new Graphics().roundRect(-t.width / 2 - pad, -t.height / 2 - pad, t.width + pad * 2, t.height + pad * 2, 10).fill({ color: 0xf5efe0 }).stroke({ color: 0x3a2a10, width: 2 });
-    c.addChild(box);
+  if (style === 'center') {
+    const t = new Text({ text, style: new TextStyle({ fontFamily: 'Impact, Arial Black, sans-serif', fontSize: 44, fill: 0xff6b6b, wordWrap: true, wordWrapWidth: 900, align: 'center' }) });
+    t.anchor.set(0.5);
+    t.position.set(W / 2, H / 2 + 80);
+    t.alpha = 0;
+    layer.addChild(t);
+    gsap.to(t, { alpha: 1, y: t.y - 10, duration: 0.2 });
+    gsap.to(t, { alpha: 0, duration: 0.3, delay: 1.2, onComplete: () => { if (!t.destroyed) t.destroy(); } });
+    return;
   }
-  c.addChild(t);
-  const p = scene.fighterPoint('boss');
-  c.position.set(isCenter ? W / 2 : p.x - 40, isCenter ? H / 2 + 80 : p.y - 250);
+  const existing = layer.getChildByLabel(SPEECH) as Container | null;
+  if (append && existing) {
+    const t = existing.getChildByLabel('text') as Text;
+    t.text = `${t.text}\n\n${text}`;
+    layoutBubble(scene, existing);
+    return;
+  }
+  if (existing) { gsap.killTweensOf(existing); existing.destroy({ children: true }); }
+  const c = new Container();
+  c.label = SPEECH;
+  const box = new Graphics();
+  box.label = 'box';
+  const t = new Text({ text, style: new TextStyle({ fontFamily: 'sans-serif', fontSize: BUBBLE_FONT, fill: 0x1a1a1a, wordWrap: true, wordWrapWidth: BUBBLE_WRAP, align: 'left', lineHeight: 24 }) });
+  t.label = 'text';
+  t.anchor.set(0.5);
+  c.addChild(box, t);
+  layoutBubble(scene, c);
   c.alpha = 0;
   layer.addChild(c);
-  gsap.to(c, { alpha: 1, y: c.y - 10, duration: 0.2 });
-  if (isCenter) gsap.to(c, { alpha: 0, duration: 0.3, delay: 1.2, onComplete: () => { if (!c.destroyed) c.destroy({ children: true }); } });
+  scene.track(gsap.to(c, { alpha: 1, duration: 0.2 }));
 }
 
 export function dim(scene: Scene, to: number, ms: number): Promise<void> {

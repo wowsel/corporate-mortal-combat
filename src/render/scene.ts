@@ -102,6 +102,8 @@ export interface Scene {
   readonly app: Application;
   fighterPoint(who: 'hero' | 'boss'): { x: number; y: number };
   startTimer(): void; stopTimer(): void;
+  /** Счётчик стоит, пока игрок читает и выбирает ответ, и идёт только во время анимаций хода. */
+  pauseTimer(): void; resumeTimer(): void;
 }
 
 let instance: Scene | null = null;
@@ -238,6 +240,8 @@ export function getScene(): Scene {
       track(timer);
     },
     stopTimer() { timer?.kill(); timer = null; },
+    pauseTimer() { timer?.pause(); },
+    resumeTimer() { timer?.resume(); },
   };
   return instance;
 }
