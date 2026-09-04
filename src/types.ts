@@ -135,7 +135,7 @@ export type Step =
   | { t: 'particles'; at: 'hero' | 'boss' | 'screen'; kind: 'paper' | 'sparks' | 'confetti' }
   | { t: 'damage'; at: 'hero' | 'boss'; value: number; muted: boolean }
   | { t: 'bar'; who: 'hero' | 'boss'; to: number; ms: number }
-  | { t: 'line'; text: string; style: 'bubble' | 'center'; append?: boolean } // append: дописать абзацем в висящий пузырь
+  | { t: 'line'; text: string; style: 'bubble' | 'center'; append?: boolean } // append: второй пузырь под висящим (реакция + вопрос)
   | { t: 'banner'; text: BannerText }
   | { t: 'sound'; name: SoundName; gain?: number }
   | { t: 'voice'; id: string }

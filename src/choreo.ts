@@ -7,7 +7,7 @@
 // Реплика-`bubble` не гаснет сама: висит до следующего пузыря или до хода игрока (clearSpeech в контроллере).
 // Тексты боя живут в обменах босса (Boss.exchanges): реакция на ответ героя берётся из обмена, на который
 // он отвечал (prev.exchange), следующая реплика — из обмена, к которому перешёл бой (r.battle.exchange),
-// и дописывается в тот же пузырь (`append`), чтобы игрок читал «реакция + вопрос» без таймера.
+// и выводится вторым пузырём под реакцией (`append`): реакция приглушается, вопрос появляется живым — без таймера.
 import type { BannerText, BattleState, Boss, Exchange, Step, Tactic, TurnResult } from './types';
 
 const WHITE = '#ffffff';
@@ -115,7 +115,7 @@ export function turnSteps(r: TurnResult, boss: Boss, prev: BattleState): Step[] 
     steps.push(...returnSteps('hero'), ...bossAttack(r, boss));
     if (r.outcome === 'continue') {
       steps.push(...returnSteps('boss'), { t: 'pose', who: 'hero', pose: 'idle' });
-      // следующая реплика босса дописывается к реакции и висит до хода игрока; при lose её нет
+      // следующая реплика босса — второй пузырь под реакцией, висит до хода игрока; при lose её нет
       steps.push({ t: 'line', text: exchangeAt(boss, r.battle.exchange).prompt, style: 'bubble', append: true });
     }
   }

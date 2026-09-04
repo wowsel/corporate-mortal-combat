@@ -104,25 +104,31 @@ export async function banner(scene: Scene, text: string): Promise<void> {
 }
 
 const SPEECH = 'speech';
-// Геометрия пузыря (координаты сцены 1280×720): стоит в просвете между бойцами, растёт вниз от HUD.
+// Геометрия пузырей (координаты сцены 1280×720): стоят в просвете между бойцами, растут вниз от HUD.
 // Замер по idle-спрайтам (все позы 700×900 → высота 520): герой в idle занимает x ≤ 450, босс — x ≥ 775
 // (Шан Цзун — самый широкий, голова от 787), головы на y 128–275, HUD заканчивается на ~75.
-// Отсюда центр просвета 612, коробка не шире 318 (перенос 290 + 2×14) и верх на 100: пузырь стоит
-// рядом с лицом босса, не закрывая ни его, ни героя. Худший случай текста (реакция 75 + реплика 110)
-// при ~30 знаках в строке — 8 строк ≈ 220 px; страховка — шрифт 17 px, если коробка длиннее допустимого.
+// Отсюда центр просвета 612, коробка не шире 318 (перенос 290 + 2×14) и верх на 100: пузыри стоят
+// рядом с лицом босса, не закрывая ни его, ни героя. Реакция на ответ героя и следующий вопрос — два
+// отдельных пузыря столбиком: верхний (реакция) приглушён и без хвостика, нижний (вопрос) — живой, с хвостиком.
+// Худший случай текста (реакция 75 + реплика 110) при ~30 знаках в строке — 8 строк ≈ 220 px плюс две
+// пары отступов и зазор ≈ 290 px; страховка — шрифт 17 px, если столбик длиннее допустимого.
 const BUBBLE_CENTER_X = 612;
 const BUBBLE_TOP = 100;
 const BUBBLE_MAX_BOTTOM = 600;
+const BUBBLE_GAP = 10;
 const BUBBLE_WRAP = 290;
 const BUBBLE_FONT = 20;
 const BUBBLE_FONT_SMALL = 17;
 const BUBBLE_PAD = 14;
 const BUBBLE_FILL = 0xf5efe0;
+const BUBBLE_FILL_OLD = 0xe4dcc8;
 const BUBBLE_STROKE = 0x3a2a10;
+const BUBBLE_TEXT = 0x1a1a1a;
+const BUBBLE_TEXT_OLD = 0x5a5044;
 
 /**
- * Гасит закреплённый пузырь босса (если есть). Вызывается контроллером боя в момент выбора приёма:
- * пузырь висел, пока игрок читал и думал, ход сделан — убрать.
+ * Гасит закреплённые пузыри босса (если есть). Вызывается контроллером боя в момент выбора приёма:
+ * пузыри висели, пока игрок читал и думал, ход сделан — убрать.
  */
 export function clearSpeech(scene: Scene): void {
   const old = scene.layers.banners.getChildByLabel(SPEECH);
@@ -131,35 +137,63 @@ export function clearSpeech(scene: Scene): void {
   gsap.to(old, { alpha: 0, duration: 0.25, onComplete: () => { if (!old.destroyed) old.destroy({ children: true }); } });
 }
 
-function drawBubbleBox(box: Graphics, t: Text): { w: number; h: number } {
+function drawBubbleBox(box: Graphics, t: Text, opts: { tail: boolean; old: boolean }): { w: number; h: number } {
   const w = t.width + BUBBLE_PAD * 2;
   const h = t.height + BUBBLE_PAD * 2;
+  const fill = opts.old ? BUBBLE_FILL_OLD : BUBBLE_FILL;
   box.clear();
-  box.roundRect(-w / 2, -h / 2, w, h, 10).fill({ color: BUBBLE_FILL }).stroke({ color: BUBBLE_STROKE, width: 2 });
-  // хвостик вправо, к лицу босса (y ≈ 180 на сцене, то есть ~80 px ниже верха коробки; у короткой коробки — по центру):
+  box.roundRect(-w / 2, -h / 2, w, h, 10).fill({ color: fill }).stroke({ color: BUBBLE_STROKE, width: 2 });
+  if (!opts.tail) return { w, h };
+  // хвостик вправо, к лицу босса: у верхней коробки на ~80 px ниже верха (y ≈ 180 на сцене), у короткой — по центру;
   // заливка поверх рамки, затем обводка только двух внешних рёбер
   const x0 = w / 2 - 1, yTip = -h / 2 + Math.min(80, h - 30), yTop = yTip - 16, yBot = yTip + 12;
-  box.poly([x0, yTop, x0 + 24, yTip, x0, yBot]).fill({ color: BUBBLE_FILL });
+  box.poly([x0, yTop, x0 + 24, yTip, x0, yBot]).fill({ color: fill });
   box.moveTo(x0, yTop).lineTo(x0 + 24, yTip).lineTo(x0, yBot).stroke({ color: BUBBLE_STROKE, width: 2 });
   return { w, h };
 }
 
-/** Перерисовать коробку под текст и поставить пузырь правым нижним углом к точке привязки; если не влезает по высоте — шрифт меньше. */
-function layoutBubble(c: Container): void {
-  const t = c.getChildByLabel('text') as Text;
-  const box = c.getChildByLabel('box') as Graphics;
-  t.style.fontSize = BUBBLE_FONT;
-  let size = drawBubbleBox(box, t);
-  if (size.h > BUBBLE_MAX_BOTTOM - BUBBLE_TOP) { t.style.fontSize = BUBBLE_FONT_SMALL; size = drawBubbleBox(box, t); }
-  c.position.set(BUBBLE_CENTER_X, BUBBLE_TOP + size.h / 2);
+/**
+ * Перерисовать коробки под текст и выстроить пузыри столбиком от BUBBLE_TOP; хвостик — только у последнего
+ * (актуальная реплика), предыдущие приглушены. Если столбик не влезает по высоте — шрифт меньше у всех.
+ */
+function layoutBubbles(c: Container): void {
+  const bubbles = c.children.filter(ch => ch.label === 'bubble') as Container[];
+  const place = (font: number): number => {
+    let y = BUBBLE_TOP;
+    bubbles.forEach((b, i) => {
+      const t = b.getChildByLabel('text') as Text;
+      const box = b.getChildByLabel('box') as Graphics;
+      const last = i === bubbles.length - 1;
+      t.style.fontSize = font;
+      t.style.fill = last ? BUBBLE_TEXT : BUBBLE_TEXT_OLD;
+      const size = drawBubbleBox(box, t, { tail: last, old: !last });
+      b.position.set(BUBBLE_CENTER_X, y + size.h / 2);
+      y += size.h + BUBBLE_GAP;
+    });
+    return y - BUBBLE_GAP;
+  };
+  if (place(BUBBLE_FONT) > BUBBLE_MAX_BOTTOM) place(BUBBLE_FONT_SMALL);
+}
+
+function makeBubble(text: string): Container {
+  const b = new Container();
+  b.label = 'bubble';
+  const box = new Graphics();
+  box.label = 'box';
+  const t = new Text({ text, style: new TextStyle({ fontFamily: 'sans-serif', fontSize: BUBBLE_FONT, fill: BUBBLE_TEXT, wordWrap: true, wordWrapWidth: BUBBLE_WRAP, align: 'left', lineHeight: 24 }) });
+  t.label = 'text';
+  t.anchor.set(0.5);
+  b.addChild(box, t);
+  return b;
 }
 
 /**
  * Реплика босса.
  * `bubble` — облачко между бойцами; не гаснет само: висит до следующего пузыря, до хода игрока (`clearSpeech`)
- * или до unmount сцены (слой banners чистится там). `append` дописывает текст абзацем в висящий пузырь
- * (реакция на ответ героя + следующая реплика читаются вместе); без пузыря ведёт себя как обычный `bubble`.
- * Новый пузырь без `append` уничтожает предыдущий мгновенно — иначе две коробки лежат друг на друге.
+ * или до unmount сцены (слой banners чистится там). `append` добавляет второй пузырь под висящий:
+ * верхний (реакция на ответ героя) приглушается и теряет хвостик, нижний (следующий вопрос) появляется живым —
+ * игрок видит, что одно — ответ на его решение, другое — новый вопрос. Без пузыря `append` ведёт себя как обычный `bubble`.
+ * Новый пузырь без `append` уничтожает предыдущие мгновенно — иначе коробки лежат друг на друге.
  * `center` — крик спецприёма поверх затемнения, гаснет сам вместе с затемнением.
  */
 export function speechLine(scene: Scene, text: string, style: 'bubble' | 'center', append = false): void {
@@ -176,21 +210,18 @@ export function speechLine(scene: Scene, text: string, style: 'bubble' | 'center
   }
   const existing = layer.getChildByLabel(SPEECH) as Container | null;
   if (append && existing) {
-    const t = existing.getChildByLabel('text') as Text;
-    t.text = `${t.text}\n\n${text}`;
-    layoutBubble(existing);
+    const b = makeBubble(text);
+    existing.addChild(b);
+    layoutBubbles(existing);
+    b.alpha = 0;
+    scene.track(gsap.to(b, { alpha: 1, duration: 0.2 }));
     return;
   }
   if (existing) { gsap.killTweensOf(existing); existing.destroy({ children: true }); }
   const c = new Container();
   c.label = SPEECH;
-  const box = new Graphics();
-  box.label = 'box';
-  const t = new Text({ text, style: new TextStyle({ fontFamily: 'sans-serif', fontSize: BUBBLE_FONT, fill: 0x1a1a1a, wordWrap: true, wordWrapWidth: BUBBLE_WRAP, align: 'left', lineHeight: 24 }) });
-  t.label = 'text';
-  t.anchor.set(0.5);
-  c.addChild(box, t);
-  layoutBubble(c);
+  c.addChild(makeBubble(text));
+  layoutBubbles(c);
   c.alpha = 0;
   layer.addChild(c);
   scene.track(gsap.to(c, { alpha: 1, duration: 0.2 }));
