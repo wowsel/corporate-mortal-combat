@@ -61,6 +61,9 @@ function postprocessCharacter(character: string, manifest: Manifest): void {
   const outDir = dirname(publicPath(poses[0]!));
   mkdirSync(outDir, { recursive: true });
   const items = poses.map(x => `${x.id}=${rawPath(x)}`);
+  if (!poses.every(x => Boolean(x.flip) === Boolean(poses[0]!.flip))) {
+    console.warn(`  [${character}] poses disagree on flip; flipping the whole character`);
+  }
   const flip = poses.some(x => x.flip) ? '1' : '0';
   const res = execFileSync('python3', ['tools/postprocess.py', 'character', '--out-dir', outDir, '--size', '700x900', '--chroma', (poses[0]!.chroma ?? '#FF00FF').replace('#', ''), '--flip', flip, '--quality', '80', ...items], { encoding: 'utf8' });
   const meta = JSON.parse(res) as { anchor: [number, number]; files: Record<string, string> };
@@ -82,7 +85,7 @@ function toMp3(buf: Buffer, format: string, target: string, kind: 'music' | 'voi
   try {
     const extra = kind === 'voice' ? ['-ac', '1', '-b:a', '64k'] : ['-b:a', '96k'];
     const r = spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', tmp, '-codec:a', 'libmp3lame', ...extra, target]);
-    if (r.status !== 0) throw new Error(`ffmpeg failed: ${r.stderr?.toString()}`);
+    if (r.status !== 0) throw new Error(`ffmpeg failed: ${r.stderr?.toString() || r.error?.message}`);
   } finally { rmSync(tmp, { force: true }); }
 }
 
@@ -105,6 +108,7 @@ async function main() {
   const key = requireKey();
   mkdirSync(RAW_DIR, { recursive: true });
   let spent = 0;
+  let failed = 0;
   const touchedCharacters = new Set<string>();
 
   for (const e of todo) {
@@ -112,8 +116,17 @@ async function main() {
     // и остальные позы получат другой референс, чем тот, что смотрели глазами
     if (!force && existsSync(rawPath(e))) {
       console.log(`  ${e.id}: raw exists, skip generation (use --force to redo)`);
-      if (e.kind === 'sprite' && e.character) touchedCharacters.add(e.character);
-      else if (e.kind !== 'music' && e.kind !== 'voice' && !e.generated) { postprocessPlain(e); e.generated = true; }
+      try {
+        if (e.kind === 'sprite' && e.character) touchedCharacters.add(e.character);
+        else if (e.kind !== 'music' && e.kind !== 'voice' && !e.generated) {
+          postprocessPlain(e);
+          e.generated = true;
+          writeManifest(manifest);
+        }
+      } catch (err) {
+        failed++;
+        console.error(`  ✗ ${e.id}: ${String(err).slice(0, 400)}`);
+      }
       continue;
     }
     console.log(`→ ${e.id}`);
@@ -134,14 +147,16 @@ async function main() {
       }
       writeManifest(manifest); // сохраняем прогресс после каждого ассета
     } catch (err) {
+      failed++;
       console.error(`  ✗ ${e.id}: ${String(err).slice(0, 400)}`);
     }
   }
   for (const c of touchedCharacters) {
-    try { postprocessCharacter(c, manifest); } catch (err) { console.error(`  ✗ crop ${c}: ${String(err).slice(0, 400)}`); }
+    try { postprocessCharacter(c, manifest); } catch (err) { failed++; console.error(`  ✗ crop ${c}: ${String(err).slice(0, 400)}`); }
   }
   writeManifest(manifest);
-  console.log(`done, spent ≈ $${spent.toFixed(2)}. Public dir: ${PUBLIC_ASSETS}`);
+  console.log(`done, spent ≈ $${spent.toFixed(2)}, failed ${failed}. Public dir: ${PUBLIC_ASSETS}`);
+  if (failed > 0) process.exitCode = 1;
 }
 
 main().catch(e => { console.error(e); process.exit(1); });

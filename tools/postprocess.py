@@ -4,7 +4,7 @@
 character: хромакей + общий кроп нескольких поз одного персонажа + якорь.
 plain:     cover-кроп до размера + WebP.
 """
-import argparse, json, os, sys
+import argparse, json, os
 import numpy as np
 from PIL import Image, ImageFilter
 

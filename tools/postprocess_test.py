@@ -40,8 +40,8 @@ def main():
                         '--chroma', 'FF00FF', f'y_idle={c}'], capture_output=True, text=True, check=True)
         ic = Image.open(os.path.join(outc, 'y_idle.webp')).convert('RGBA')
         px = ic.getpixel((350, 850))
-        if px[3] > 0:
-            assert not (px[0] > 150 and px[2] > 150 and px[1] < 100), px  # розовость подавлена
+        assert px[3] > 0, px  # частично непрозрачна (≈160 по построению)
+        assert not (px[0] > 150 and px[2] > 150 and px[1] < 100), px  # розовость подавлена
         # plain
         big = os.path.join(d, 'bg.png'); Image.new('RGB', (2048, 1536), (10, 20, 30)).save(big)
         outbg = os.path.join(d, 'bg.webp')
