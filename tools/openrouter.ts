@@ -73,6 +73,8 @@ export async function generateImage(req: ImageRequest, key: string): Promise<{ p
 
 export interface AudioRequest {
   model: string; prompt: string;
+  system?: string;           // системное сообщение: чат-аудио модели читают prompt как реплику диалога, поэтому
+                             // роль диктора и запрет на добавления живут здесь, а в prompt — только фраза
   voice?: string;            // голоса chat-completions-аудио OpenAI: alloy, ash, ballad, coral, echo, sage, shimmer, verse
   format: 'mp3' | 'wav';
   audioParams?: boolean;     // false — не посылать поле `audio` вовсе (для моделей, которые его отвергают)
@@ -120,7 +122,7 @@ export async function generateAudio(req: AudioRequest, key: string): Promise<{ a
   const post = (fmt: string) => {
     const body: Record<string, unknown> = {
       model: req.model, stream: true, modalities: ['text', 'audio'],
-      messages: [{ role: 'user', content: req.prompt }],
+      messages: [...(req.system ? [{ role: 'system', content: req.system }] : []), { role: 'user', content: req.prompt }],
       stream_options: { include_usage: true }, // без этого usage.cost в стриме не приходит
     };
     if (req.audioParams !== false) body['audio'] = req.voice ? { voice: req.voice, format: fmt } : { format: fmt };

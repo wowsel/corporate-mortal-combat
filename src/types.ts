@@ -144,6 +144,7 @@ export interface AssetEntry {
   duration?: number;
   seed?: number;
   voice?: string;        // для kind voice: голос TTS
+  system?: string;       // для kind voice: системная инструкция диктору; prompt тогда — только сама фраза
   resolution?: '1K' | '2K';
 }
 

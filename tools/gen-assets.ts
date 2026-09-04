@@ -132,7 +132,7 @@ async function main() {
     console.log(`→ ${e.id}`);
     try {
       if (e.kind === 'music' || e.kind === 'voice') {
-        const r = await withRetry(() => generateAudio({ model: e.model, prompt: e.prompt, voice: e.voice, format: 'mp3', audioParams: e.kind === 'music' ? MUSIC_AUDIO_PARAMS : true }, key));
+        const r = await withRetry(() => generateAudio({ model: e.model, prompt: e.prompt, system: e.system, voice: e.voice, format: 'mp3', audioParams: e.kind === 'music' ? MUSIC_AUDIO_PARAMS : true }, key));
         toMp3(r.audio, r.format, publicPath(e), e.kind);
         spent += r.cost ?? estimate(e);
         e.generated = true;
