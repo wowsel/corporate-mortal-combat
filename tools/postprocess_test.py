@@ -42,6 +42,25 @@ def main():
         px = ic.getpixel((350, 850))
         assert px[3] > 0, px  # частично непрозрачна (≈160 по построению)
         assert not (px[0] > 150 and px[2] > 150 and px[1] < 100), px  # розовость подавлена
+        # приглушённая маджента с виньеткой (как её реально рисует модель):
+        # ключ и пороги оцениваются по картинке, фон обязан выкоситься полностью
+        v = os.path.join(d, 'v.png')
+        vim = Image.new('RGB', (400, 600))
+        vpx = vim.load()
+        for x in range(400):
+            for y in range(600):
+                t = (x / 399 + y / 599) / 2
+                vpx[x, y] = (int(166 + t * 58), int(22 + t * 26), int(109 + t * 47))
+        for x in range(150, 250):
+            for y in range(200, 560):
+                vpx[x, y] = (90, 70, 50)
+        vim.save(v)
+        outv = os.path.join(d, 'outv')
+        subprocess.run([sys.executable, 'tools/postprocess.py', 'character', '--out-dir', outv, '--size', '700x900',
+                        '--chroma', 'FF00FF', f'z_idle={v}'], capture_output=True, text=True, check=True)
+        iv = Image.open(os.path.join(outv, 'z_idle.webp')).convert('RGBA')
+        assert iv.getpixel((5, 5))[3] == 0, iv.getpixel((5, 5))
+        assert iv.getpixel((350, 850))[3] > 200, iv.getpixel((350, 850))
         # plain
         big = os.path.join(d, 'bg.png'); Image.new('RGB', (2048, 1536), (10, 20, 30)).save(big)
         outbg = os.path.join(d, 'bg.webp')

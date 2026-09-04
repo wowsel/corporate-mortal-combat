@@ -4,7 +4,7 @@
 character: хромакей + общий кроп нескольких поз одного персонажа + якорь.
 plain:     cover-кроп до размера + WebP.
 """
-import argparse, json, os
+import argparse, json, os, sys
 import numpy as np
 from PIL import Image, ImageFilter
 
@@ -21,27 +21,74 @@ def rgb_to_ycbcr(arr):
     return y, cb, cr
 
 
-def chroma_key(img, key_rgb, near=45.0, far=115.0):
+def border_frame_mask(shape, frac=0.03):
+    """Булева маска внешней рамки шириной frac от стороны (минимум 1 px)."""
+    h, w = shape[:2]
+    bw = max(1, int(round(frac * w))); bh = max(1, int(round(frac * h)))
+    m = np.zeros((h, w), dtype=bool)
+    m[:bh, :] = True; m[-bh:, :] = True; m[:, :bw] = True; m[:, -bw:] = True
+    return m
+
+
+def hue_class(key_rgb):
+    """'magenta' | 'green' | None — по относительному соотношению каналов ключа."""
+    r, g, b = (float(v) for v in key_rgb)
+    if min(r, b) > g + 30:
+        return 'magenta'
+    if g > max(r, b) + 30:
+        return 'green'
+    return None
+
+
+def estimate_key(arr, hint_rgb, frac=0.03):
+    """Оценивает реальный цвет фона как медиану рамки и валидирует его подсказкой.
+
+    Модель почти никогда не рисует ровный #FF00FF: получается приглушённая маджента
+    с виньеткой. Поэтому ключ берём из самой картинки, а --chroma используем только
+    как sanity-подсказку: если оценка ушла дальше 90 единиц CbCr от подсказки,
+    значит фон не хромакейный — предупреждаем и работаем по подсказке.
+    """
+    m = border_frame_mask(arr.shape, frac)
+    est = np.median(arr[m], axis=0)
+    hint = np.array(hint_rgb, dtype=np.float32)
+    ecb, ecr = rgb_to_ycbcr(est.reshape(1, 1, 3))[1:]
+    hcb, hcr = rgb_to_ycbcr(hint.reshape(1, 1, 3))[1:]
+    d = float(np.sqrt((ecb - hcb) ** 2 + (ecr - hcr) ** 2).reshape(-1)[0])
+    if d > 90.0:
+        sys.stderr.write(
+            f'warning: estimated background {tuple(int(v) for v in est)} is {d:.0f} CbCr units '
+            f'from the hinted chroma {tuple(int(v) for v in hint)}; falling back to the hint\n')
+        return hint, m
+    return est.astype(np.float32), m
+
+
+def chroma_key(img, key_rgb, near=None, far=None):
     """Возвращает RGBA: маска по расстоянию в CbCr до ключа, мягкая кромка, despill.
 
-    Расстояние в CbCr от чистой мадженты до нейтрального серого ≈ 136; near/far ≈ 1/3 и 5/6
-    от него, чтобы сглаженная кромка «50% фон + 50% субъект» (≈68) получила alpha ≈ 0.3, а не 0.95.
+    Ключ оценивается по самой картинке (медиана рамки), пороги — адаптивные:
+    near = p99(расстояний пикселей рамки до ключа) + 8, far = near + 45.
+    near/far можно задать явно (CLI --near/--far) — тогда адаптив не используется.
     """
     arr = np.asarray(img.convert('RGB')).astype(np.float32)
+    key, border = estimate_key(arr, key_rgb)
     _, cb, cr = rgb_to_ycbcr(arr)
-    kcb, kcr = rgb_to_ycbcr(np.array(key_rgb, dtype=np.float32).reshape(1, 1, 3))[1:]
+    kcb, kcr = rgb_to_ycbcr(key.reshape(1, 1, 3))[1:]
     dist = np.sqrt((cb - kcb) ** 2 + (cr - kcr) ** 2)
+    if near is None:
+        near = float(np.percentile(dist[border], 99)) + 8.0
+    if far is None:
+        far = near + 45.0
     alpha = np.clip((dist - near) / (far - near), 0.0, 1.0)
     r, g, b = arr[..., 0], arr[..., 1], arr[..., 2]
-    kr, kg, kb = key_rgb
-    # despill только там, где цвет действительно «маджентовый» (оба канала ключа выше третьего);
+    # despill только там, где ключ действительно «маджентовый» (оба канала ключа выше третьего);
     # красный галстук (200,40,40) или твид (150,110,80) не трогаем: у них min(r,b) <= g → spill = 0
-    if kr > 128 and kb > 128 and kg < 128:
+    cls = hue_class(key)
+    if cls == 'magenta':
         spill = np.clip((np.minimum(r, b) - g) / 60.0, 0.0, 1.0)
         lim = g + (np.maximum(r, b) - g) * 0.35
         r = r * (1 - spill) + np.minimum(r, lim) * spill
         b = b * (1 - spill) + np.minimum(b, lim) * spill
-    elif kg > 128 and kr < 128:  # зелёный ключ
+    elif cls == 'green':
         spill = np.clip((g - np.maximum(r, b)) / 60.0, 0.0, 1.0)
         lim = (r + b) / 2 + (g - (r + b) / 2) * 0.35
         g = g * (1 - spill) + np.minimum(g, lim) * spill
@@ -68,7 +115,7 @@ def do_character(args):
     items = []
     for spec in args.items:
         aid, path = spec.split('=', 1)
-        rgba = chroma_key(Image.open(path), key)
+        rgba = chroma_key(Image.open(path), key, args.near, args.far)
         if args.flip:
             rgba = rgba.transpose(Image.FLIP_LEFT_RIGHT)
         items.append((aid, rgba, alpha_bbox(rgba)))
@@ -128,6 +175,7 @@ def main():
     c = sub.add_parser('character')
     c.add_argument('--out-dir', required=True); c.add_argument('--size', default='700x900')
     c.add_argument('--chroma', default='FF00FF'); c.add_argument('--flip', type=int, default=0)
+    c.add_argument('--near', type=float, default=None); c.add_argument('--far', type=float, default=None)
     c.add_argument('--quality', type=int, default=80); c.add_argument('items', nargs='+')
     c.set_defaults(fn=do_character)
     q = sub.add_parser('plain')
