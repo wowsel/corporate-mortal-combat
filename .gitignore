@@ -7,3 +7,4 @@ dist/
 .playwright-mcp/
 public/assets/**/*.tmp
 __pycache__/
+.superpowers/

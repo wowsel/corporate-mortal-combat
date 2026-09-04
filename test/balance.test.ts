@@ -4,8 +4,10 @@ import { summarize } from '../tools/simulate';
 
 describe('balance', () => {
   const n = CONTENT.ranks.length;
+  // одна симуляция на describe: summarize сеет rng заново, повторный вызов дал бы те же числа
+  const best = summarize(CONTENT.ranks, 'best', 'weakness', 300);
   it('правильная стратегия: каждый босс ≥ 60% с первого раза, два последних снимают 60–90 уверенности, промоушен ≥ 50%', () => {
-    const s = summarize(CONTENT.ranks, 'best', 'weakness', 300);
+    const s = best;
     s.bosses.forEach((b, k) => {
       expect(b.firstTryWin, b.boss).toBeGreaterThanOrEqual(0.6);
       // Ранние боссы могут браться в 100% — это дизайн. Для двух последних угроза измеряется не долей
@@ -14,8 +16,9 @@ describe('balance', () => {
       if (k >= n - 2) {
         const boss = CONTENT.ranks[k]!.boss;
         const absorbed = (b.avgTurns - 1) * 1.125 * (boss.attack + b.avgStress * 0.05);
-        expect(absorbed, `${b.boss} absorbed`).toBeGreaterThanOrEqual(60);
-        expect(absorbed, `${b.boss} absorbed`).toBeLessThanOrEqual(90);
+        const why = `${b.boss} absorbed=${absorbed.toFixed(1)} turns=${b.avgTurns.toFixed(2)} attack=${boss.attack} stress=${b.avgStress.toFixed(1)}`;
+        expect(absorbed, why).toBeGreaterThanOrEqual(60);
+        expect(absorbed, why).toBeLessThanOrEqual(90);
       }
     });
     expect(s.promotionRate).toBeGreaterThanOrEqual(0.5);
@@ -26,8 +29,12 @@ describe('balance', () => {
     expect(s.bosses[0]!.firstTryWin).toBeGreaterThanOrEqual(0.3);
     expect(s.bosses[n - 1]!.firstTryWin).toBeLessThanOrEqual(0.2);
   });
+  it('Fatality достижима намеренно ослабленными ходами у финального босса', () => {
+    const s = summarize(CONTENT.ranks, 'best', 'fatality', 300);
+    expect(s.fatalityRate).toBeGreaterThanOrEqual(0.9);
+  });
   it('бой при слабости длится 3–9 ходов', () => {
-    const s = summarize(CONTENT.ranks, 'best', 'weakness', 300);
+    const s = best;
     for (const b of s.bosses) { expect(b.avgTurns, b.boss).toBeGreaterThanOrEqual(3); expect(b.avgTurns, b.boss).toBeLessThanOrEqual(9); }
   });
 });

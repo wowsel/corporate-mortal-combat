@@ -55,7 +55,8 @@ export interface Rank {
 export type EndingId = 'promotion' | 'burnout' | 'fatality';
 /** Карточка под текстом концовки: кто и что сказал напоследок. */
 export interface Epilogue { name: string; portrait: string; text: string }
-/** Вариант концовки по флагу: перекрывает поля базовой концовки, первый подходящий выигрывает. */
+/** Вариант концовки по флагу: перекрывает поля базовой концовки, первый подходящий выигрывает.
+ *  Иллюстрация не перекрывается: одна картинка на id концовки. */
 export interface EndingVariant { requiresFlag: string; title?: string; text?: string; epilogue?: Epilogue }
 export interface Ending {
   id: EndingId;
